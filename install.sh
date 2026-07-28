@@ -4,7 +4,7 @@
 
 set -e
 
-REPO_URL="https://github.com/e2ret/NOEMA-RNSGate.git"
+REPO_URL="https://github.com/e2ret/NOEMA-RNSGate-Lite.git"
 INSTALL_DIR="$HOME/NOEMA-RNSGate"
 RNS_CONFIG_DIR="$HOME/.reticulum"
 LXMF_TOOLS_DIR="$HOME/lxmf-tools"
@@ -333,7 +333,7 @@ install_service "nomadnet" \
     "$CURRENT_HOME" \
     "network.target rnsd.service"
 
-SERVICES_LIST="$SERVICES_LIST nomadnet"
+SERVICES_LIST="$SERVICES_LIST nomadnet rbrowser"
 
 sudo systemctl daemon-reload
 sudo systemctl enable $SERVICES_LIST
