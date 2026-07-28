@@ -261,8 +261,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
     <div class="nav-item active" onclick="nav('services',this)">Services</div>
     <div class="nav-item"       onclick="nav('configs',this)">Configs</div>
     <div class="nav-item"       onclick="nav('addresses',this);loadAddressesPanel();">Addresses</div>
-    <div class="nav-sep">messenger</div>
-    <div class="nav-item"       onclick="nav('chat',this)">LXMF Chat <span id="chat-badge" style="display:none;background:#f87171;color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;margin-left:4px">0</span></div>
+
     <div class="nav-sep">monitoring</div>
     <div class="nav-item"       onclick="nav('monitor',this)">Monitoring</div>
     <div class="nav-sep">network</div>
@@ -411,43 +410,6 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
       </div>
     </div>
 
-    <!-- CHAT -->
-    <div class="panel" id="panel-chat">
-      <div style="display:flex;flex:1;min-height:0;gap:0;border:1px solid var(--bd);border-radius:12px;overflow:hidden">
-        <div style="width:200px;background:var(--s2);border-right:1px solid var(--bd);display:flex;flex-direction:column;flex-shrink:0">
-          <div style="padding:10px 12px;border-bottom:1px solid var(--bd);font-size:10px;color:var(--purple);letter-spacing:.08em;text-transform:uppercase;font-weight:600">Contacts</div>
-          <div style="flex:1;overflow-y:auto" id="chat-contacts-list"></div>
-          <div style="padding:8px">
-            <div style="font-size:10px;color:var(--mu);margin-bottom:4px">My address:</div>
-            <div style="font-size:9px;color:var(--teal);word-break:break-all;line-height:1.4;cursor:pointer" id="chat-my-addr" title="Click to copy" onclick="navigator.clipboard.writeText(this.innerText)">—</div>
-            <div style="font-size:10px;color:var(--mu);margin-top:6px;margin-bottom:2px">👥 Group:</div>
-            <div style="font-size:9px;color:var(--green);word-break:break-all;line-height:1.4;cursor:pointer" id="chat-group-addr" title="Click to copy" onclick="navigator.clipboard.writeText(this.innerText)">—</div>
-            <div style="margin-top:6px;display:flex;gap:4px">
-              <input id="new-contact-addr" placeholder="address" style="flex:1;background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:4px 6px;font-size:10px;color:var(--tx);font-family:var(--fn)">
-              <input id="new-contact-name" placeholder="name" style="width:50px;background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:4px 6px;font-size:10px;color:var(--tx);font-family:var(--fn)">
-            </div>
-            <button class="btn ok" onclick="addChatContact()" style="width:100%;margin-top:4px;font-size:10px">+ add</button>
-          </div>
-        </div>
-        <div style="flex:1;display:flex;flex-direction:column;background:var(--bg)">
-          <div style="padding:10px 14px;border-bottom:1px solid var(--bd);background:var(--s1);display:flex;align-items:center;justify-content:space-between">
-            <div>
-              <div style="font-size:13px;font-weight:700;color:var(--tx);cursor:pointer" id="chat-peer-name" onclick="renameChatContact()" title="Click to rename">Select contact</div>
-              <div style="font-size:10px;color:var(--teal)" id="chat-peer-addr">—</div>
-            </div>
-            <button class="btn er" onclick="removeChatContact()" id="chat-remove-btn" style="display:none;font-size:10px">✕</button>
-          </div>
-          <div style="flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:8px" id="chat-messages"></div>
-          <div style="padding:10px 12px;border-top:1px solid var(--bd);background:var(--s1);display:flex;gap:8px">
-            <input type="file" id="chat-file-input" style="display:none" onchange="uploadChatFile(this)">
-            <button class="btn" onclick="document.getElementById('chat-file-input').click()" style="border-radius:20px;padding:7px 10px;font-size:14px" title="Attach file">📎</button>
-            <input id="chat-input" placeholder="Message..." style="flex:1;background:var(--bg);border:1px solid var(--bd);border-radius:20px;padding:7px 14px;font-size:12px;color:var(--tx);font-family:var(--fn)" onkeydown="if(event.key==='Enter')sendChatMsg()">
-            <button class="btn pr" onclick="sendChatMsg()" style="border-radius:20px;padding:7px 16px">▶</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- MONITOR -->
     <div class="panel" id="panel-monitor">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;flex:1;min-height:0">
@@ -566,22 +528,6 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
         <button class="btn" onclick="apCopy('ap-lxmf-bridge')" style="font-size:11px">📋 Copy</button>
       </div>
 
-      <!-- LXMF Chat -->
-      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;margin-bottom:12px">
-        <div style="font-size:11px;color:var(--mu);margin-bottom:4px">🔹 LXMF Chat</div>
-        <div style="font-size:10px;color:var(--mu);margin-bottom:6px">Встроенный мессенджер дашборда. Добавь в контакты чтобы писать владельцу шлюза.</div>
-        <div id="ap-lxmf-chat" style="font-family:var(--fn);font-size:12px;color:var(--teal);word-break:break-all;margin-bottom:8px">—</div>
-        <button class="btn" onclick="apCopy('ap-lxmf-chat')" style="font-size:11px">📋 Copy</button>
-      </div>
-
-      <!-- Group Chat -->
-      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;margin-bottom:12px">
-        <div style="font-size:11px;color:var(--mu);margin-bottom:4px">👥 Групповой чат (LXMF)</div>
-        <div style="font-size:10px;color:var(--mu);margin-bottom:6px">Отправь /join чтобы присоединиться. Команды: /join /leave /members /help</div>
-        <div id="ap-group-chat" style="font-family:var(--fn);font-size:12px;color:var(--teal);word-break:break-all;margin-bottom:8px">—</div>
-        <button class="btn" onclick="apCopy('ap-group-chat')" style="font-size:11px">📋 Copy</button>
-      </div>
-
       <!-- I2P -->
       <div style="background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;margin-bottom:12px">
         <div style="font-size:11px;color:var(--mu);margin-bottom:4px">🔹 I2P адрес (b32)</div>
@@ -657,34 +603,6 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
 
     <!-- RMAP -->
     <div class="panel" id="panel-rmap">
-      <div style="display:grid;grid-template-columns:1fr 300px;gap:16px">
-      <div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-        <div class="section-lbl" style="margin:0">Network Nodes</div>
-        <div style="display:flex;gap:6px">
-          <button class="btn ok" onclick="loadRmapNodes()" style="font-size:10px">↻ refresh</button>
-          <a href="https://rmap.world" target="_blank" class="btn" style="text-decoration:none;font-size:10px">RMAP</a>
-          <a href="https://directory.rns.recipes" target="_blank" class="btn" style="text-decoration:none;font-size:10px">📋 Directory</a>
-        </div>
-      </div>
-      <div style="background:var(--s1);border:1px solid var(--bd);border-radius:12px;overflow:hidden;position:relative;height:400px" id="rmap-canvas">
-        <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(45,212,191,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(45,212,191,.04) 1px,transparent 1px);background-size:40px 40px"></div>
-        <svg id="rmap-lines" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"></svg>
-        <div id="rmap-markers"></div>
-        <div id="rmap-popup" style="position:absolute;background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:10px 14px;font-size:11px;color:var(--tx);min-width:180px;z-index:10;pointer-events:none;display:none;font-family:var(--fn)">
-          <div id="rp-name" style="font-weight:700;font-size:13px;margin-bottom:6px;color:var(--teal)"></div>
-          <div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="color:var(--mu)">Host:</span><span id="rp-host"></span></div>
-          <div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="color:var(--mu)">Port:</span><span id="rp-port"></span></div>
-          <div style="display:flex;justify-content:space-between"><span style="color:var(--mu)">Status:</span><span id="rp-status"></span></div>
-        </div>
-        <div id="rmap-stats" style="position:absolute;top:12px;left:12px;background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:6px 12px;font-size:11px;color:var(--mu);font-family:var(--fn)">click ↻ refresh</div>
-        <div style="position:absolute;bottom:12px;left:12px;background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:8px 12px;font-size:10px;color:var(--mu);font-family:var(--fn)">
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px"><div style="width:9px;height:9px;border-radius:50%;background:#60a5fa"></div>My Gateway</div>
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px"><div style="width:9px;height:9px;border-radius:50%;background:#4ade9a"></div>Online</div>
-          <div style="display:flex;align-items:center;gap:6px"><div style="width:9px;height:9px;border-radius:50%;background:#555"></div>Offline</div>
-        </div>
-      </div>
-      </div>
       <!-- Right column: Public Nodes -->
       <div>
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
@@ -725,33 +643,6 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
         <button class="btn ok" onclick="showBackupModal()">⬇ download backup</button>
         <button class="btn wr" onclick="showRestoreModal()">↑ restore</button>
       </div>
-      <div class="section-lbl">Chat files</div>
-      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:10px 14px;margin-bottom:12px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <div style="font-size:12px;color:var(--tx)">Used: <span id="files-size" style="color:var(--teal)">—</span> / <span id="files-max">100</span> MB</div>
-          <div style="display:flex;gap:6px">
-            <input id="files-max-input" type="number" value="100" min="10" max="10000" style="width:60px;background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:3px 6px;font-size:11px;color:var(--tx);font-family:var(--fn)">
-            <button class="btn ok" onclick="setFilesLimit()" style="font-size:10px">✓ limit</button>
-            <button class="btn er" onclick="showClearFilesModal()" style="font-size:10px">🗑 clear</button>
-          </div>
-        </div>
-        <div id="files-list" style="max-height:200px;overflow-y:auto;font-size:11px"></div>
-      </div>
-
-      <div class="section-lbl">Chat History</div>
-      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:10px 14px;margin-bottom:12px">
-        <div style="font-size:12px;color:var(--mu);margin-bottom:10px">Clear chat history</div>
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          <select id="chat-clear-days" style="background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:4px 8px;font-size:11px;color:var(--tx);font-family:var(--fn)">
-            <option value="0">all history</option>
-            <option value="7">older than 7 days</option>
-            <option value="30">older than 30 days</option>
-            <option value="90">older than 90 days</option>
-          </select>
-          <button class="btn er" onclick="showClearChatModal()" style="font-size:10px">🗑 clear</button>
-        </div>
-      </div>
-
       <div class="section-lbl">Quick Commands</div>
       <div style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:10px 14px;margin-bottom:12px">
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
@@ -1358,7 +1249,7 @@ async function loadChat(){
   const r = await fetch(API+"/api/chat/address");
   const d = await r.json();
   if(d.address) document.getElementById("chat-my-addr").textContent = d.address;
-  fetch(API+"/api/addresses").then(r=>r.json()).then(ad=>{ const ga=document.getElementById("chat-group-addr"); if(ga) ga.textContent=ad.group_chat||"—"; });
+
   const cr = await fetch(API+"/api/chat/contacts");
   chatContacts = await cr.json();
   renderChatContacts();
@@ -1890,12 +1781,8 @@ async function loadAddressesPanel(){
   try{
     const d = await fetch(API+"/api/addresses").then(r=>r.json());
     if(d.lxmf_bridge) document.getElementById("ap-lxmf-bridge").textContent = d.lxmf_bridge;
-    if(d.group_chat)  document.getElementById("ap-group-chat").textContent  = d.group_chat;
   }catch(e){}
-  try{
-    const d = await fetch(API+"/api/chat/address").then(r=>r.json());
-    if(d.address) document.getElementById("ap-lxmf-chat").textContent = d.address;
-  }catch(e){}
+
   try{
     const d = await fetch(API+"/api/nomadnet/status").then(r=>r.json());
     if(d.page_addr){

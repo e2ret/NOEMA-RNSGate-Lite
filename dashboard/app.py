@@ -24,7 +24,7 @@ def _find_rns_bin(name):
     return found or name
 _RNS_BIN = os.path.dirname(_find_rns_bin("rnstatus"))
 
-SERVICES = ["lxmf_bridge_mqtt", "rnsd", "i2pd", "lxmf_group_chat", "nomadnet"]
+SERVICES = ["lxmf_bridge_mqtt", "rnsd", "i2pd", "nomadnet", "rbrowser"]
 
 NOMADNET_PAGE = f"{_HOME}/.nomadnetwork/storage/pages/index.mu"
 NOMADNET_ADDR_FILE = f"{_HOME}/.nomadnetwork/storage/hashes"
@@ -286,11 +286,6 @@ def addresses():
     addrs = {}
     try:
         addrs["lxmf_bridge"] = open(f"{_HOME}/lxmf-tools/lxmf_address").read().strip()
-    except: pass
-    try:
-        out, rc = sh(f"sudo journalctl -u lxmf_group_chat -n 50 --no-pager | grep -m1 'GROUP. Address' | grep -oP '<\\K[0-9a-f]+(?=>)'")
-        if rc == 0 and out.strip():
-            addrs["group_chat"] = out.strip()
     except: pass
     return jsonify(addrs)
 
@@ -1015,9 +1010,7 @@ def reset_identity():
             p = os.path.join(_HOME, f)
             if os.path.exists(p): os.remove(p)
         # Remove group chat identity
-        group_chat_dir = os.path.join(_HOME, ".lxmf_group_chat")
-        if os.path.exists(group_chat_dir):
-            shutil.rmtree(group_chat_dir)
+
         # Remove Nomadnet identity (keep pages)
         nn_storage = os.path.join(_HOME, ".nomadnetwork/storage")
         nn_addr = os.path.join(_HOME, ".nomadnetwork/node_address")
@@ -1065,4 +1058,4 @@ def index(): return send_from_directory(".", "index.html")
 
 if __name__ == "__main__":
     print("▶ http://0.0.0.0:8081")
-    app.run(host="0.0.0.0", port=8081)
+    app.run(host="0.0.0.0", port=8081, threaded=True)
