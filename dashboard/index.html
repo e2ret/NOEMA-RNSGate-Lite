@@ -1,1 +1,2025 @@
+<!DOCTYPE html>
+<html lang="ru" style="background:#0b1220">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NOEMA RNSGate</title>
+<link rel="icon" href="logo.png" type="image/png">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
+:root{
+  --bg:#0b1220;
+  --s1:rgba(17,24,39,.55);
+  --s2:rgba(31,41,55,.65);
+  --s3:rgba(51,65,85,.9);
+  --bd:rgba(148,163,184,.12);
+  --tx:#f8fafc;
+  --mu:#94a3b8;
+  --gr:#14b8a6;
+  --am:#f59e0b;
+  --rd:#ef4444;
+  --bl:#3b82f6;
+  --teal:#14b8a6;
+  --purple:#8b5cf6;
+  --fn:'Inter',system-ui,sans-serif;
+  --mono:'JetBrains Mono',monospace;
+  --shadow:0 10px 30px rgba(0,0,0,.25),0 1px 0 rgba(255,255,255,.03);
+  --radius:16px
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+
+body{
+  background:transparent;
+  color:var(--tx);
+  font-family:var(--fn);
+  font-size:14px;
+  line-height:1.5;
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased
+}
+
+.shell{display:grid;grid-template-rows:auto auto 1fr;height:100vh}
+
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 24px;
+  background:transparent;
+  border-bottom:1px solid var(--bd);
+  flex-wrap:wrap;gap:8px
+}
+
+.logo{font-size:16px;font-weight:700;color:var(--teal);letter-spacing:.01em;font-family:var(--fn)}
+.logo b{color:var(--tx)}
+
+.pill{
+  display:flex;align-items:center;gap:6px;
+  padding:6px 14px;border-radius:10px;
+  border:1px solid var(--bd);
+  background:rgba(31,41,55,.6);
+  backdrop-filter:blur(10px);
+  color:var(--tx);font-size:12px;cursor:pointer;
+  font-family:var(--mono);
+  transition:all .2s
+}
+.pill:hover{border-color:rgba(20,184,166,.3);background:rgba(31,41,55,.9)}
+
+.dot{width:7px;height:7px;border-radius:50%;background:var(--gr)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.dot{animation:blink 2s infinite}
+
+.metrics{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(110px,1fr));
+  gap:10px;padding:14px 24px;
+  background:rgba(11,18,32,.35);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--bd)
+}
+
+.mc{
+  background:var(--s1);
+  backdrop-filter:blur(20px);
+  border:1px solid var(--bd);
+  border-radius:18px;
+  padding:16px;
+  transition:.25s;
+  box-shadow:var(--shadow)
+}
+.mc:hover{transform:translateY(-2px);border-color:rgba(20,184,166,.2)}
+.mc .lb{color:var(--mu);font-size:11px;text-transform:uppercase;letter-spacing:.12em;font-weight:600;margin-bottom:8px;font-family:var(--mono)}
+.mc .vl{font-size:28px;font-weight:700;line-height:1;font-family:var(--mono)}
+
+.g{color:var(--gr)}.a{color:var(--am)}.r{color:var(--rd)}.b{color:var(--bl)}
+
+.body{display:grid;grid-template-columns:210px 1fr;overflow:hidden;height:100%}
+
+.sidebar{
+  background:rgba(11,18,32,.35);
+  backdrop-filter:blur(16px);
+  border-right:1px solid var(--bd);
+  overflow-y:auto;
+  padding:12px
+}
+
+.nav-sep{
+  font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--mu);padding:10px 14px 3px;font-weight:600;opacity:.4
+}
+
+.nav-item{
+  display:flex;align-items:center;gap:8px;
+  padding:6px 14px;margin-bottom:1px;
+  cursor:pointer;color:var(--mu);
+  transition:.2s;
+  border-radius:12px;
+  border:1px solid transparent;
+  font-size:15px;font-weight:500
+}
+.nav-item:hover{color:var(--tx);background:rgba(255,255,255,.04)}
+.nav-item.active{
+  color:#fff;
+  background:rgba(20,184,166,.15);
+  border-color:rgba(20,184,166,.25);
+  font-weight:600
+}
+
+.main{overflow-y:auto;padding:24px 28px;background:transparent;display:flex;flex-direction:column}
+.panel{display:none}.panel.active{display:flex;flex-direction:column;flex:1;min-height:0}
+
+.btn{
+  font-size:12px;padding:8px 16px;
+  border-radius:10px;
+  border:1px solid var(--bd);
+  background:rgba(31,41,55,.8);
+  cursor:pointer;color:var(--tx);
+  font-family:var(--fn);font-weight:500;
+  transition:all .2s
+}
+.btn:hover{transform:translateY(-1px);background:var(--s3);border-color:rgba(148,163,184,.25)}
+.btn.ok{background:rgba(20,184,166,.15);color:var(--gr);border-color:rgba(20,184,166,.25)}
+.btn.ok:hover{background:rgba(20,184,166,.25)}
+.btn.wr{background:rgba(245,158,11,.12);color:var(--am);border-color:rgba(245,158,11,.25)}
+.btn.wr:hover{background:rgba(245,158,11,.22)}
+.btn.er{background:rgba(239,68,68,.12);color:var(--rd);border-color:rgba(239,68,68,.25)}
+.btn.er:hover{background:rgba(239,68,68,.22)}
+.btn.pr{background:var(--teal);color:#fff;border:none;font-weight:600;box-shadow:0 4px 14px rgba(20,184,166,.35)}
+.btn.pr:hover{filter:brightness(1.1);box-shadow:0 6px 20px rgba(20,184,166,.45)}
+
+.brow{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+
+.svc{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--bd)}
+.svc:last-child{border-bottom:none}
+.svc-n{font-size:14px;font-weight:600;font-family:var(--mono);color:var(--tx)}
+
+.badge{font-size:11px;padding:4px 10px;border-radius:8px;font-weight:600;letter-spacing:.03em}
+.badge.active{background:rgba(20,184,166,.15);color:var(--gr);border:1px solid rgba(20,184,166,.25)}
+.badge.inactive,.badge.failed{background:rgba(239,68,68,.15);color:var(--rd);border:1px solid rgba(239,68,68,.25)}
+
+.log-toolbar{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.log-box{
+  background:var(--s1);backdrop-filter:blur(20px);
+  border:1px solid var(--bd);border-radius:var(--radius);
+  padding:14px 16px;flex:1;min-height:0;overflow-y:auto;
+  line-height:1.8;font-size:12px;font-family:var(--mono);
+  box-shadow:var(--shadow)
+}
+.ll{color:var(--tx)}.ll.err{color:var(--rd)}.ll.warn{color:var(--am)}.ll.ok{color:var(--gr)}
+
+select{
+  font-family:var(--fn);font-size:13px;padding:6px 12px;
+  background:var(--s2);border:1px solid var(--bd);
+  border-radius:10px;color:var(--tx)
+}
+
+.cfg-tabs{display:flex;gap:2px;margin-bottom:12px;border-bottom:1px solid var(--bd)}
+.ctab{font-size:12px;padding:8px 16px;cursor:pointer;color:var(--mu);border-bottom:2px solid transparent;margin-bottom:-1px;font-weight:500}
+.ctab.active{color:var(--teal);border-bottom-color:var(--teal);font-weight:600}
+.ctab:hover:not(.active){color:var(--tx)}
+.cfg-path{font-size:11px;color:var(--mu);margin-bottom:8px;font-family:var(--mono)}
+
+textarea{
+  width:100%;background:var(--s1);border:1px solid var(--bd);
+  border-radius:var(--radius);padding:14px 16px;
+  color:var(--tx);font-family:var(--mono);font-size:12px;
+  line-height:1.7;resize:vertical;flex:1;min-height:200px;
+  backdrop-filter:blur(20px)
+}
+textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(20,184,166,.1)}
+
+.pb{height:4px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;margin-top:8px}
+.pbf{height:100%;border-radius:4px;background:var(--gr);transition:width .4s}
+.pbf.a{background:var(--am)}.pbf.r{background:var(--rd)}
+
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  background:var(--teal);color:#fff;
+  font-size:12px;font-weight:600;padding:10px 24px;
+  border-radius:12px;opacity:0;transition:opacity .2s;
+  pointer-events:none;z-index:9999;
+  box-shadow:0 8px 24px rgba(20,184,166,.35)
+}
+.toast.show{opacity:1}
+
+.lxmf-toolbar{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.lxmf-box{
+  background:var(--s1);backdrop-filter:blur(20px);
+  border:1px solid var(--bd);border-radius:var(--radius);
+  padding:14px 16px;flex:1;min-height:0;overflow-y:auto;
+  line-height:1.8;font-size:13px;box-shadow:var(--shadow)
+}
+.lm{padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.lm:last-child{border-bottom:none}
+.lm .ts{color:var(--mu);margin-right:8px;font-family:var(--mono)}
+
+.section-lbl{
+  font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--teal);margin-bottom:14px;font-weight:700
+}
+
+#qr-modal{
+  display:none;position:fixed;top:0;left:0;width:100%;height:100%;
+  background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:999;
+  align-items:center;justify-content:center;flex-direction:column;gap:16px
+}
+
+@keyframes rmap-ring{0%{transform:scale(1);opacity:.7}100%{transform:scale(2.8);opacity:0}}
+</style>
+</head>
+<body>
+<canvas id="bg-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none"></canvas>
+<div class="shell">
+<div class="topbar">
+  <div>
+    <div class="logo" style="display:flex;align-items:center;gap:10px"><img src="logo.png" style="height:36px;width:36px;object-fit:contain;border-radius:6px"><b>NOEMA RNSGate</b></div>
+    <div style="font-size:11px;color:var(--mu);margin-top:2px" id="uptime-lbl">—</div>
+    <div style="font-size:11px;color:var(--mu);margin-top:1px" id="rns-ver-lbl">—</div>
+    <div style="font-size:11px;color:var(--mu);margin-top:1px" id="clock-lbl">—</div>
+  </div>
+  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+    <div style="display:flex;gap:6px;align-items:center">
+      <div class="pill"><div class="dot" id="dot"></div><span id="ip-lbl">—</span></div>
+      <button class="btn ok" onclick="refreshAll()">↻</button>
+    </div>
+    <div class="pill" onclick="showQR()" title="LXMF Bridge">LXMF <span id="lxmf-addr-lbl">—</span></div>
+  </div>
+</div>
+<div class="metrics">
+  <div class="mc"><div class="lb">CPU</div><div class="vl a" id="m-cpu">—</div><div class="pb"><div class="pbf a" id="pb-cpu" style="width:0%"></div></div></div>
+  <div class="mc"><div class="lb">RAM</div><div class="vl" id="m-ram">—</div><div class="pb"><div class="pbf" id="pb-ram" style="width:0%"></div></div></div>
+  <div class="mc"><div class="lb">Disk</div><div class="vl" id="m-disk">—</div><div class="pb"><div class="pbf" id="pb-disk" style="width:0%"></div></div></div>
+  <div class="mc"><div class="lb">Temp.</div><div class="vl a" id="m-temp">—</div></div>
+  <div class="mc"><div class="lb">MQTT broker</div><div class="vl" id="m-mqtt-status">—</div></div>
+  <div class="mc"><div class="lb">LXMF sent</div><div class="vl g" id="m-lxmf-sent">0</div></div>
+  <div class="mc"><div class="lb">LXMF received</div><div class="vl b" id="m-lxmf-recv">0</div></div>
+</div>
+<div class="body">
+  <div class="sidebar">
+    <div class="nav-sep">management</div>
+    <div class="nav-item active" onclick="nav('services',this)">Services</div>
+    <div class="nav-item"       onclick="nav('configs',this)">Configs</div>
+    <div class="nav-item"       onclick="nav('addresses',this);loadAddressesPanel();">Addresses</div>
+    <div class="nav-sep">messenger</div>
+    <div class="nav-item"       onclick="nav('chat',this)">LXMF Chat <span id="chat-badge" style="display:none;background:#f87171;color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;margin-left:4px">0</span></div>
+    <div class="nav-sep">monitoring</div>
+    <div class="nav-item"       onclick="nav('monitor',this)">Monitoring</div>
+    <div class="nav-sep">network</div>
+    <div class="nav-item"       onclick="nav('rnode',this)">RNode</div>
+    <div class="nav-item"       onclick="nav('rmap',this);loadNodesMonitor();">Network</div>
+    <div class="nav-item"       onclick="nav('i2p',this)">I2P</div>
+    <div class="nav-item"       onclick="nav('nomadnet',this);loadNomadnet();">Nomadnet</div>
+    <div class="nav-sep">system</div>
+    <div class="nav-item"       onclick="nav('logs',this)">Logs</div>
+    <div class="nav-item"       onclick="nav('system',this)">System</div>
+  </div>
+  <div class="main">
+
+    <!-- SERVICES -->
+    <div class="panel active" id="panel-services">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
+      <div>
+      <div id="svc-list"></div>
+      <div class="brow">
+        <button class="btn wr" onclick="restartAll()">restart all</button>
+      </div>
+      </div>
+      <div style="margin-top:20px;display:flex;flex-direction:column;gap:16px">
+      <div style="margin-bottom:16px;background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:10px;box-shadow:var(--shadow)">
+        <style>
+          @keyframes mg-flow { to { stroke-dashoffset: -24; } }
+          @keyframes mg-ring { 0%,100%{r:10;opacity:.6} 50%{r:14;opacity:0} }
+          .mg-flow { stroke-dasharray: 6 6; animation: mg-flow 1.4s linear infinite; }
+          .mg-flow.slow { animation-duration: 2.2s; }
+          .mg-flow.off { opacity: 0.15; stroke: #444 !important; animation: none; stroke-dasharray: 4 8; }
+          .mg-nc { transition: all .3s; }
+          .mg-nc.dim { opacity: .25; filter: grayscale(1); }
+          .mg-ring { animation: mg-ring 2s ease-out infinite; }
+          .mg-tbtn { cursor: pointer; }
+          .mg-tbtn rect { transition: fill .15s; }
+          .mg-tbtn:hover rect { fill: #2a2d50 !important; }
+        </style>
+        <svg viewBox="0 0 700 440" style="width:100%;height:auto;max-height:320px;display:block">
+          <defs>
+            <marker id="mg-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </marker>
+          </defs>
+
+          <!-- Lines: all nodes to center hub -->
+          <line id="mg-l-rnode" x1="155" y1="84"  x2="262" y2="142" class="mg-flow slow" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#mg-arr)"/>
+          <line id="mg-l-net"   x1="350" y1="84"  x2="350" y2="142" class="mg-flow slow" stroke="#60a5fa" stroke-width="1.5" marker-end="url(#mg-arr)"/>
+          <line id="mg-l-rns"   x1="155" y1="180" x2="262" y2="180" class="mg-flow" stroke="#2dd4bf" stroke-width="2" marker-end="url(#mg-arr)" marker-start="url(#mg-arr)"/>
+          <line id="mg-l-mqtt"  x1="438" y1="180" x2="545" y2="180" class="mg-flow slow" stroke="#a78bfa" stroke-width="2" marker-end="url(#mg-arr)" marker-start="url(#mg-arr)"/>
+          <line id="mg-l-i2p"   x1="438" y1="218" x2="545" y2="276" class="mg-flow slow" stroke="#34d399" stroke-width="1.5" marker-end="url(#mg-arr)" marker-start="url(#mg-arr)"/>
+
+          <!-- Line labels -->
+          <text x="180" y="105" font-family="Courier New" font-size="10" fill="#fbbf24" text-anchor="middle">LoRa</text>
+          <text x="375" y="115" font-family="Courier New" font-size="10" fill="#60a5fa" text-anchor="middle">announces</text>
+          <text x="208" y="168" font-family="Courier New" font-size="10" fill="#2dd4bf" text-anchor="middle">LXMF</text>
+          <text x="491" y="168" font-family="Courier New" font-size="10" fill="#a78bfa" text-anchor="middle">MQTT</text>
+          <text x="478" y="252" font-family="Courier New" font-size="10" fill="#34d399" text-anchor="middle">I2P</text>
+
+          <!-- Node: RNode (top-left) -->
+          <g class="mg-nc" id="mg-n-rnode">
+            <rect x="20" y="36" width="135" height="78" rx="12" fill="#1a1810" stroke="#fbbf24" stroke-width="1.5"/>
+            <circle cx="87" cy="64" r="9" fill="none" stroke="#fbbf24" stroke-width="0.5" class="mg-ring" style="animation-duration:2.6s"/>
+            <circle cx="87" cy="64" r="5" fill="#fbbf24"><animate attributeName="opacity" values="1;.4;1" dur="2.8s" repeatCount="indefinite"/></circle>
+            <text x="87" y="86" font-family="Courier New" font-size="12" fill="#e8eaf6" font-weight="700" text-anchor="middle">RNode</text>
+            <text x="87" y="101" font-family="Courier New" font-size="9.5" fill="#fbbf24" text-anchor="middle">LoRa 869 MHz</text>
+          </g>
+
+          <!-- Globe: RNS Network (top-right) -->
+          <g class="mg-nc" id="mg-n-net">
+            <rect x="282" y="36" width="135" height="78" rx="12" fill="#10182a" stroke="#60a5fa" stroke-width="1.5"/>
+            <circle cx="350" cy="64" r="16" fill="none" stroke="#60a5fa" stroke-width="1" opacity="0.6"/>
+            <ellipse cx="350" cy="64" rx="16" ry="6" fill="none" stroke="#60a5fa" stroke-width="0.6" opacity="0.5"/>
+            <ellipse cx="350" cy="64" rx="9" ry="16" fill="none" stroke="#60a5fa" stroke-width="0.6" opacity="0.4"/>
+            <circle cx="345" cy="60" r="1.8" fill="#60a5fa"><animate attributeName="opacity" values="0.9;0.2;0.9" dur="2.1s" repeatCount="indefinite"/></circle>
+            <circle cx="357" cy="68" r="1.4" fill="#60a5fa"><animate attributeName="opacity" values="0.7;0.1;0.7" dur="3s" repeatCount="indefinite"/></circle>
+            <text x="350" y="91" font-family="Courier New" font-size="12" fill="#e8eaf6" font-weight="700" text-anchor="middle">RNS Network</text>
+            <text x="350" y="106" font-family="Courier New" font-size="9.5" fill="#60a5fa" text-anchor="middle">public mesh</text>
+          </g>
+
+          <!-- Node: Reticulum (mid-left) -->
+          <g class="mg-nc" id="mg-n-rns">
+            <rect x="20" y="142" width="135" height="78" rx="12" fill="#10201c" stroke="#2dd4bf" stroke-width="1.5"/>
+            <circle cx="87" cy="170" r="14" fill="none" stroke="#2dd4bf" stroke-width="0.5" class="mg-ring"/>
+            <circle cx="87" cy="170" r="7" fill="#2dd4bf"><animate attributeName="opacity" values="1;.5;1" dur="2s" repeatCount="indefinite"/></circle>
+            <text x="87" y="192" font-family="Courier New" font-size="12" fill="#e8eaf6" font-weight="700" text-anchor="middle">Reticulum</text>
+            <text x="87" y="207" font-family="Courier New" font-size="9.5" fill="#2dd4bf" text-anchor="middle" id="mg-rns-status">rnsd · active</text>
+          </g>
+
+          <!-- Node: NOEMA hub (center) -->
+          <g class="mg-nc" id="mg-n-hub">
+            <rect x="262" y="142" width="176" height="78" rx="14" fill="#15241c" stroke="#4ade9a" stroke-width="2"/>
+            <circle cx="350" cy="166" r="16" fill="none" stroke="#4ade9a" stroke-width="0.5" class="mg-ring" style="animation-duration:1.8s"/>
+            <circle cx="350" cy="166" r="8" fill="#4ade9a"><animate attributeName="opacity" values="1;.6;1" dur="1.6s" repeatCount="indefinite"/></circle>
+            <text x="350" y="189" font-family="Courier New" font-size="13" fill="#e8eaf6" font-weight="700" text-anchor="middle">NOEMA RNSGate</text>
+            <text x="350" y="204" font-family="Courier New" font-size="9.5" fill="#8b90c0" text-anchor="middle">lxmf_bridge_mqtt</text>
+            <text x="350" y="216" font-family="Courier New" font-size="9.5" fill="#4ade9a" text-anchor="middle" id="mg-hub-status">● active</text>
+          </g>
+
+          <!-- Node: MQTT Broker (mid-right) -->
+          <g class="mg-nc" id="mg-n-mqtt">
+            <rect x="545" y="142" width="135" height="78" rx="12" fill="#1c1730" stroke="#a78bfa" stroke-width="1.5"/>
+            <circle cx="612" cy="170" r="14" fill="none" stroke="#a78bfa" stroke-width="0.5" class="mg-ring" style="animation-duration:2.4s"/>
+            <circle cx="612" cy="170" r="7" fill="#a78bfa"><animate attributeName="opacity" values="1;.5;1" dur="2.4s" repeatCount="indefinite"/></circle>
+            <text x="612" y="192" font-family="Courier New" font-size="12" fill="#e8eaf6" font-weight="700" text-anchor="middle">MQTT</text>
+            <text x="612" y="207" font-family="Courier New" font-size="9.5" fill="#a78bfa" text-anchor="middle" id="mg-mqtt-status">broker · —</text>
+          </g>
+
+          <!-- Node: I2P (bottom-right) -->
+          <g class="mg-nc" id="mg-n-i2p">
+            <rect x="545" y="238" width="135" height="78" rx="12" fill="#0f211a" stroke="#34d399" stroke-width="1.5"/>
+            <circle cx="612" cy="266" r="14" fill="none" stroke="#34d399" stroke-width="0.5" class="mg-ring" style="animation-duration:2.8s"/>
+            <circle cx="612" cy="266" r="7" fill="#34d399"><animate attributeName="opacity" values="1;.5;1" dur="2.8s" repeatCount="indefinite"/></circle>
+            <text x="612" y="288" font-family="Courier New" font-size="12" fill="#e8eaf6" font-weight="700" text-anchor="middle">I2P</text>
+            <text x="612" y="303" font-family="Courier New" font-size="9.5" fill="#34d399" text-anchor="middle" id="mg-i2p-status">i2pd · —</text>
+          </g>
+
+          <!-- Line: hub to Nomadnet -->
+          <line id="mg-l-nn" x1="350" y1="220" x2="175" y2="358" class="mg-flow slow" stroke="#818cf8" stroke-width="1.5" marker-end="url(#mg-arr)" marker-start="url(#mg-arr)"/>
+          <text x="230" y="308" font-family="Courier New" font-size="10" fill="#818cf8" text-anchor="middle">Nomadnet</text>
+
+          <!-- Node: Nomadnet (bottom-left) -->
+          <g class="mg-nc" id="mg-n-nn">
+            <rect x="105" y="330" width="140" height="78" rx="12" fill="#1a1830" stroke="#818cf8" stroke-width="1.5"/>
+            <circle cx="175" cy="358" r="14" fill="none" stroke="#818cf8" stroke-width="0.5" class="mg-ring" style="animation-duration:3s"/>
+            <circle cx="175" cy="358" r="7" fill="#818cf8"><animate attributeName="opacity" values="1;.5;1" dur="3s" repeatCount="indefinite"/></circle>
+            <text x="175" y="380" font-family="Courier New" font-size="12" fill="#e8eaf6" font-weight="700" text-anchor="middle">Nomadnet</text>
+            <text x="175" y="395" font-family="Courier New" font-size="9.5" fill="#818cf8" text-anchor="middle" id="mg-nn-status">nomadnet · —</text>
+          </g>
+        </svg>
+      </div>
+        <div style="display:none">
+          <div class="section-lbl" style="margin-bottom:8px">Recent messages</div>
+          <div id="home-msgs" style="font-size:12px;line-height:1.9;color:var(--mu);min-height:120px;max-height:200px;overflow-y:auto">no messages</div>
+        </div>
+        <div style="display:none">
+          <div>
+            <div class="section-lbl" style="margin-bottom:8px">Public Nodes</div>
+            <div id="home-nodes" style="font-size:12px;line-height:1.9">—</div>
+          </div>
+          <div style="background:var(--s1);border:1px solid var(--bd);border-radius:8px;padding:10px 14px;box-shadow:var(--shadow)">
+            <div class="section-lbl" style="margin-bottom:8px">RNS interfaces</div>
+            <div id="home-rns" style="font-size:12px;line-height:1.9">—</div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <!-- CHAT -->
+    <div class="panel" id="panel-chat">
+      <div style="display:flex;flex:1;min-height:0;gap:0;border:1px solid var(--bd);border-radius:12px;overflow:hidden">
+        <div style="width:200px;background:var(--s2);border-right:1px solid var(--bd);display:flex;flex-direction:column;flex-shrink:0">
+          <div style="padding:10px 12px;border-bottom:1px solid var(--bd);font-size:10px;color:var(--purple);letter-spacing:.08em;text-transform:uppercase;font-weight:600">Contacts</div>
+          <div style="flex:1;overflow-y:auto" id="chat-contacts-list"></div>
+          <div style="padding:8px">
+            <div style="font-size:10px;color:var(--mu);margin-bottom:4px">My address:</div>
+            <div style="font-size:9px;color:var(--teal);word-break:break-all;line-height:1.4;cursor:pointer" id="chat-my-addr" title="Click to copy" onclick="navigator.clipboard.writeText(this.innerText)">—</div>
+            <div style="font-size:10px;color:var(--mu);margin-top:6px;margin-bottom:2px">👥 Group:</div>
+            <div style="font-size:9px;color:var(--green);word-break:break-all;line-height:1.4;cursor:pointer" id="chat-group-addr" title="Click to copy" onclick="navigator.clipboard.writeText(this.innerText)">—</div>
+            <div style="margin-top:6px;display:flex;gap:4px">
+              <input id="new-contact-addr" placeholder="address" style="flex:1;background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:4px 6px;font-size:10px;color:var(--tx);font-family:var(--fn)">
+              <input id="new-contact-name" placeholder="name" style="width:50px;background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:4px 6px;font-size:10px;color:var(--tx);font-family:var(--fn)">
+            </div>
+            <button class="btn ok" onclick="addChatContact()" style="width:100%;margin-top:4px;font-size:10px">+ add</button>
+          </div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;background:var(--bg)">
+          <div style="padding:10px 14px;border-bottom:1px solid var(--bd);background:var(--s1);display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--tx);cursor:pointer" id="chat-peer-name" onclick="renameChatContact()" title="Click to rename">Select contact</div>
+              <div style="font-size:10px;color:var(--teal)" id="chat-peer-addr">—</div>
+            </div>
+            <button class="btn er" onclick="removeChatContact()" id="chat-remove-btn" style="display:none;font-size:10px">✕</button>
+          </div>
+          <div style="flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:8px" id="chat-messages"></div>
+          <div style="padding:10px 12px;border-top:1px solid var(--bd);background:var(--s1);display:flex;gap:8px">
+            <input type="file" id="chat-file-input" style="display:none" onchange="uploadChatFile(this)">
+            <button class="btn" onclick="document.getElementById('chat-file-input').click()" style="border-radius:20px;padding:7px 10px;font-size:14px" title="Attach file">📎</button>
+            <input id="chat-input" placeholder="Message..." style="flex:1;background:var(--bg);border:1px solid var(--bd);border-radius:20px;padding:7px 14px;font-size:12px;color:var(--tx);font-family:var(--fn)" onkeydown="if(event.key==='Enter')sendChatMsg()">
+            <button class="btn pr" onclick="sendChatMsg()" style="border-radius:20px;padding:7px 16px">▶</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MONITOR -->
+    <div class="panel" id="panel-monitor">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;flex:1;min-height:0">
+        <div style="display:flex;flex-direction:column;background:var(--s1);border:1px solid var(--bd);border-radius:8px;overflow:hidden">
+          <div style="padding:8px 12px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between">
+            <div class="section-lbl" style="margin:0">LXMF Messages</div>
+            <button class="btn" onclick="clearLxmf()" style="font-size:10px">clear</button>
+          </div>
+          <div class="lxmf-box" id="lxmf-box" style="flex:1;height:auto;border-radius:0;border:none"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;background:var(--s1);border:1px solid var(--bd);border-radius:8px;overflow:hidden">
+          <div style="padding:8px 12px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between">
+            <div class="section-lbl" style="margin:0">RNS interfaces</div>
+            <button class="btn ok" onclick="loadRns()" style="font-size:10px">↻ refresh</button>
+          </div>
+          <div id="rns-list" style="font-size:12px;line-height:2;padding:10px 12px;overflow-y:auto;flex:1"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- I2P -->
+    <div class="panel" id="panel-i2p">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div class="section-lbl" style="margin:0">I2P Integration</div>
+        <button class="btn ok" onclick="loadI2pStatus()" style="font-size:10px">↻ refresh</button>
+      </div>
+
+      <!-- Status -->
+      <div id="i2p-status-block" style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:12px 14px;margin-bottom:12px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <div id="i2p-dot" style="width:10px;height:10px;border-radius:50%;background:var(--mu)"></div>
+          <div style="font-size:13px;font-weight:700;color:var(--tx)">i2pd daemon</div>
+          <div id="i2p-status-lbl" style="font-size:11px;color:var(--mu)">unknown</div>
+        </div>
+        <div id="i2p-addr-block" style="display:none">
+          <div style="font-size:10px;color:var(--mu);margin-bottom:4px;text-transform:uppercase;letter-spacing:.07em">I2P Tunnel Address (Reticulum)</div>
+          <div id="i2p-addr" style="font-family:var(--fn);font-size:11px;color:var(--teal);word-break:break-all"></div>
+        </div>
+      </div>
+
+      <!-- Install / Control -->
+      <div class="section-lbl" style="margin-bottom:8px">Daemon Control</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+        <button class="btn ok" onclick="i2pAction('install')" style="font-size:11px">Install i2pd</button>
+        <button class="btn ok" onclick="i2pAction('start')" style="font-size:11px">Start</button>
+        <button class="btn wr" onclick="i2pAction('stop')" style="font-size:11px">Stop</button>
+        <button class="btn wr" onclick="i2pAction('restart')" style="font-size:11px">Restart</button>
+      </div>
+
+      <!-- Reticulum integration -->
+      <div class="section-lbl" style="margin-bottom:8px">Reticulum Interface</div>
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:12px 14px;margin-bottom:12px">
+        <div style="font-size:11px;color:var(--mu);margin-bottom:8px">Add I2P interface to Reticulum config pointing to a remote node:</div>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
+          <input id="i2p-peer-addr" placeholder="xxxxx.b32.i2p" style="flex:1;min-width:200px;background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:6px 10px;color:var(--tx);font-size:12px;font-family:var(--fn)">
+          <input id="i2p-peer-name" placeholder="Interface name" value="I2P-Node" style="width:120px;background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:6px 10px;color:var(--tx);font-size:12px">
+          <button class="btn ok" onclick="i2pAddInterface()" style="font-size:11px">Add to config</button>
+        </div>
+        <div id="i2p-rns-status" style="font-size:11px;color:var(--mu)"></div>
+      </div>
+
+      <!-- Setup tunnel -->
+      <div class="section-lbl" style="margin-bottom:8px">Local Tunnel Setup</div>
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:12px 14px;margin-bottom:12px">
+        <div style="font-size:11px;color:var(--mu);margin-bottom:8px">Create incoming I2P tunnel for this MeshGate (so others can connect anonymously):</div>
+        <button class="btn ok" onclick="i2pAction('setup_tunnel')" style="font-size:11px">Setup Reticulum tunnel in i2pd</button>
+        <div id="i2p-tunnel-result" style="margin-top:8px;font-size:11px;color:var(--teal);font-family:var(--fn)"></div>
+      </div>
+
+      <!-- Output -->
+      <div id="i2p-output" style="font-family:var(--fn);font-size:11px;color:var(--teal);background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:8px 10px;min-height:32px;white-space:pre-wrap;display:none"></div>
+    </div>
+
+    <!-- NOMADNET -->
+    <div class="panel" id="panel-nomadnet">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div class="section-lbl" style="margin:0">Nomadnet Node</div>
+        <button class="btn" onclick="loadNomadnet()" style="font-size:11px">↻ refresh</button>
+      </div>
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:12px 14px;margin-bottom:12px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <span style="font-size:13px;font-weight:600;color:var(--tx)">nomadnet daemon</span>
+          <span id="nn-status-dot" style="width:8px;height:8px;border-radius:50%;background:#6b7280;display:inline-block"></span>
+          <span id="nn-status-txt" style="font-size:11px;color:var(--mu)">—</span>
+        </div>
+        <div style="font-size:10px;color:var(--mu);margin-bottom:2px">Node Address</div>
+        <div id="nn-addr" style="font-size:11px;color:var(--teal);font-family:var(--fn);cursor:pointer" title="Click to copy" onclick="navigator.clipboard.writeText(this.innerText)">—</div>
+      </div>
+      <div style="margin-bottom:16px">
+        <div class="section-lbl" style="margin-bottom:8px">Daemon Control</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn ok" onclick="nnAction('start')" style="font-size:11px">Start</button>
+          <button class="btn wr" onclick="nnAction('stop')" style="font-size:11px">Stop</button>
+          <button class="btn wr" onclick="nnAction('restart')" style="font-size:11px">Restart</button>
+        </div>
+      </div>
+      <div style="margin-bottom:12px">
+        <div class="section-lbl" style="margin-bottom:8px">Page Editor — index.mu</div>
+        <textarea id="nn-editor" style="width:100%;height:320px;background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:10px;color:var(--tx);font-family:var(--fn);font-size:12px;resize:vertical;box-sizing:border-box" spellcheck="false"></textarea>
+        <div style="margin-top:8px">
+          <button class="btn ok" onclick="nnSavePage()" style="font-size:11px">💾 Save &amp; Restart</button>
+        </div>
+      </div>
+      <div id="nn-output" style="font-family:var(--fn);font-size:11px;color:var(--teal);background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:8px 10px;min-height:32px;white-space:pre-wrap;display:none"></div>
+    </div>
+
+    <!-- ADDRESSES -->
+    <div class="panel" id="panel-addresses">
+      <div class="section-lbl" style="margin-bottom:16px">Адреса шлюза</div>
+
+      <!-- LXMF Bridge -->
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;margin-bottom:12px">
+        <div style="font-size:11px;color:var(--mu);margin-bottom:4px">🔹 LXMF Bridge</div>
+        <div style="font-size:10px;color:var(--mu);margin-bottom:6px">Для приёма команд из Reticulum в MQTT / Home Assistant. Добавь в Sideband как контакт.</div>
+        <div id="ap-lxmf-bridge" style="font-family:var(--fn);font-size:12px;color:var(--teal);word-break:break-all;margin-bottom:8px">—</div>
+        <button class="btn" onclick="apCopy('ap-lxmf-bridge')" style="font-size:11px">📋 Copy</button>
+      </div>
+
+      <!-- LXMF Chat -->
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;margin-bottom:12px">
+        <div style="font-size:11px;color:var(--mu);margin-bottom:4px">🔹 LXMF Chat</div>
+        <div style="font-size:10px;color:var(--mu);margin-bottom:6px">Встроенный мессенджер дашборда. Добавь в контакты чтобы писать владельцу шлюза.</div>
+        <div id="ap-lxmf-chat" style="font-family:var(--fn);font-size:12px;color:var(--teal);word-break:break-all;margin-bottom:8px">—</div>
+        <button class="btn" onclick="apCopy('ap-lxmf-chat')" style="font-size:11px">📋 Copy</button>
+      </div>
+
+      <!-- Group Chat -->
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;margin-bottom:12px">
+        <div style="font-size:11px;color:var(--mu);margin-bottom:4px">👥 Групповой чат (LXMF)</div>
+        <div style="font-size:10px;color:var(--mu);margin-bottom:6px">Отправь /join чтобы присоединиться. Команды: /join /leave /members /help</div>
+        <div id="ap-group-chat" style="font-family:var(--fn);font-size:12px;color:var(--teal);word-break:break-all;margin-bottom:8px">—</div>
+        <button class="btn" onclick="apCopy('ap-group-chat')" style="font-size:11px">📋 Copy</button>
+      </div>
+
+      <!-- I2P -->
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;margin-bottom:12px">
+        <div style="font-size:11px;color:var(--mu);margin-bottom:4px">🔹 I2P адрес (b32)</div>
+        <div style="font-size:10px;color:var(--mu);margin-bottom:6px">Анонимное подключение без публичного IP. Передай другому шлюзу.</div>
+        <div id="ap-i2p" style="font-family:var(--fn);font-size:12px;color:var(--teal);word-break:break-all;margin-bottom:8px">—</div>
+        <button class="btn" onclick="apCopy('ap-i2p')" style="font-size:11px">📋 Copy</button>
+      </div>
+
+      <!-- Nomadnet Node -->
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;margin-bottom:12px">
+        <div style="font-size:11px;color:var(--mu);margin-bottom:4px">🌐 Nomadnet Node</div>
+        <div style="font-size:10px;color:var(--mu);margin-bottom:6px">Страница-визитка шлюза в Reticulum сети.</div>
+        <div id="ap-nn-node" style="font-family:var(--fn);font-size:12px;color:var(--teal);word-break:break-all;margin-bottom:8px">—</div>
+        <button class="btn" onclick="apCopy('ap-nn-node')" style="font-size:11px">📋 Copy</button>
+      </div>
+
+      <!-- Nomadnet Chat -->
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;margin-bottom:12px">
+        <div style="font-size:11px;color:var(--mu);margin-bottom:4px">💬 Nomadnet Chat</div>
+        <div style="font-size:10px;color:var(--mu);margin-bottom:6px">IRC-style чат в сети Nomadnet. Открой в Nomadnet браузере.</div>
+        <div id="ap-nn-chat" style="font-family:var(--fn);font-size:12px;color:var(--teal);word-break:break-all;margin-bottom:8px">—</div>
+        <button class="btn" onclick="apCopy('ap-nn-chat')" style="font-size:11px">📋 Copy</button>
+      </div>
+
+      <div id="ap-toast" style="display:none;color:var(--gr);font-size:12px;margin-top:8px">✓ Скопировано</div>
+    </div>
+
+    <!-- LOGS -->
+    <div class="panel" id="panel-logs">
+      <div class="log-toolbar">
+        <select id="log-unit" onchange="loadLogs()">
+          <option value="lxmf_bridge_mqtt">lxmf_bridge_mqtt</option>
+          <option value="rnsd">rnsd</option>
+        </select>
+        <button class="btn" onclick="loadLogs()">↻</button>
+      </div>
+      <div class="log-box" id="log-box"></div>
+    </div>
+
+    <!-- CONFIGS -->
+    <div class="panel" id="panel-configs">
+      <div class="cfg-tabs" id="cfg-tabs"></div>
+      <div class="cfg-path" id="cfg-path"></div>
+      <textarea id="cfg-area" spellcheck="false"></textarea>
+      <div class="brow">
+        <button class="btn pr" onclick="saveConfig()">Save</button>
+        <button class="btn" onclick="downloadConfig()">↓ Download</button>
+      </div>
+    </div>
+
+    <!-- RNODE -->
+    <div class="panel" id="panel-rnode">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div class="section-lbl" style="margin:0">RNode</div>
+        <button class="btn ok" onclick="loadRnodePanel()" style="font-size:10px">↻ refresh</button>
+      </div>
+      <div id="rnode-status" style="margin-bottom:12px"></div>
+      <div id="rnode-metrics" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:16px"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div style="background:var(--s1);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;min-width:0;overflow:hidden">
+          <div class="section-lbl" style="margin-bottom:8px">Airtime % (15s)</div>
+          <div style="position:relative;height:160px"><canvas id="rnode-chart-airtime"></canvas></div>
+        </div>
+        <div style="background:var(--s1);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;min-width:0;overflow:hidden">
+          <div class="section-lbl" style="margin-bottom:8px">Noise dBm</div>
+          <div style="position:relative;height:160px"><canvas id="rnode-chart-noise"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RETICULUM NODES -->
+    <!-- nodes_monitor merged into rmap -->
+
+    <!-- RMAP -->
+    <div class="panel" id="panel-rmap">
+      <div style="display:grid;grid-template-columns:1fr 300px;gap:16px">
+      <div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div class="section-lbl" style="margin:0">Network Nodes</div>
+        <div style="display:flex;gap:6px">
+          <button class="btn ok" onclick="loadRmapNodes()" style="font-size:10px">↻ refresh</button>
+          <a href="https://rmap.world" target="_blank" class="btn" style="text-decoration:none;font-size:10px">RMAP</a>
+          <a href="https://directory.rns.recipes" target="_blank" class="btn" style="text-decoration:none;font-size:10px">📋 Directory</a>
+        </div>
+      </div>
+      <div style="background:var(--s1);border:1px solid var(--bd);border-radius:12px;overflow:hidden;position:relative;height:400px" id="rmap-canvas">
+        <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(45,212,191,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(45,212,191,.04) 1px,transparent 1px);background-size:40px 40px"></div>
+        <svg id="rmap-lines" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"></svg>
+        <div id="rmap-markers"></div>
+        <div id="rmap-popup" style="position:absolute;background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:10px 14px;font-size:11px;color:var(--tx);min-width:180px;z-index:10;pointer-events:none;display:none;font-family:var(--fn)">
+          <div id="rp-name" style="font-weight:700;font-size:13px;margin-bottom:6px;color:var(--teal)"></div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="color:var(--mu)">Host:</span><span id="rp-host"></span></div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="color:var(--mu)">Port:</span><span id="rp-port"></span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--mu)">Status:</span><span id="rp-status"></span></div>
+        </div>
+        <div id="rmap-stats" style="position:absolute;top:12px;left:12px;background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:6px 12px;font-size:11px;color:var(--mu);font-family:var(--fn)">click ↻ refresh</div>
+        <div style="position:absolute;bottom:12px;left:12px;background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:8px 12px;font-size:10px;color:var(--mu);font-family:var(--fn)">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px"><div style="width:9px;height:9px;border-radius:50%;background:#60a5fa"></div>My Gateway</div>
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px"><div style="width:9px;height:9px;border-radius:50%;background:#4ade9a"></div>Online</div>
+          <div style="display:flex;align-items:center;gap:6px"><div style="width:9px;height:9px;border-radius:50%;background:#555"></div>Offline</div>
+        </div>
+      </div>
+      </div>
+      <!-- Right column: Public Nodes -->
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div class="section-lbl" style="margin:0">Public Nodes</div>
+          <div style="display:flex;gap:6px">
+            <button class="btn ok" onclick="loadNodesMonitor()" style="font-size:10px">↻ check</button>
+            <button class="btn" onclick="showAddNode()" style="font-size:10px">+ add</button>
+          </div>
+        </div>
+        <div id="nodes-monitor-list"></div>
+        <div id="add-node-form" style="display:none;margin-top:10px;padding:10px;background:var(--s1);border:1px solid var(--bd);border-radius:6px">
+          <div style="font-size:12px;font-weight:700;margin-bottom:8px">New node</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <input id="new-node-name" placeholder="Name" style="flex:1;min-width:80px;font-family:var(--fn);font-size:12px;padding:5px 8px;border:1px solid var(--bd);border-radius:5px;background:var(--bg);color:var(--tx)">
+            <input id="new-node-host" placeholder="host" style="flex:2;min-width:120px;font-family:var(--fn);font-size:12px;padding:5px 8px;border:1px solid var(--bd);border-radius:5px;background:var(--bg);color:var(--tx)">
+            <input id="new-node-port" placeholder="port" value="4242" style="width:60px;font-family:var(--fn);font-size:12px;padding:5px 8px;border:1px solid var(--bd);border-radius:5px;background:var(--bg);color:var(--tx)">
+            <button class="btn pr" onclick="addNode()">Add</button>
+            <button class="btn" onclick="hideAddNode()">Cancel</button>
+          </div>
+        </div>
+        <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--bd)">
+          <div class="section-lbl">rnprobe</div>
+          <div style="display:flex;gap:6px;margin-bottom:8px">
+            <input id="probe-addr" placeholder="LXMF address" style="flex:1;font-family:var(--fn);font-size:12px;padding:5px 8px;border:1px solid var(--bd);border-radius:5px;background:var(--s1);color:var(--tx)">
+            <button class="btn ok" onclick="doProbe()">▶ probe</button>
+          </div>
+          <div id="probe-result" style="font-size:12px;font-family:var(--fn);color:var(--mu);white-space:pre-wrap"></div>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <!-- SYSTEM -->
+    <div class="panel" id="panel-system">
+      <div id="sys-info" style="line-height:2.2;margin-bottom:20px"></div>
+      <div class="section-lbl">Backup & Restore</div>
+      <div class="brow" style="margin-bottom:20px">
+        <button class="btn ok" onclick="showBackupModal()">⬇ download backup</button>
+        <button class="btn wr" onclick="showRestoreModal()">↑ restore</button>
+      </div>
+      <div class="section-lbl">Chat files</div>
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:10px 14px;margin-bottom:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="font-size:12px;color:var(--tx)">Used: <span id="files-size" style="color:var(--teal)">—</span> / <span id="files-max">100</span> MB</div>
+          <div style="display:flex;gap:6px">
+            <input id="files-max-input" type="number" value="100" min="10" max="10000" style="width:60px;background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:3px 6px;font-size:11px;color:var(--tx);font-family:var(--fn)">
+            <button class="btn ok" onclick="setFilesLimit()" style="font-size:10px">✓ limit</button>
+            <button class="btn er" onclick="showClearFilesModal()" style="font-size:10px">🗑 clear</button>
+          </div>
+        </div>
+        <div id="files-list" style="max-height:200px;overflow-y:auto;font-size:11px"></div>
+      </div>
+
+      <div class="section-lbl">Chat History</div>
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:10px 14px;margin-bottom:12px">
+        <div style="font-size:12px;color:var(--mu);margin-bottom:10px">Clear chat history</div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <select id="chat-clear-days" style="background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:4px 8px;font-size:11px;color:var(--tx);font-family:var(--fn)">
+            <option value="0">all history</option>
+            <option value="7">older than 7 days</option>
+            <option value="30">older than 30 days</option>
+            <option value="90">older than 90 days</option>
+          </select>
+          <button class="btn er" onclick="showClearChatModal()" style="font-size:10px">🗑 clear</button>
+        </div>
+      </div>
+
+      <div class="section-lbl">Quick Commands</div>
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:10px 14px;margin-bottom:12px">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+          <button class="btn" onclick="runCmd('find_ports')" style="font-size:10px">🔌 find ports</button>
+          <button class="btn" onclick="runCmd('rnstatus')" style="font-size:10px">📡 rnstatus</button>
+          <button class="btn wr" onclick="runCmd('restart_rnsd')" style="font-size:10px">↺ restart rnsd</button>
+          <button class="btn wr" onclick="runCmd('restart_lxmf')" style="font-size:10px">↺ restart lxmf</button>
+          <button class="btn" onclick="runCmd('free_mem')" style="font-size:10px">💾 memory</button>
+          <button class="btn" onclick="runCmd('uptime')" style="font-size:10px">⏱ uptime</button>
+        </div>
+        <div id="cmd-output" style="font-family:var(--fn);font-size:11px;color:var(--teal);background:var(--bg);border-radius:6px;padding:8px 10px;min-height:32px;white-space:pre-wrap;display:none"></div>
+      </div>
+
+      <div class="section-lbl">System</div>
+      <div class="brow">
+        <button class="btn wr" onclick="svcAction('dashboard','restart')">↺ restart dashboard</button>
+        <button class="btn er" onclick="showRebootModal()">⏻ reboot</button>
+        <button class="btn er" onclick="showResetModal()" style="margin-top:8px;width:100%">🔑 Reset все identity</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+
+<div id="clear-chat-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center">
+  <div style="background:var(--s1);border:1px solid var(--bd);border-radius:16px;padding:28px 32px;max-width:380px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.5)">
+    <div style="font-size:15px;font-weight:700;color:var(--rd);margin-bottom:8px">🗑 Clear chat history</div>
+    <div style="font-size:12px;color:var(--mu);margin-bottom:20px" id="clear-chat-desc">All chat history will be deleted.</div>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn" onclick="closeModal('clear-chat-modal')">Cancel</button>
+      <button class="btn er" onclick="doClearChat()">🗑 Delete</button>
+    </div>
+  </div>
+</div>
+
+<div id="clear-files-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center">
+  <div style="background:var(--s1);border:1px solid var(--bd);border-radius:16px;padding:28px 32px;max-width:380px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.5)">
+    <div style="font-size:15px;font-weight:700;color:var(--rd);margin-bottom:8px">🗑 Clear chat files</div>
+    <div style="font-size:12px;color:var(--mu);margin-bottom:20px">All attached files will be deleted. Messages will remain but files will be unavailable.</div>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn" onclick="closeModal('clear-files-modal')">Cancel</button>
+      <button class="btn er" onclick="doClearFiles()">🗑 Delete all</button>
+    </div>
+  </div>
+</div>
+
+<!-- Backup Modal -->
+<div id="backup-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center">
+  <div style="background:var(--s1);border:1px solid var(--bd);border-radius:16px;padding:28px 32px;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.5)">
+    <div style="font-size:15px;font-weight:700;color:var(--tx);margin-bottom:8px">⬇ Download backup</div>
+    <div style="font-size:12px;color:var(--mu);margin-bottom:20px;line-height:1.8">
+      Will be saved:<br>
+      • ~/.reticulum/config<br>
+      • ~/lxmf-tools/config.cfg.owr<br>
+      • ~/lxmf-tools/identity<br>
+      • monitored_nodes.json
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn" onclick="closeModal('backup-modal')">Cancel</button>
+      <button class="btn ok" onclick="doBackupDownload()">⬇ Download</button>
+    </div>
+  </div>
+</div>
+
+<!-- Restore Modal -->
+<div id="restore-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center">
+  <div style="background:var(--s1);border:1px solid var(--bd);border-radius:16px;padding:28px 32px;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.5)">
+    <div style="font-size:15px;font-weight:700;color:var(--tx);margin-bottom:8px">↑ Restore from backup</div>
+    <div style="font-size:12px;color:var(--mu);margin-bottom:16px;line-height:1.8">Select ZIP-file backupа:</div>
+    <input type="file" id="restore-file" accept=".zip" style="font-size:12px;color:var(--tx);margin-bottom:16px;width:100%">
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn" onclick="closeModal('restore-modal')">Cancel</button>
+      <button class="btn ok" onclick="doRestore()">↑ Restore</button>
+    </div>
+  </div>
+</div>
+
+<!-- Reboot Modal -->
+<div id="reset-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:1000;align-items:center;justify-content:center">
+  <div style="background:var(--s2);border:1px solid var(--rd);border-radius:12px;padding:24px;max-width:420px;text-align:center">
+    <div style="font-size:16px;font-weight:700;color:var(--rd);margin-bottom:12px">⚠ Reset Identity</div>
+    <div style="font-size:13px;color:var(--mu);margin-bottom:20px">Reset: LXMF adress, I2P tonnel, Reticulum identity, chat history.<br><br></div>
+    <div style="display:flex;gap:8px;justify-content:center">
+      <button class="btn" onclick="closeModal('reset-modal')">Cancel</button>
+      <button class="btn er" onclick="doResetIdentity()">Reset</button>
+    </div>
+    <div id="reset-status" style="margin-top:12px;font-size:12px;color:var(--mu)"></div>
+  </div>
+</div>
+<div id="reboot-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center">
+  <div style="background:var(--s1);border:1px solid var(--bd);border-radius:16px;padding:28px 32px;max-width:380px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.5)">
+    <div style="font-size:15px;font-weight:700;color:var(--rd);margin-bottom:8px">⏻ Rebooting</div>
+    <div style="font-size:12px;color:var(--mu);margin-bottom:20px">Server will reboot. All services will temporarily stop.</div>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn" onclick="closeModal('reboot-modal')">Cancel</button>
+      <button class="btn er" onclick="doReboot()">⏻ Reboot</button>
+    </div>
+  </div>
+</div>
+<!-- QR Modal -->
+<div id="qr-modal" onclick="this.style.display='none'">
+  <div id="qr-box" style="background:#fff;padding:20px;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.3)"></div>
+  <div style="color:#fff;font-size:12px;font-family:var(--fn)" id="qr-addr"></div>
+</div>
+<script>
+const API="";
+let cfgData={},curCfg=null;
+let lxmfMsgs=[];
+
+function nav(id,el){
+  document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+  el.classList.add("active");
+  document.getElementById("panel-"+id).classList.add("active");
+  if(id==="chat") loadChat();
+  if(id==="monitor"){ loadLxmf(); loadRns(); }
+  if(id==="logs") loadLogs();
+  if(id==="configs") loadConfigs();
+
+  if(id==="nodes_monitor") loadNodesMonitor();
+  if(id==="rnode") loadRnodePanel();
+  if(id==="i2p") loadI2pStatus();
+  if(id==="system"){ loadSystem(); loadSystemFiles(); }
+  if(id==="rmap") loadRmapNodes();
+}
+
+function toast(msg,ok=true){
+  const t=document.getElementById("toast");
+  t.textContent=msg;
+  t.style.background=ok?"var(--gr)":"var(--rd)";
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),2000);
+}
+
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+
+// Clock
+setInterval(()=>{
+  const n=new Date();
+  document.getElementById("clock-lbl").textContent=
+    n.toLocaleDateString("ru",{weekday:"short",day:"numeric",month:"short"})+" · "+
+    n.toLocaleTimeString("ru");
+},1000);
+
+// System
+async function loadSystem(){
+  const r=await fetch(API+"/api/system?_="+Date.now());
+  const d=await r.json();
+  document.getElementById("uptime-lbl").textContent="Uptime: "+d.uptime;
+  document.getElementById("rns-ver-lbl").textContent="RNS: "+d.rns_version+" · Python: "+d.py_version;
+    try{const vr=await fetch(API+"/api/version").then(r=>r.json());const vl=document.getElementById("rns-ver-lbl");if(vl&&vr.version)vl.textContent+=" · Dashboard: v"+vr.version;}catch(e){}
+  document.getElementById("ip-lbl").textContent=d.ip;
+  const cpu=d.cpu||0, ram=d.ram_total?Math.round(d.ram_used/d.ram_total*100):0;
+  const disk=d.disk_total?Math.round(d.disk_used/d.disk_total*100):0;
+  document.getElementById("m-cpu").textContent=Math.round(cpu)+"%";
+  document.getElementById("pb-cpu").style.width=cpu+"%";
+  document.getElementById("m-ram").textContent=ram+"%";
+  document.getElementById("pb-ram").style.width=ram+"%";
+  document.getElementById("m-disk").textContent=disk+"%";
+  document.getElementById("pb-disk").style.width=disk+"%";
+  document.getElementById("m-temp").textContent=d.temp+"°C";
+  const _si=document.getElementById("sys-info"); if(_si) _si.innerHTML=
+    `IP: ${esc(d.ip)}<br>Uptime: ${esc(d.uptime)}<br>RNS: ${esc(d.rns_version)}<br>Python: ${esc(d.py_version)}<br>CPU: ${cpu}%<br>RAM: ${d.ram_used}/${d.ram_total} MB<br>Disk: ${d.disk_used}/${d.disk_total} MB`;
+  // home sys
+  const _hs=document.getElementById("home-sys"); if(_hs) _hs.innerHTML=`IP: ${esc(d.ip)}<br>Uptime: ${esc(d.uptime)}<br>CPU: ${cpu}% · RAM: ${ram}% · Disk: ${disk}%<br>Temp: ${d.temp}°C`;
+}
+
+// MQTT status
+async function checkMqttStatus(){
+  try{
+    const r=await fetch(API+"/api/mqtt/status");
+    const d=await r.json();
+    const el=document.getElementById("m-mqtt-status");
+    el.textContent=d.status==="ok"?"OK":"Error";
+    el.className="vl "+(d.status==="ok"?"g":"r");
+  }catch(e){}
+}
+
+// Services
+async function loadServices(){
+  const r=await fetch(API+"/api/services");
+  const data=await r.json();
+  const el=document.getElementById("svc-list");
+  el.innerHTML=data.map(s=>`
+    <div class="svc">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:10px;height:10px;border-radius:50%;background:${s.status==="active"?"var(--gr)":"var(--rd)"}"></div>
+        <div class="svc-n">${esc(s.name)}</div>
+        <span class="badge ${s.status}">${esc(s.status)}</span>
+      </div>
+      <div class="svc-btns">
+        <button class="btn ok" onclick="svcAction('${s.name}','start')">▶ start</button>
+        <button class="btn er" onclick="svcAction('${s.name}','stop')">■ stop</button>
+        <button class="btn wr" onclick="svcAction('${s.name}','restart')">↺ restart</button>
+      </div>
+    </div>`).join("");
+}
+
+async function svcAction(name,action){
+  await fetch(API+`/api/services/${name}/${action}`,{method:"POST"});
+  toast(name+" "+action);
+  loadServices();
+}
+
+async function restartAll(){
+  for(const s of ["rnsd","lxmf_bridge_mqtt"]){
+    await fetch(API+`/api/services/${s}/restart`,{method:"POST"});
+  }
+  toast("All services rerunningы");
+  loadServices();
+}
+
+// Modals
+function showBackupModal(){const m=document.getElementById("backup-modal");m.style.display="flex";}
+function showRestoreModal(){const m=document.getElementById("restore-modal");m.style.display="flex";}
+function showResetModal(){const m=document.getElementById("reset-modal");m.style.display="flex";}
+async function doResetIdentity(){
+  const st=document.getElementById("reset-status");
+  st.textContent="Resetting...";
+  try{
+    const r=await fetch(API+"/api/reset_identity",{method:"POST"});
+    const d=await r.json();
+    if(d.ok){
+      closeModal("reset-modal");
+      // Show overlay with countdown
+      const ov=document.createElement("div");
+      ov.style.cssText="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px";
+      ov.innerHTML="<div style='font-size:18px;font-weight:700;color:#4ade9a'>Identity Reset</div><div style='font-size:13px;color:#8b91b8'>Please wait...</div><div id='reset-cnt' style='font-size:24px;font-weight:700;color:#fff'>8</div>";
+      document.body.appendChild(ov);
+      let n=8;
+      const t=setInterval(()=>{
+        n--;
+        const el=document.getElementById("reset-cnt");
+        if(el) el.textContent=n;
+        if(n<=0){clearInterval(t);location.reload();}
+      },1000);
+    } else {
+      st.style.color="var(--rd)";st.textContent="Ошибка: "+d.error;
+    }
+  }catch(e){st.style.color="var(--rd)";st.textContent="Ошибка: "+e;}
+}
+function showRebootModal(){const m=document.getElementById("reboot-modal");m.style.display="flex";}
+function closeModal(id){document.getElementById(id).style.display="none";}
+
+async function doBackupDownload(){
+  closeModal("backup-modal");
+  try{
+    const r=await fetch(API+"/api/backup/download");
+    if(!r.ok){toast("Backup error",false);return;}
+    const blob=await r.blob();
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");
+    a.href=url;
+    const ts=new Date().toISOString().slice(0,16).replace("T","_").replace(/:/g,"-");
+    a.download="meshgate_backup_"+ts+".zip";
+    a.click();
+    URL.revokeObjectURL(url);
+    toast("Backup downloaded");
+  }catch(e){toast("Error: "+e,false);}
+}
+
+async function doRestore(){
+  const file=document.getElementById("restore-file").files[0];
+  if(!file){toast("Select file",false);return;}
+  closeModal("restore-modal");
+  const fd=new FormData();
+  fd.append("file",file);
+  try{
+    const r=await fetch(API+"/api/backup/restore",{method:"POST",body:fd});
+    const d=await r.json();
+    if(d.ok) toast("Restored! Restart services.");
+    else toast("Error: "+d.error,false);
+  }catch(e){toast("Error: "+e,false);}
+}
+
+async function doReboot(){
+  closeModal("reboot-modal");
+  await fetch(API+"/api/reboot",{method:"POST"});
+  toast("Rebooting...");
+}
+
+// LXMF
+async function loadLxmf(){
+  const r=await fetch(API+"/api/lxmf?since=0");
+  const d=await r.json();
+  lxmfMsgs=d.msgs||[];
+  renderLxmf();
+  // stats
+  const s=await fetch(API+"/api/lxmf/stats").then(r=>r.json());
+  document.getElementById("m-lxmf-sent").textContent=s.count?.sent||0;
+  document.getElementById("m-lxmf-recv").textContent=s.count?.recv||0;
+  // last msg
+  if(lxmfMsgs.length>0){
+    const last=lxmfMsgs[lxmfMsgs.length-1];
+    document.getElementById("m-last-msg").textContent=last.substring(0,30)+"…";
+    // home msgs
+    const recent=lxmfMsgs.slice(-5).reverse();
+    document.getElementById("home-msgs").innerHTML=recent.map(m=>{
+      const {ts,content,isSend}=parseLxmfMsg(m);
+      return `<div style="border-bottom:1px solid var(--s3);padding:2px 0"><span style="color:var(--mu);margin-right:6px">${esc(ts)}</span><span style="color:${isSend?"var(--gr)":"var(--bl)"}"> ${isSend?"→":"←"}</span> ${esc(content)}</div>`;
+    }).join("")||"no messages";
+  }
+}
+
+function parseLxmfMsg(raw){
+  try{
+    const jsonPart=raw.split(">>")[1]?.trim();
+    const d=JSON.parse(jsonPart);
+    const content=d.content||d.destination||"";
+    const ts=raw.match(/\[(.+?)\]/)?.[1]||"";
+    const isSend=raw.includes("lxmf/send");
+    return {ts, content, isSend};
+  }catch(e){
+    return {ts:"", content:raw, isSend:false};
+  }
+}
+
+function renderLxmf(){
+  const box=document.getElementById("lxmf-box");
+  box.innerHTML=lxmfMsgs.map(m=>{
+    const {ts,content,isSend}=parseLxmfMsg(m);
+    const dir=isSend?"→":"←";
+    const cls=isSend?"send":"recv";
+    return `<div class="lm ${cls}"><span class="ts">${esc(ts)}</span><span style="color:${isSend?"var(--gr)":"var(--bl)"}">${dir}</span> ${esc(content)}</div>`;
+  }).join("");
+  box.scrollTop=box.scrollHeight;
+}
+
+async function clearLxmf(){
+  await fetch(API+"/api/lxmf/clear",{method:"POST"});
+  lxmfMsgs=[];
+  renderLxmf();
+}
+
+// Topology update
+async function updateTopology(){
+  try{
+    const sv=await fetch(API+"/api/services").then(r=>r.json());
+    const rns=sv.find(s=>s.name==="rnsd");
+    const lxmf=sv.find(s=>s.name==="lxmf_bridge_mqtt");
+    if(rns){
+      const on=rns.status==="active";
+      document.getElementById("mg-n-rns")?.classList.toggle("dim",!on);
+      document.getElementById("mg-l-rns")?.classList.toggle("off",!on);
+      const el=document.getElementById("mg-rns-status");
+      if(el) el.textContent="rnsd · "+(on?"active":"inactive");
+    }
+    if(lxmf){
+      const on=lxmf.status==="active";
+      const hub=document.getElementById("mg-n-hub");
+      hub?.classList.toggle("dim",!on);
+      document.getElementById("mg-l-rns")?.classList.toggle("off",!on);
+      document.getElementById("mg-l-mqtt")?.classList.toggle("off",!on);
+      document.getElementById("mg-l-net")?.classList.toggle("off",!on);
+      const el=document.getElementById("mg-hub-status");
+      if(el) el.textContent="● "+(on?"active":"inactive");
+    }
+    const mq=await fetch(API+"/api/mqtt/status").then(r=>r.json());
+    const mqOn=mq.status==="ok";
+    document.getElementById("mg-n-mqtt")?.classList.toggle("dim",!mqOn);
+    document.getElementById("mg-l-mqtt")?.classList.toggle("off",!mqOn);
+    const ms=document.getElementById("mg-mqtt-status");
+    if(ms) ms.textContent="broker · "+(mqOn?"OK":"error");
+
+    const rnsStatus=await fetch(API+"/api/rnstatus").then(r=>r.json());
+    const ifaces=rnsStatus.interfaces||[];
+    const rnode=ifaces.find(i=>i.name&&i.name.includes("RNode"));
+    const rnodeOn=rnode&&rnode.fields&&rnode.fields["Status"]==="Up";
+    document.getElementById("mg-n-rnode")?.classList.toggle("dim",!rnodeOn);
+    document.getElementById("mg-l-rnode")?.classList.toggle("off",!rnodeOn);
+
+    // I2P status
+    try{
+      const i2p=await fetch(API+"/api/i2p/status").then(r=>r.json());
+      const i2pOn=i2p.running;
+      document.getElementById("mg-n-i2p")?.classList.toggle("dim",!i2pOn);
+      document.getElementById("mg-l-i2p")?.classList.toggle("off",!i2pOn);
+      const is=document.getElementById("mg-i2p-status");
+      if(is) is.textContent="i2pd · "+(i2pOn?"running":"stopped");
+    } catch(e){}
+    try{
+      const nn=await fetch(API+"/api/nomadnet/status").then(r=>r.json());
+      const nnOn=nn.running;
+      document.getElementById("mg-n-nn")?.classList.toggle("dim",!nnOn);
+      document.getElementById("mg-l-nn")?.classList.toggle("off",!nnOn);
+      const ns=document.getElementById("mg-nn-status");
+      if(ns) ns.textContent="nomadnet · "+(nnOn?"active":"stopped");
+    }catch(e){}
+  }catch(e){}
+}
+
+// Polling LXMF
+let lxmfTotal=0;
+async function pollLxmf(){
+  try{
+    const r=await fetch(API+"/api/lxmf?since="+lxmfTotal);
+    const d=await r.json();
+    if(d.msgs&&d.msgs.length>0){
+      lxmfMsgs=[...lxmfMsgs,...d.msgs];
+      lxmfTotal=d.total;
+      renderLxmf();
+      const last=lxmfMsgs[lxmfMsgs.length-1];
+      const {content:lc}=parseLxmfMsg(last);
+      document.getElementById("m-last-msg").textContent=lc.substring(0,30)+(lc.length>30?"…":"");
+    }
+    const s=await fetch(API+"/api/lxmf/stats").then(r=>r.json());
+    document.getElementById("m-lxmf-sent").textContent=s.count?.sent||0;
+    document.getElementById("m-lxmf-recv").textContent=s.count?.recv||0;
+  }catch(e){}
+}
+
+// RNS
+async function loadRns(){
+  const r=await fetch(API+"/api/rnstatus");
+  const d=await r.json();
+  const ifaces=d.interfaces||[];
+  const el=document.getElementById("rns-list");
+  el.innerHTML=ifaces.map(i=>{
+    const status=i.fields["Status"]||"—";
+    const color=status==="Up"?"var(--gr)":"var(--rd)";
+    const fields=Object.entries(i.fields).map(([k,v])=>`<span style="color:var(--mu)">${esc(k)}:</span> ${esc(v)}`).join(" &nbsp;·&nbsp; ");
+    return `<div style="padding:8px 0;border-bottom:1px solid var(--s3)">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+        <div style="width:8px;height:8px;border-radius:50%;background:${color}"></div>
+        <b>${esc(i.name)}</b>
+      </div>
+      <div style="font-size:11px;color:var(--mu);padding-left:16px">${fields}</div>
+    </div>`;
+  }).join("")||"no data";
+  // home rns
+  document.getElementById("home-rns").innerHTML=ifaces.map(i=>{
+    const status=i.fields["Status"]||"—";
+    const color=status==="Up"?"var(--gr)":"var(--rd)";
+    return `<div style="display:flex;align-items:center;gap:6px"><div style="width:6px;height:6px;border-radius:50%;background:${color}"></div>${esc(i.name)}</div>`;
+  }).join("")||"—";
+}
+
+// Logs
+async function loadLogs(){
+  const unit=document.getElementById("log-unit").value;
+  const r=await fetch(API+"/api/logs/"+unit);
+  const lines=await r.json();
+  const box=document.getElementById("log-box");
+  box.innerHTML=lines.map(l=>`<div class="ll ${l.l}">${esc(l.t)}</div>`).join("");
+  box.scrollTop=box.scrollHeight;
+}
+
+// Configs
+async function loadConfigs(){
+  const r=await fetch(API+"/api/configs");
+  cfgData=await r.json();
+  const tabs=document.getElementById("cfg-tabs");
+  tabs.innerHTML=Object.keys(cfgData).map(k=>`<div class="ctab" onclick="selectCfg('${k}',this)">${esc(k)}</div>`).join("");
+  const first=tabs.querySelector(".ctab");
+  if(first){first.click();}
+}
+
+function selectCfg(name,el){
+  document.querySelectorAll(".ctab").forEach(t=>t.classList.remove("active"));
+  el.classList.add("active");
+  curCfg=name;
+  document.getElementById("cfg-path").textContent=cfgData[name].path;
+  document.getElementById("cfg-area").value=cfgData[name].content;
+}
+
+async function saveConfig(){
+  if(!curCfg)return;
+  const content=document.getElementById("cfg-area").value;
+  const r=await fetch(API+"/api/configs/"+curCfg,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({content})});
+  const d=await r.json();
+  if(d.ok) toast("Saved");
+  else toast("Error: "+d.error,false);
+}
+
+function downloadConfig(){
+  if(!curCfg)return;
+  const blob=new Blob([document.getElementById("cfg-area").value],{type:"text/plain"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=curCfg+".cfg";
+  a.click();
+}
+
+// Nodes monitor
+async function loadNodesMonitor(){
+  const el=document.getElementById("nodes-monitor-list");
+  el.textContent="checking...";
+  const r=await fetch(API+"/api/nodes_monitor");
+  const nodes=await r.json();
+  el.innerHTML=nodes.map(n=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--s3)">
+      <div>
+        <div style="font-weight:700">${esc(n.name)}</div>
+        <div style="font-size:11px;color:var(--mu)">${esc(n.host)}:${n.port}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:8px;height:8px;border-radius:50%;background:${n.status==="online"?"var(--gr)":"var(--rd)"}"></div>
+        <span style="font-size:11px;color:${n.status==="online"?"var(--gr)":"var(--rd)"}">${n.status}</span>
+        <button class="btn er" style="font-size:10px;padding:2px 8px" onclick="removeNode('${esc(n.host)}',${n.port})">✕</button>
+      </div>
+    </div>`).join("");
+  // home nodes
+  document.getElementById("home-nodes").innerHTML=nodes.map(n=>`
+    <div style="display:flex;align-items:center;gap:6px">
+      <div style="width:6px;height:6px;border-radius:50%;background:${n.status==="online"?"var(--gr)":"var(--rd)"}"></div>
+      ${esc(n.name)}
+    </div>`).join("")||"—";
+}
+
+let _nodesList=[];
+async function removeNode(host,port){
+  const r=await fetch(API+"/api/nodes_monitor");
+  _nodesList=await r.json();
+  _nodesList=_nodesList.filter(n=>!(n.host===host&&n.port===port));
+  await fetch(API+"/api/nodes_monitor",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(_nodesList)});
+  loadNodesMonitor();
+}
+
+function showAddNode(){document.getElementById("add-node-form").style.display="block";}
+function hideAddNode(){document.getElementById("add-node-form").style.display="none";}
+
+async function addNode(){
+  const name=document.getElementById("new-node-name").value.trim();
+  const host=document.getElementById("new-node-host").value.trim();
+  const port=parseInt(document.getElementById("new-node-port").value)||4242;
+  if(!host)return;
+  const r=await fetch(API+"/api/nodes_monitor");
+  const nodes=await r.json();
+  nodes.push({name:name||host,host,port});
+  await fetch(API+"/api/nodes_monitor",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(nodes)});
+  hideAddNode();
+  loadNodesMonitor();
+}
+
+// rnprobe
+async function doProbe(){
+  const addr=document.getElementById("probe-addr").value.trim();
+  if(!addr)return;
+  document.getElementById("probe-result").textContent="checking...";
+  const r=await fetch(API+"/api/rnprobe",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({addr})});
+  const d=await r.json();
+  document.getElementById("probe-result").textContent=d.output||d.error||"no response";
+}
+
+// QR
+function showQR(){
+  const addr=document.getElementById("lxmf-addr-lbl").textContent;
+  if(addr==="—")return;
+  const url=`https://lxmf.reticulum.io/?addr=${addr}`;
+  const modal=document.getElementById("qr-modal");
+  modal.style.display="flex";
+  document.getElementById("qr-addr").textContent=addr;
+  document.getElementById("qr-box").innerHTML=`<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}" style="width:200px;height:200px;border-radius:6px">`;
+}
+
+// Addresses
+async function loadAddresses(){
+  try{
+    const d=await fetch(API+"/api/addresses").then(r=>r.json());
+    if(d.lxmf_bridge) document.getElementById("lxmf-addr-lbl").textContent=d.lxmf_bridge;
+  }catch(e){}
+}
+
+function copyGroupAddr(){
+  const p=document.getElementById("group-chat-pill");
+  const addr=p?.dataset.full;
+  if(!addr) return;
+  const doCopy = () => {
+    const l=document.getElementById("group-addr-lbl");
+    const orig=l.textContent;
+    l.textContent="copied!";
+    setTimeout(()=>{ l.textContent=orig; }, 1200);
+  };
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(addr).then(doCopy).catch(()=>fallbackCopy(addr,doCopy));
+  } else {
+    fallbackCopy(addr, doCopy);
+  }
+}
+function fallbackCopy(text, cb){
+  const ta=document.createElement("textarea");
+  ta.value=text; ta.style.position="fixed"; ta.style.opacity="0";
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand("copy"); cb&&cb(); }catch(e){}
+  document.body.removeChild(ta);
+}
+
+function refreshAll(){
+  loadServices();
+  checkMqttStatus();
+  loadAddresses();
+  loadRns();
+}
+
+// CHAT
+let chatCurrentAddr = null;
+let chatContacts = [];
+let chatPollTimer = null;
+let chatLastTs = Math.floor(Date.now()/1000);
+
+async function loadChat(){
+  const r = await fetch(API+"/api/chat/address");
+  const d = await r.json();
+  if(d.address) document.getElementById("chat-my-addr").textContent = d.address;
+  fetch(API+"/api/addresses").then(r=>r.json()).then(ad=>{ const ga=document.getElementById("chat-group-addr"); if(ga) ga.textContent=ad.group_chat||"—"; });
+  const cr = await fetch(API+"/api/chat/contacts");
+  chatContacts = await cr.json();
+  renderChatContacts();
+}
+
+let _contactUnread = {};
+
+function renderChatContacts(){
+  const el = document.getElementById("chat-contacts-list");
+  if(!el) return;
+  if(!chatContacts.length){
+    el.innerHTML = '<div style="padding:12px;font-size:11px;color:var(--mu);text-align:center">no contacts</div>';
+    return;
+  }
+  el.innerHTML = chatContacts.map((c,i) => {
+    const unread = _contactUnread[c.addr] || 0;
+    const badge = unread > 0 ? `<span style="background:#f87171;color:#fff;border-radius:10px;padding:1px 5px;font-size:9px;margin-left:4px">${unread}</span>` : '';
+    return `<div onclick="openChat('${c.addr}','${esc(c.name||'')}')" style="padding:9px 12px;cursor:pointer;border-bottom:1px solid var(--bd);border-left:2px solid ${chatCurrentAddr===c.addr?'var(--teal)':'transparent'};background:${chatCurrentAddr===c.addr?'var(--s3)':'transparent'}">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div style="font-size:12px;font-weight:700;color:${unread>0?'var(--tx)':'var(--tx)'}">${esc(c.name||c.addr.slice(0,8))}</div>
+        ${badge}
+      </div>
+      <div style="font-size:9px;color:var(--mu);margin-top:2px">${c.addr.slice(0,16)}…</div>
+    </div>`;
+  }).join("");
+}
+
+async function openChat(addr, name){
+  chatCurrentAddr = addr;
+  clearUnread(addr);
+  document.getElementById("chat-peer-name").textContent = name || addr.slice(0,16)+"…";
+  document.getElementById("chat-peer-addr").textContent = addr;
+  document.getElementById("chat-remove-btn").style.display = "block";
+  renderChatContacts();
+  const r = await fetch(API+"/api/chat/history/"+addr);
+  const msgs = await r.json();
+  renderChatMsgs(msgs);
+  if(msgs.length) chatLastTs = Math.max(chatLastTs, ...msgs.map(m=>m.ts));
+}
+
+function renderChatMsgs(msgs){
+  const box = document.getElementById("chat-messages");
+  if(!box) return;
+  box.innerHTML = msgs.map(m => {
+    const isOut = m.direction==="out";
+    const time = new Date(m.ts*1000).toLocaleTimeString("ru",{hour:"2-digit",minute:"2-digit"});
+    let body = "";
+    if(m.file_id){
+      const isImg = m.file_mime && m.file_mime.startsWith("image/");
+      if(isImg){
+        body = `<img src="/api/chat/files/${m.file_id}/preview" style="max-width:220px;max-height:180px;border-radius:8px;display:block;cursor:pointer;margin-bottom:4px" onclick="window.open('/api/chat/files/${m.file_id}/preview')">`;
+      } else {
+        body = `<a href="/api/chat/files/${m.file_id}" style="color:var(--teal);font-size:12px;text-decoration:none;display:block;margin-bottom:4px">📎 ${esc(m.file_name||'file')} ${m.file_size?'('+Math.round(m.file_size/1024)+' КБ)':''}</a>`;
+      }
+      if(m.text && m.text !== m.file_name) body += `<div style="font-size:12px;color:var(--tx)">${esc(m.text)}</div>`;
+    } else {
+      body = `<div style="font-size:12px;color:var(--tx)">${esc(m.text)}</div>`;
+    }
+    return `<div style="display:flex;justify-content:${isOut?'flex-end':'flex-start'}">
+      <div style="background:${isOut?'var(--s2)':'var(--s1)'};border:1px solid ${isOut?'var(--bd)':'var(--teal)'};border-radius:${isOut?'10px 10px 2px 10px':'10px 10px 10px 2px'};padding:7px 12px;max-width:75%">
+        ${body}
+        <div style="font-size:10px;color:var(--mu);margin-top:3px;text-align:${isOut?'right':'left'}">${time}${isOut?' ✓':''}</div>
+      </div>
+    </div>`;
+  }).join("");
+  box.scrollTop = box.scrollHeight;
+}
+
+async function pollChatIncoming(){
+  try{
+    // Load contacts if not yet loaded
+    if(chatContacts.length===0){
+      const cr = await fetch(API+"/api/chat/contacts");
+      chatContacts = await cr.json();
+    }
+    const r = await fetch(API+"/api/chat/incoming?since="+chatLastTs);
+    const msgs = await r.json();
+    if(!msgs.length) return;
+    chatLastTs = Math.max(chatLastTs, ...msgs.map(m=>m.ts));
+    const senders = [...new Set(msgs.map(m=>m.from))];
+    for(const addr of senders){
+      if(!chatContacts.find(c=>c.addr===addr)){
+        chatContacts.push({addr, name: addr.slice(0,8)});
+        await fetch(API+"/api/chat/contacts",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(chatContacts)});
+        renderChatContacts();
+      }
+      if(addr===chatCurrentAddr){
+        const r2 = await fetch(API+"/api/chat/history/"+addr);
+        const all = await r2.json();
+        renderChatMsgs(all);
+      } else {
+        const name = chatContacts.find(c=>c.addr===addr)?.name||addr.slice(0,8);
+        toast("💬 "+name+": "+msgs.find(m=>m.from===addr)?.text?.slice(0,30));
+        if(addr!==chatCurrentAddr){ addUnread(msgs.filter(m=>m.from===addr).length, addr); } else { clearUnread(addr); }
+      }
+    }
+  }catch(e){}
+}
+
+let chatPendingFile = null;
+
+async function uploadChatFile(input){
+  if(!chatCurrentAddr || !input.files[0]) return;
+  const file = input.files[0];
+  input.value = "";
+  const fd = new FormData();
+  fd.append("file", file);
+  toast("Uploading " + file.name + "...");
+  try{
+    const r = await fetch(API+"/api/chat/files/upload", {method:"POST", body:fd});
+    const d = await r.json();
+    if(!d.ok){ toast("Upload error",false); return; }
+    chatPendingFile = d;
+    const inp = document.getElementById("chat-input");
+    inp.placeholder = "📎 " + d.name + " — write signature и click ▶";
+    inp.focus();
+    toast("File ready — write signature и send");
+  }catch(e){ toast("Error: "+e, false); }
+}
+
+async function renameChatContact(){
+  if(!chatCurrentAddr) return;
+  const contact = chatContacts.find(c=>c.addr===chatCurrentAddr);
+  const oldName = contact?.name || "";
+  const newName = prompt("Enter name contact:", oldName);
+  if(newName===null) return;
+  const name = newName.trim() || chatCurrentAddr.slice(0,8);
+  if(contact){
+    contact.name = name;
+  } else {
+    chatContacts.push({addr: chatCurrentAddr, name});
+  }
+  await fetch(API+"/api/chat/contacts",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(chatContacts)});
+  document.getElementById("chat-peer-name").textContent = name;
+  renderChatContacts();
+  toast("Name saved");
+}
+
+async function sendChatMsg(){
+  const inp = document.getElementById("chat-input");
+  const text = inp.value.trim();
+  if(!chatCurrentAddr) return;
+  if(!text && !chatPendingFile) return;
+  inp.value = "";
+  inp.placeholder = "Message...";
+  const payload = {to: chatCurrentAddr, text: text || ""};
+  if(chatPendingFile){
+    payload.file_id = chatPendingFile.id;
+    payload.file_name = chatPendingFile.name;
+    payload.file_size = chatPendingFile.size;
+    payload.file_mime = chatPendingFile.mime;
+    chatPendingFile = null;
+  }
+  const r = await fetch(API+"/api/chat/send",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+  const d = await r.json();
+  if(d.ok){
+    const r2 = await fetch(API+"/api/chat/history/"+chatCurrentAddr);
+    const all = await r2.json();
+    renderChatMsgs(all);
+    chatLastTs = Math.max(chatLastTs, d.ts);
+  } else {
+    toast("Error: "+(d.error||"unknown"),false);
+  }
+}
+
+async function addChatContact(){
+  const addr = document.getElementById("new-contact-addr").value.trim().replace(/[<>]/g,"");
+  const name = document.getElementById("new-contact-name").value.trim();
+  if(!addr) return;
+  chatContacts.push({addr, name: name||addr.slice(0,8)});
+  await fetch(API+"/api/chat/contacts",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(chatContacts)});
+  document.getElementById("new-contact-addr").value = "";
+  document.getElementById("new-contact-name").value = "";
+  renderChatContacts();
+}
+
+async function removeChatContact(){
+  if(!chatCurrentAddr) return;
+  chatContacts = chatContacts.filter(c=>c.addr!==chatCurrentAddr);
+  await fetch(API+"/api/chat/contacts",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(chatContacts)});
+  chatCurrentAddr = null;
+  document.getElementById("chat-peer-name").textContent = "Select contact";
+  document.getElementById("chat-peer-addr").textContent = "—";
+  document.getElementById("chat-remove-btn").style.display = "none";
+  document.getElementById("chat-messages").innerHTML = "";
+  renderChatContacts();
+}
+
+// CHAT HISTORY MANAGEMENT
+function showClearChatModal(){
+  const days = document.getElementById("chat-clear-days").value;
+  const desc = document.getElementById("clear-chat-desc");
+  if(days==="0") desc.textContent = "All chat history will be permanently deleted.";
+  else desc.textContent = `Messages older than ${days} days will be deleted.`;
+  document.getElementById("clear-chat-modal").style.display="flex";
+}
+
+async function doClearChat(){
+  const days = parseInt(document.getElementById("chat-clear-days").value);
+  closeModal("clear-chat-modal");
+  const r = await fetch(API+"/api/chat/history/clear",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({days})});
+  const d = await r.json();
+  toast(d.deleted ? `Deleted ${d.deleted} messages` : "History cleared");
+  if(chatCurrentAddr){
+    const r2 = await fetch(API+"/api/chat/history/"+chatCurrentAddr);
+    renderChatMsgs(await r2.json());
+  }
+}
+
+// FILES MANAGEMENT
+async function loadSystemFiles(){
+  try{
+    const r = await fetch(API+"/api/chat/files");
+    const d = await r.json();
+    document.getElementById("files-size").textContent = d.size_mb.toFixed(1);
+    document.getElementById("files-max").textContent = d.max_mb;
+    document.getElementById("files-max-input").value = d.max_mb;
+    const list = document.getElementById("files-list");
+    if(!d.files.length){
+      list.innerHTML = '<div style="color:var(--mu);padding:4px 0">no fileов</div>';
+      return;
+    }
+    list.innerHTML = d.files.slice().reverse().map(f => {
+      const isImg = f.mime && f.mime.startsWith("image/");
+      const size = f.size > 1048576 ? (f.size/1048576).toFixed(1)+" MB" : Math.round(f.size/1024)+" КБ";
+      const time = new Date(f.ts*1000).toLocaleString("ru",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"});
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--bd)">
+        <div style="display:flex;align-items:center;gap:8px;min-width:0">
+          ${isImg?`<img src="/api/chat/files/${f.id}/preview" style="width:32px;height:32px;object-fit:cover;border-radius:4px;flex-shrink:0">`:'<div style="width:32px;height:32px;background:var(--bg);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">📎</div>'}
+          <div style="min-width:0">
+            <div style="color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px">${esc(f.name)}</div>
+            <div style="color:var(--mu);font-size:10px">${size} · ${time}</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:4px;flex-shrink:0">
+          <a href="/api/chat/files/${f.id}" style="color:var(--teal);text-decoration:none;font-size:11px;padding:2px 6px;border:1px solid var(--teal);border-radius:4px">↓</a>
+          <button onclick="deleteFile('${f.id}')" style="background:transparent;border:1px solid var(--rd);color:var(--rd);border-radius:4px;padding:2px 6px;font-size:11px;cursor:pointer;font-family:var(--fn)">✕</button>
+        </div>
+      </div>`;
+    }).join("");
+  }catch(e){}
+}
+
+async function setFilesLimit(){
+  const val = parseInt(document.getElementById("files-max-input").value);
+  if(!val || val < 10) return;
+  await fetch(API+"/api/chat/files/settings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({max_mb:val})});
+  toast("Limit set: "+val+" MB");
+  loadSystemFiles();
+}
+
+async function deleteFile(fid){
+  await fetch(API+"/api/chat/files/"+fid,{method:"DELETE"});
+  loadSystemFiles();
+}
+
+function showClearFilesModal(){
+  document.getElementById("clear-files-modal").style.display="flex";
+}
+
+async function doClearFiles(){
+  closeModal("clear-files-modal");
+  await fetch(API+"/api/chat/files/clear",{method:"POST"});
+  toast("All files deleted");
+  loadSystemFiles();
+}
+
+// RMAP NODES
+let _rmapT;
+async function loadRmapNodes(){
+  try{
+    const r=await fetch(API+"/api/nodes_monitor?_="+Date.now());
+    const nodes=await r.json();
+    const myIp=document.getElementById("ip-lbl").textContent||"—";
+    const all=[{name:"MeshGate",host:myIp,port:8081,status:"online",me:true},...nodes];
+    const mk=document.getElementById("rmap-markers");
+    const ln=document.getElementById("rmap-lines");
+    if(!mk||!ln)return;
+    mk.innerHTML="";ln.innerHTML="";
+    const cx=50,cy=50,rad=34;
+    const oth=all.filter(n=>!n.me);
+    const pos=all.map((n,i)=>{
+      if(n.me)return{x:cx,y:cy};
+      const idx=oth.indexOf(n);
+      const a=(2*Math.PI*idx/oth.length)-Math.PI/2;
+      return{x:Math.round(cx+rad*Math.cos(a)),y:Math.round(cy+rad*Math.sin(a))};
+    });
+    let on=0,off=0;
+    all.forEach((n,i)=>{
+      const p=pos[i];const isMe=!!n.me;const isOn=n.status==="online";
+      if(!isMe){isOn?on++:off++;}
+      if(!isMe){
+        const l=document.createElementNS("http://www.w3.org/2000/svg","line");
+        l.setAttribute("x1","50%");l.setAttribute("y1","50%");
+        l.setAttribute("x2",p.x+"%");l.setAttribute("y2",p.y+"%");
+        l.setAttribute("stroke",isOn?"#2dd4bf":"#555");
+        l.setAttribute("stroke-width","1");
+        l.setAttribute("stroke-dasharray",isOn?"5 5":"3 8");
+        l.setAttribute("opacity",isOn?"0.4":"0.2");
+        ln.appendChild(l);
+      }
+      const m=document.createElement("div");
+      m.style.cssText="position:absolute;transform:translate(-50%,-50%);cursor:pointer;left:"+p.x+"%;top:"+p.y+"%";
+      const ds=isMe?"width:17px;height:17px;background:#60a5fa;border:2px solid #60a5fa;box-shadow:0 0 10px #60a5fa70"
+        :isOn?"width:13px;height:13px;background:#4ade9a;border:2px solid #4ade9a;box-shadow:0 0 8px #4ade9a60"
+        :"width:11px;height:11px;background:#333;border:2px solid #555";
+      const ring=isOn&&!isMe?'<div style="position:absolute;inset:-5px;border-radius:50%;border:1px solid #4ade9a50;animation:rmap-ring 2.5s ease-out infinite"></div>':'';
+      m.innerHTML='<div style="border-radius:50%;'+ds+'">'+ring+'</div>'
+        +'<div style="position:absolute;top:18px;left:50%;transform:translateX(-50%);background:var(--bg);border:1px solid var(--bd);border-radius:5px;padding:1px 7px;font-size:10px;white-space:nowrap;font-family:var(--fn);color:'+(isOn?'var(--tx)':'var(--mu)')+'">'+esc(n.name)+'</div>';
+      m.onclick=()=>{
+        clearTimeout(_rmapT);
+        const pop=document.getElementById("rmap-popup");
+        document.getElementById("rp-name").textContent=n.name;
+        document.getElementById("rp-host").textContent=n.host||"—";
+        document.getElementById("rp-port").textContent=n.port||"—";
+        document.getElementById("rp-status").innerHTML=isOn?'<span style="color:var(--gr)">● online</span>':'<span style="color:var(--rd)">● offline</span>';
+        let l=(p.x+4)+"%",t=(p.y+4)+"%";
+        if(p.x>60)l=(p.x-32)+"%";if(p.y>60)t=(p.y-34)+"%";
+        pop.style.left=l;pop.style.top=t;pop.style.display="block";
+        _rmapT=setTimeout(()=>pop.style.display="none",3000);
+      };
+      mk.appendChild(m);
+    });
+    document.getElementById("rmap-stats").textContent="● "+on+" online  ○ "+off+" offline";
+  }catch(e){}
+}
+
+// UNREAD
+let _unread = 0;
+function addUnread(n, addr){
+  _unread += n;
+  if(addr){ _contactUnread[addr] = (_contactUnread[addr]||0) + n; }
+  const b = document.getElementById("chat-badge");
+  if(b){ b.textContent = _unread; b.style.display = _unread>0?"inline":"none"; }
+  if(_unread>0) document.title = "("+_unread+") MeshGate";
+  renderChatContacts();
+}
+function clearUnread(addr){
+  if(addr){
+    const n = _contactUnread[addr]||0;
+    _unread = Math.max(0, _unread - n);
+    delete _contactUnread[addr];
+  } else {
+    _unread = 0;
+    _contactUnread = {};
+  }
+  const b = document.getElementById("chat-badge");
+  if(b){ b.textContent = _unread; b.style.display = _unread>0?"inline":"none"; }
+  if(_unread===0) document.title = "NOEMA RNSGate";
+  else document.title = "("+_unread+") MeshGate";
+  renderChatContacts();
+}
+
+// RNODE PANEL
+let rnodeChartAirtime = null;
+let rnodeChartNoise = null;
+
+async function loadRnodePanel(){
+  try{
+    const r = await fetch(API+"/api/rnstatus?_="+Date.now());
+    const d = await r.json();
+    const ifaces = d.interfaces||[];
+    const rnode = ifaces.find(i=>i.name&&i.name.includes("RNode"));
+
+    const statusEl = document.getElementById("rnode-status");
+    const metricsEl = document.getElementById("rnode-metrics");
+    if(!statusEl||!metricsEl) return;
+
+    if(!rnode){
+      statusEl.innerHTML = '<div style="color:var(--mu);font-size:13px">RNode not connected or not configured в ~/.reticulum/config</div>';
+      metricsEl.innerHTML = '';
+      return;
+    }
+
+    const f = rnode.fields||{};
+    const isUp = f["Status"]==="Up";
+
+    statusEl.innerHTML = `<div style="display:flex;align-items:center;gap:10px">
+      <div style="width:10px;height:10px;border-radius:50%;background:${isUp?"#4ade9a":"#f87171"};box-shadow:0 0 8px ${isUp?"#4ade9a60":"#f8717160"}"></div>
+      <div style="font-size:13px;font-weight:700;color:var(--tx)">${esc(rnode.name)}</div>
+      <div style="font-size:11px;color:${isUp?"var(--gr)":"var(--rd)"}">● ${isUp?"online":"offline"}</div>
+    </div>`;
+
+    const metrics = [
+      f["Battery"]    && {icon:"🔋", label:"Battery",   value: f["Battery"]},
+      f["Airtime"]    && {icon:"📡", label:"Airtime",    value: f["Airtime"].split(",")[0]},
+      f["Ch. Load"]   && {icon:"📶", label:"Ch. Load",   value: f["Ch. Load"].split(",")[0]},
+      f["CPU temp"]   && {icon:"🌡", label:"CPU Temp.",  value: f["CPU temp"]},
+      f["Noise Fl."]  && {icon:"📻", label:"Noise",        value: f["Noise Fl."]},
+      f["Rate"]       && {icon:"⚡", label:"Rate",        value: f["Rate"]},
+      f["Traffic"]    && {icon:"↕",  label:"Traffic",     value: f["Traffic"]},
+      f["Mode"]       && {icon:"⚙",  label:"Mode",      value: f["Mode"]},
+    ].filter(Boolean);
+
+    metricsEl.innerHTML = metrics.map(m=>`
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:8px 10px">
+        <div style="font-size:14px;margin-bottom:3px">${m.icon}</div>
+        <div style="font-size:9px;color:var(--mu);letter-spacing:.07em;text-transform:uppercase;margin-bottom:2px">${esc(m.label)}</div>
+        <div style="font-size:12px;font-weight:700;color:var(--teal)">${esc(m.value)}</div>
+      </div>`).join("");
+
+    // Load history for graphs
+    loadRnodeCharts();
+  }catch(e){}
+}
+
+async function loadRnodeCharts(){
+  try{
+    const r = await fetch(API+"/api/rnode/history");
+    const data = await r.json();
+    if(!data.length) return;
+
+    const labels = data.map(d=>{
+      const dt = new Date(d.ts*1000);
+      return dt.getHours()+":"+String(dt.getMinutes()).padStart(2,"0");
+    });
+    const airtime = data.map(d=>d.airtime||0);
+    const noise = data.map(d=>d.noise||0);
+
+    const ctxA = document.getElementById("rnode-chart-airtime");
+    const ctxN = document.getElementById("rnode-chart-noise");
+    if(!ctxA||!ctxN) return;
+
+    if(rnodeChartAirtime) rnodeChartAirtime.destroy();
+    if(rnodeChartNoise) rnodeChartNoise.destroy();
+
+    const chartOpts = (color) => ({
+      type:"line",
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        animation:false,
+        plugins:{legend:{display:false}},
+        scales:{
+          x:{ticks:{color:"#8b90c0",font:{size:9},maxTicksLimit:8},grid:{color:"#3d4270"}},
+          y:{ticks:{color:"#8b90c0",font:{size:9}},grid:{color:"#3d4270"}}
+        }
+      }
+    });
+
+    rnodeChartAirtime = new Chart(ctxA, {
+      ...chartOpts("#2dd4bf"),
+      data:{labels, datasets:[{data:airtime,borderColor:"#2dd4bf",backgroundColor:"#2dd4bf20",borderWidth:1.5,pointRadius:0,fill:true,tension:.3}]}
+    });
+    rnodeChartNoise = new Chart(ctxN, {
+      ...chartOpts("#a78bfa"),
+      data:{labels, datasets:[{data:noise,borderColor:"#a78bfa",backgroundColor:"#a78bfa20",borderWidth:1.5,pointRadius:0,fill:true,tension:.3}]}
+    });
+  }catch(e){}
+}
+
+async function runCmd(cmd){
+  const out = document.getElementById("cmd-output");
+  if(!out) return;
+  out.style.display = "block";
+  out.style.color = "var(--mu)";
+  out.textContent = "executing...";
+  try{
+    const r = await fetch(API+"/api/run", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({cmd})});
+    const d = await r.json();
+    out.style.color = d.rc===0 ? "var(--teal)" : "var(--rd)";
+    out.textContent = d.output || "(no output)";
+  }catch(e){
+    out.style.color = "var(--rd)";
+    out.textContent = "Error: "+e;
+  }
+}
+
+// I2P
+async function loadI2pStatus(){
+  try{
+    const r = await fetch(API+"/api/i2p/status?_="+Date.now());
+    const d = await r.json();
+    const dot = document.getElementById("i2p-dot");
+    const lbl = document.getElementById("i2p-status-lbl");
+    const addrBlock = document.getElementById("i2p-addr-block");
+    const addrEl = document.getElementById("i2p-addr");
+    if(!dot) return;
+    const running = d.running;
+    dot.style.background = running ? "#4ade9a" : "#f87171";
+    dot.style.boxShadow = running ? "0 0 8px #4ade9a60" : "none";
+    lbl.style.color = running ? "var(--gr)" : "var(--rd)";
+    lbl.textContent = running ? "● running" : "● stopped";
+    if(d.b32_address){
+      addrBlock.style.display = "block";
+      addrEl.textContent = d.b32_address;
+    } else {
+      addrBlock.style.display = "none";
+    }
+  }catch(e){}
+}
+
+async function i2pAction(action){
+  const out = document.getElementById("i2p-output");
+  if(out){ out.style.display="block"; out.textContent="executing..."; }
+  try{
+    const r = await fetch(API+"/api/i2p/action",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action})});
+    const d = await r.json();
+    if(out){
+      out.style.color = d.ok ? "var(--teal)" : "var(--rd)";
+      out.textContent = d.output || d.error || "(no output)";
+    }
+    if(action==="setup_tunnel" && d.b32_address){
+      const tr = document.getElementById("i2p-tunnel-result");
+      if(tr) tr.textContent = "✓ Tunnel address: "+d.b32_address;
+    }
+    setTimeout(loadI2pStatus, 2000);
+  }catch(e){
+    if(out){ out.style.color="var(--rd)"; out.textContent="Error: "+e; }
+  }
+}
+
+async function i2pAddInterface(){
+  const addr = document.getElementById("i2p-peer-addr")?.value.trim();
+  const name = document.getElementById("i2p-peer-name")?.value.trim()||"I2P-Node";
+  const st = document.getElementById("i2p-rns-status");
+  if(!addr){ if(st) st.textContent="Enter b32 address"; return; }
+  if(st) st.textContent = "Adding...";
+  try{
+    const r = await fetch(API+"/api/i2p/add_interface",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({addr,name})});
+    const d = await r.json();
+    if(st) st.style.color = d.ok?"var(--gr)":"var(--rd)";
+    if(st) st.textContent = d.ok?"✓ Added to Reticulum config. Restart rnsd to apply.":("Error: "+d.error);
+  }catch(e){
+    if(st){ st.style.color="var(--rd)"; st.textContent="Error: "+e; }
+  }
+}
+
+async function loadAddressesPanel(){
+  try{
+    const d = await fetch(API+"/api/addresses").then(r=>r.json());
+    if(d.lxmf_bridge) document.getElementById("ap-lxmf-bridge").textContent = d.lxmf_bridge;
+    if(d.group_chat)  document.getElementById("ap-group-chat").textContent  = d.group_chat;
+  }catch(e){}
+  try{
+    const d = await fetch(API+"/api/chat/address").then(r=>r.json());
+    if(d.address) document.getElementById("ap-lxmf-chat").textContent = d.address;
+  }catch(e){}
+  try{
+    const d = await fetch(API+"/api/nomadnet/status").then(r=>r.json());
+    if(d.page_addr){
+      document.getElementById("ap-nn-node").textContent = d.page_addr+":/page/index.mu";
+      document.getElementById("ap-nn-chat").textContent = d.page_addr+":/page/nomadnet.mu";
+    }
+  }catch(e){}
+  try{
+    const d = await fetch(API+"/api/i2p/status").then(r=>r.json());
+    if(d.b32||d.b32_address) document.getElementById("ap-i2p").textContent = d.b32||d.b32_address;
+  }catch(e){}
+}
+
+function apCopy(id){
+  const el = document.getElementById(id);
+  if(!el||el.textContent==="—") return;
+  try {
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    document.execCommand("copy");
+    sel.removeAllRanges();
+    const t=document.getElementById("ap-toast");
+    if(t){ t.textContent="✓ Скопировано"; t.style.display="block"; setTimeout(()=>t.style.display="none",1500); }
+  } catch(e) {
+    const t=document.getElementById("ap-toast");
+    if(t){ t.textContent="Выдели вручную"; t.style.display="block"; setTimeout(()=>t.style.display="none",2000); }
+  }
+}
+
+async function loadNomadnet(){
+  try{
+    const r = await fetch(API+"/api/nomadnet/status");
+    const d = await r.json();
+    const dot = document.getElementById("nn-status-dot");
+    const txt = document.getElementById("nn-status-txt");
+    const addr = document.getElementById("nn-addr");
+    if(dot) dot.style.background = d.running?"#4ade80":"#6b7280";
+    if(txt) txt.textContent = d.status;
+    if(addr) addr.textContent = d.page_addr || "—";
+  }catch(e){}
+  try{
+    const r = await fetch(API+"/api/nomadnet/page");
+    const d = await r.json();
+    const ed = document.getElementById("nn-editor");
+    if(ed && d.content) ed.value = d.content;
+  }catch(e){}
+}
+async function nnAction(action){
+  const out = document.getElementById("nn-output");
+  if(out){ out.style.display="block"; out.textContent="..."; }
+  try{
+    const r = await fetch(API+"/api/services/nomadnet/"+action,{method:"POST"});
+    const d = await r.json();
+    if(out) out.textContent = action+" → "+d.status;
+    setTimeout(loadNomadnet, 2000);
+  }catch(e){ if(out) out.textContent = "Error: "+e; }
+}
+async function nnSavePage(){
+  const ed = document.getElementById("nn-editor");
+  const out = document.getElementById("nn-output");
+  const content = ed?.value || "";
+  if(out){ out.style.display="block"; out.textContent="Saving..."; }
+  try{
+    const r = await fetch(API+"/api/nomadnet/page",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({content})});
+    const d = await r.json();
+    if(out) out.textContent = d.ok?"✓ Saved & restarted":("Error: "+d.error);
+  }catch(e){ if(out) out.textContent = "Error: "+e; }
+}
+
+// Init
+loadSystem();
+loadServices();
+checkMqttStatus();
+loadAddresses();
+loadLxmf();
+loadNodesMonitor();
+loadRns();
+
+setInterval(loadSystem,10000);
+setInterval(loadServices,15000);
+setInterval(checkMqttStatus,10000);
+setInterval(pollLxmf,3000);
+setInterval(updateTopology,10000);
+updateTopology();
+setInterval(pollChatIncoming,5000);
+// Load contacts and initialize chatLastTs from history at startup
+fetch(API+"/api/chat/contacts").then(r=>r.json()).then(async d=>{
+  chatContacts=d;
+  // Get max timestamp from all conversations to avoid fake unread notifications
+  let maxTs = Math.floor(Date.now()/1000);
+  for(const c of d){
+    try{
+      const r = await fetch(API+"/api/chat/history/"+c.addr);
+      const msgs = await r.json();
+      if(msgs.length) maxTs = Math.max(maxTs, ...msgs.map(m=>m.ts));
+    }catch(e){}
+  }
+  chatLastTs = maxTs;
+});
+
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+(function(){
+  const cv=document.getElementById('bg-canvas'),ctx=cv.getContext('2d');
+  let W,H,N;
+  function resize(){W=cv.width=innerWidth;H=cv.height=innerHeight;}
+  function init(){N=[];for(let i=0;i<Math.floor(W*H/16000);i++)N.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35,r:Math.random()*1.5+.5,p:Math.random()*6.28});}
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    N.forEach(n=>{n.x+=n.vx;n.y+=n.vy;n.p+=.02;if(n.x<0||n.x>W)n.vx*=-1;if(n.y<0||n.y>H)n.vy*=-1;});
+    for(let i=0;i<N.length;i++)for(let j=i+1;j<N.length;j++){
+      const dx=N[i].x-N[j].x,dy=N[i].y-N[j].y,d=Math.sqrt(dx*dx+dy*dy);
+      if(d<160){ctx.beginPath();ctx.strokeStyle=`rgba(20,184,166,${(1-d/160)*.2})`;ctx.lineWidth=.8;ctx.moveTo(N[i].x,N[i].y);ctx.lineTo(N[j].x,N[j].y);ctx.stroke();}
+    }
+    N.forEach(n=>{const a=(Math.sin(n.p)*.5+.5)*.6+.2;ctx.beginPath();ctx.arc(n.x,n.y,n.r,0,6.28);ctx.fillStyle=`rgba(20,184,166,${a})`;ctx.fill();});
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize',()=>{resize();init();});
+  resize();init();draw();
+})();
+</script>
+</body>
+</html>
