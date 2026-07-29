@@ -4,7 +4,7 @@
 
 set -e
 
-REPO_URL="https://github.com/e2ret/NOEMA-RNSGate-Lite.git"
+REPO_URL="https://github.com/e2ret/NOEMA-RNSGate.git"
 INSTALL_DIR="$HOME/NOEMA-RNSGate"
 RNS_CONFIG_DIR="$HOME/.reticulum"
 LXMF_TOOLS_DIR="$HOME/lxmf-tools"
@@ -119,9 +119,28 @@ mkdir -p "$RNS_CONFIG_DIR"
 if [ -f "$RNS_CONFIG_DIR/config" ]; then
     echo "      Reticulum config already exists, skipping."
 else
-    cp "$INSTALL_DIR/config" "$RNS_CONFIG_DIR/config"
-    echo "      Config copied to $RNS_CONFIG_DIR/config"
-    echo "      Edit it to match your network setup."
+    cat > "$RNS_CONFIG_DIR/config" << 'RNSEOF'
+[reticulum]
+  enable_transport = Yes
+  share_instance = Yes
+  shared_instance_port = 37428
+  instance_control_port = 37429
+  panic_on_interface_error = No
+
+[interfaces]
+
+  [[Default Interface]]
+    type = AutoInterface
+    enabled = yes
+
+  [[TCP]]
+    type = TCPServerInterface
+    enabled = true
+    port = 4242
+    listen_ip = 0.0.0.0
+RNSEOF
+    echo "      Default Reticulum config created."
+    echo "      Edit $RNS_CONFIG_DIR/config to add LoRa or other interfaces."
 fi
 
 # --- MQTT configuration ---
@@ -333,7 +352,7 @@ install_service "nomadnet" \
     "$CURRENT_HOME" \
     "network.target rnsd.service"
 
-SERVICES_LIST="$SERVICES_LIST nomadnet rbrowser"
+SERVICES_LIST="$SERVICES_LIST nomadnet"
 
 sudo systemctl daemon-reload
 sudo systemctl enable $SERVICES_LIST
