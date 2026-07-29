@@ -4,8 +4,8 @@
 
 set -e
 
-REPO_URL="https://github.com/e2ret/NOEMA-RNSGate-Lite.git"
-INSTALL_DIR="$HOME/NOEMA-RNSGate-Lite"
+REPO_URL="https://github.com/e2ret/NOEMA-RNSGate.git"
+INSTALL_DIR="$HOME/NOEMA-RNSGate"
 RNS_CONFIG_DIR="$HOME/.reticulum"
 LXMF_TOOLS_DIR="$HOME/lxmf-tools"
 PYTHON="$INSTALL_DIR/.venv/bin/python3"
@@ -119,28 +119,9 @@ mkdir -p "$RNS_CONFIG_DIR"
 if [ -f "$RNS_CONFIG_DIR/config" ]; then
     echo "      Reticulum config already exists, skipping."
 else
-    cat > "$RNS_CONFIG_DIR/config" << 'RNSEOF'
-[reticulum]
-  enable_transport = Yes
-  share_instance = Yes
-  shared_instance_port = 37428
-  instance_control_port = 37429
-  panic_on_interface_error = No
-
-[interfaces]
-
-  [[Default Interface]]
-    type = AutoInterface
-    enabled = yes
-
-  [[TCP]]
-    type = TCPServerInterface
-    enabled = true
-    port = 4242
-    listen_ip = 0.0.0.0
-RNSEOF
-    echo "      Default Reticulum config created."
-    echo "      Edit $RNS_CONFIG_DIR/config to add LoRa or other interfaces."
+    cp "$INSTALL_DIR/config" "$RNS_CONFIG_DIR/config"
+    echo "      Config copied to $RNS_CONFIG_DIR/config"
+    echo "      Edit it to match your network setup."
 fi
 
 # --- MQTT configuration ---
@@ -165,6 +146,10 @@ echo "[5/7] Setting up lxmf-tools..."
 mkdir -p "$LXMF_TOOLS_DIR"
 cp "$INSTALL_DIR/lxmf-tools/lxmf_bridge_mqtt.py" "$LXMF_TOOLS_DIR/lxmf_bridge_mqtt.py"
 
+if [ -f "$INSTALL_DIR/lxmf-tools/lxmf_group_chat.py" ]; then
+    cp "$INSTALL_DIR/lxmf-tools/lxmf_group_chat.py" "$LXMF_TOOLS_DIR/lxmf_group_chat.py"
+    echo "      lxmf_group_chat.py installed."
+fi
 
 if [ -f "$LXMF_TOOLS_DIR/config.cfg.owr" ]; then
     echo "      lxmf-tools config already exists, skipping."
@@ -275,7 +260,19 @@ install_service "dashboard" \
     "$INSTALL_DIR/dashboard" \
     "network.target"
 
-SERVICES_LIST="rnsd lxmf_bridge_mqtt dashboard nomadnet rbrowser"
+# --- Group chat (optional, uses shared instance) ---
+echo "[7/7] Setting up LXMF Group Chat..."
+if [ -f "$LXMF_TOOLS_DIR/lxmf_group_chat.py" ]; then
+    install_service "lxmf_group_chat" \
+        "LXMF Group Chat Relay" \
+        "$PYTHON -u $LXMF_TOOLS_DIR/lxmf_group_chat.py --rnsconfig $RNS_CONFIG_DIR" \
+        "$CURRENT_HOME" \
+        "network.target rnsd.service"
+    SERVICES_LIST="rnsd lxmf_bridge_mqtt dashboard lxmf_group_chat"
+else
+    echo "      lxmf_group_chat.py not found, skipping."
+    SERVICES_LIST="rnsd lxmf_bridge_mqtt dashboard"
+fi
 
 # --- Nomadnet node ---
 echo "[7b] Setting up Nomadnet node..."
@@ -403,40 +400,6 @@ WorkingDirectory=/root/rBrowser
 ExecStart=${INSTALL_DIR}/.venv/bin/python3 rBrowser.py
 Restart=on-failure
 RestartSec=5
-
-[Install]
-WantedBy=multi-user.target
-SVCEOF
-    systemctl daemon-reload
-    systemctl enable rbrowser
-    echo "  [OK] rbrowser.service installed"
-fi
-
-# --- Install rBrowser ---
-echo "Installing rBrowser..."
-if [ ! -d "/root/rBrowser" ]; then
-    git clone https://github.com/fr33n0w/rBrowser.git /root/rBrowser
-    "$INSTALL_DIR/.venv/bin/pip" install waitress --quiet
-    echo "  [OK] rBrowser cloned"
-else
-    echo "  [SKIP] rBrowser already exists"
-fi
-
-if [ ! -f /etc/systemd/system/rbrowser.service ]; then
-    cat > /etc/systemd/system/rbrowser.service << SVCEOF
-[Unit]
-Description=rBrowser Nomadnet Browser
-After=network.target rnsd.service
-Wants=rnsd.service
-
-[Service]
-Type=simple
-User=root
-WorkingDirectory=/root/rBrowser
-ExecStart=${INSTALL_DIR}/.venv/bin/python3 rBrowser.py
-Restart=on-failure
-RestartSec=5
-TimeoutStartSec=30
 
 [Install]
 WantedBy=multi-user.target
