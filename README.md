@@ -1,5 +1,9 @@
 # NOEMA RNSGate Lite — LoRa · MQTT · I2P · Nomadnet
 
+<p align="left">
+  <img src="https://github.com/e2ret/NOEMA-RNSGate-Lite/blob/main/001.png" width="800" alt="Noema Power Card">
+</p>
+
 [🇷🇺 Читать на русском](#ru)
 
  for the Reticulum network, combining LoRa radio, LXMF messaging, MQTT integration with Home Assistant, anonymous I2P network, Nomadnet, and a modern web dashboard.
