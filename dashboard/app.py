@@ -15,7 +15,7 @@ def _find_rns_bin(name):
     for path in [
         f"{_HOME}/rns-env/bin/{name}",
         f"{_HOME}/MeshGate/.venv/bin/{name}",
-        f"{_HOME}/NOEMA-RNSGate/.venv/bin/{name}",
+        f"{_HOME}/NOEMA-RNSGate-Lite/.venv/bin/{name}",
     ]:
         if os.path.exists(path):
             return path
@@ -481,7 +481,7 @@ def _chat_init():
     import sys as _sys, glob as _glob
     # Find site-packages in venv
     _sp_paths = _glob.glob(f"{_HOME}/rns-env/lib/python*/site-packages") +                 _glob.glob(f"{_HOME}/MeshGate/.venv/lib/python*/site-packages") + \
-                _glob.glob(f"{_HOME}/NOEMA-RNSGate/.venv/lib/python*/site-packages")
+                _glob.glob(f"{_HOME}/NOEMA-RNSGate-Lite/.venv/lib/python*/site-packages")
     if _sp_paths: _sys.path.insert(0, _sp_paths[0])
     import RNS, LXMF
     os.makedirs(CHAT_STORAGE, exist_ok=True)
@@ -645,7 +645,7 @@ def chat_send():
     import sys as _sys, glob as _glob
     # Find site-packages in venv
     _sp_paths = _glob.glob(f"{_HOME}/rns-env/lib/python*/site-packages") +                 _glob.glob(f"{_HOME}/MeshGate/.venv/lib/python*/site-packages") + \
-                _glob.glob(f"{_HOME}/NOEMA-RNSGate/.venv/lib/python*/site-packages")
+                _glob.glob(f"{_HOME}/NOEMA-RNSGate-Lite/.venv/lib/python*/site-packages")
     if _sp_paths: _sys.path.insert(0, _sp_paths[0])
     import RNS, LXMF, time as _t
     data = request.json or {}
@@ -830,6 +830,7 @@ def run_command():
         "free_mem":     "LC_ALL=C free -h",
         "disk":         "df -h /",
         "uptime":       "uptime",
+        "rns_update":   f"{_RNS_BIN}/pip install --upgrade rns && echo OK",
     }
     cmd_id = (request.json or {}).get("cmd", "")
     if cmd_id not in allowed:
@@ -952,7 +953,7 @@ def nomadnet_status():
     except:
         try:
             import sys as _sys, glob as _glob
-            _sp = _glob.glob(f"{_HOME}/NOEMA-RNSGate/.venv/lib/python*/site-packages")
+            _sp = _glob.glob(f"{_HOME}/NOEMA-RNSGate-Lite/.venv/lib/python*/site-packages")
             if _sp: _sys.path.insert(0, _sp[0])
             import RNS as _rns
             _rns.Reticulum(configdir=f"{_HOME}/.reticulum", loglevel=_rns.LOG_CRITICAL)
@@ -984,6 +985,17 @@ def nomadnet_page_save():
 
 @app.route("/api/version")
 def version(): return jsonify({"version": __version__})
+@app.route("/api/rns_update_check")
+def rns_update_check():
+    import urllib.request, json as _json
+    try:
+        cur,_ = sh(f"{_RNS_BIN}/python3 -c 'import RNS; print(RNS.__version__)' 2>/dev/null")
+        cur = (cur or "").strip()
+        with urllib.request.urlopen("https://pypi.org/pypi/rns/json", timeout=5) as r:
+            latest = _json.loads(r.read())["info"]["version"]
+        return jsonify({"current": cur, "latest": latest, "update_available": cur != latest})
+    except Exception as e:
+        return jsonify({"error": str(e)})
 
 @app.route("/api/reset_identity", methods=["POST"])
 def reset_identity():
@@ -1044,7 +1056,7 @@ def reset_identity():
         import threading as _thr
         _thr.Thread(target=_recalc_nn, daemon=True).start()
         # Restart all services in background - dashboard last
-        _sp.Popen(f"sleep 1 && sudo systemctl restart i2pd rnsd lxmf_bridge_mqtt nomadnet && sleep 8 && {_HOME}/NOEMA-RNSGate/.venv/bin/python3 {_HOME}/NOEMA-RNSGate/recalc_nn_addr.py && sleep 2 && sudo systemctl restart dashboard", shell=True)
+        _sp.Popen(f"sleep 1 && sudo systemctl restart i2pd rnsd lxmf_bridge_mqtt nomadnet && sleep 8 && {_HOME}/NOEMA-RNSGate-Lite/.venv/bin/python3 {_HOME}/NOEMA-RNSGate/recalc_nn_addr.py && sleep 2 && sudo systemctl restart dashboard", shell=True)
         return jsonify({"ok": True})
     except Exception as e:
         return jsonify({"ok": False, "error": str(e)})

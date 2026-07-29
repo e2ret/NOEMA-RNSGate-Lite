@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>NOEMA RNSGate</title>
+<title>NOEMA RNSGate Lite</title>
 <link rel="icon" href="logo.png" type="image/png">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
@@ -94,39 +94,71 @@ body{
 
 .g{color:var(--gr)}.a{color:var(--am)}.r{color:var(--rd)}.b{color:var(--bl)}
 
-.body{display:grid;grid-template-columns:210px 1fr;overflow:hidden;height:100%}
+.body{display:flex;flex-direction:column;overflow:hidden;height:100%}
 
 .sidebar{
-  background:rgba(11,18,32,.35);
+  background:rgba(11,18,32,.6);
   backdrop-filter:blur(16px);
-  border-right:1px solid var(--bd);
-  overflow-y:auto;
-  padding:12px
+  border-bottom:1px solid var(--bd);
+  padding:0 16px;
+  display:flex;
+  flex-wrap:nowrap;
+  overflow-x:auto;
+  overflow-y:hidden;
+  scrollbar-width:none;
+  gap:4px;
+  align-items:center;
+  justify-content:center;
+  min-height:52px;
+  flex-shrink:0
 }
+.sidebar::-webkit-scrollbar{display:none}
 
 .nav-sep{
-  font-size:11px;letter-spacing:.1em;text-transform:uppercase;
-  color:var(--mu);padding:10px 14px 3px;font-weight:600;opacity:.4
+  width:1px;height:20px;
+  background:var(--bd);
+  margin:0 6px;
+  flex-shrink:0
 }
 
 .nav-item{
-  display:flex;align-items:center;gap:8px;
-  padding:6px 14px;margin-bottom:1px;
+  display:flex;align-items:center;
+  padding:7px 16px;
   cursor:pointer;color:var(--mu);
-  transition:.2s;
-  border-radius:12px;
+  transition:.15s;
+  border-radius:10px;
   border:1px solid transparent;
-  font-size:15px;font-weight:500
+  font-size:15px;font-weight:500;
+  white-space:nowrap;flex-shrink:0;
+  text-transform:uppercase;letter-spacing:.06em
 }
-.nav-item:hover{color:var(--tx);background:rgba(255,255,255,.04)}
+.nav-item:hover{color:var(--tx);background:rgba(255,255,255,.05)}
 .nav-item.active{
   color:#fff;
   background:rgba(20,184,166,.15);
-  border-color:rgba(20,184,166,.25);
+  border-color:rgba(20,184,166,.3);
   font-weight:600
 }
 
-.main{overflow-y:auto;padding:24px 28px;background:transparent;display:flex;flex-direction:column}
+.sys-btn{
+  display:inline-flex;align-items:center;
+  padding:7px 16px;
+  cursor:pointer;
+  transition:.15s;
+  border-radius:10px;
+  border:none;
+  background:rgba(255,255,255,.06);
+  font-size:15px;font-weight:600;
+  font-family:var(--fn);
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+.sys-btn:hover{background:rgba(255,255,255,.1);}
+.sys-btn.teal{color:var(--teal);}
+.sys-btn.am{color:var(--am);}
+.sys-btn.rd{color:var(--rd);}
+.main{overflow-y:auto;padding:20px 20px;background:transparent;display:flex;flex-direction:column;flex:1;min-height:0}
 .panel{display:none}.panel.active{display:flex;flex-direction:column;flex:1;min-height:0}
 
 .btn{
@@ -233,7 +265,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
 <div class="shell">
 <div class="topbar">
   <div>
-    <div class="logo" style="display:flex;align-items:center;gap:10px"><img src="logo.png" style="height:36px;width:36px;object-fit:contain;border-radius:6px"><b>NOEMA RNSGate</b></div>
+    <div class="logo" style="display:flex;align-items:center;gap:10px"><img src="logo.png" style="height:36px;width:36px;object-fit:contain;border-radius:6px"><b>NOEMA RNSGate <span style="color:var(--teal)">Lite</span></b></div>
     <div style="font-size:11px;color:var(--mu);margin-top:2px" id="uptime-lbl">—</div>
     <div style="font-size:11px;color:var(--mu);margin-top:1px" id="rns-ver-lbl">—</div>
     <div style="font-size:11px;color:var(--mu);margin-top:1px" id="clock-lbl">—</div>
@@ -241,7 +273,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
   <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
     <div style="display:flex;gap:6px;align-items:center">
       <div class="pill"><div class="dot" id="dot"></div><span id="ip-lbl">—</span></div>
-      <button class="btn ok" onclick="refreshAll()">↻</button>
+      <button class="sys-btn teal" onclick="refreshAll()">↻</button>
     </div>
     <div class="pill" onclick="showQR()" title="LXMF Bridge">LXMF <span id="lxmf-addr-lbl">—</span></div>
   </div>
@@ -257,19 +289,17 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
 </div>
 <div class="body">
   <div class="sidebar">
-    <div class="nav-sep">management</div>
     <div class="nav-item active" onclick="nav('services',this)">Services</div>
     <div class="nav-item"       onclick="nav('configs',this)">Configs</div>
     <div class="nav-item"       onclick="nav('addresses',this);loadAddressesPanel();">Addresses</div>
-    <div class="nav-sep">monitoring</div>
-    <div class="nav-item"       onclick="nav('monitor',this)">Monitoring</div>
-    <div class="nav-sep">network</div>
+    <div class="nav-item"       onclick="nav('monitor',this)">Monitor</div>
+    <div class="nav-sep"></div>
     <div class="nav-item"       onclick="nav('rnode',this)">RNode</div>
     <div class="nav-item"       onclick="nav('rmap',this);loadNodesMonitor();">Network</div>
     <div class="nav-item"       onclick="nav('i2p',this)">I2P</div>
     <div class="nav-item"       onclick="nav('nomadnet',this);loadNomadnet();">Nomadnet</div>
-    <div class="nav-item"       onclick="nav('rbrowser',this)">🌐 Browser</div>
-    <div class="nav-sep">system</div>
+    <div class="nav-item"       onclick="nav('rbrowser',this)">Browser</div>
+    <div class="nav-sep"></div>
     <div class="nav-item"       onclick="nav('logs',this)">Logs</div>
     <div class="nav-item"       onclick="nav('system',this)">System</div>
   </div>
@@ -277,14 +307,14 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
 
     <!-- SERVICES -->
     <div class="panel active" id="panel-services">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
+      <div style="display:grid;grid-template-columns:1fr;gap:20px;align-items:start">
       <div>
       <div id="svc-list"></div>
       <div class="brow">
-        <button class="btn wr" onclick="restartAll()">restart all</button>
+        <button class="sys-btn am" onclick="restartAll()">restart all</button>
       </div>
       </div>
-      <div style="margin-top:20px;display:flex;flex-direction:column;gap:16px">
+      <div style="display:none">
       <div style="margin-bottom:16px;background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:10px;box-shadow:var(--shadow)">
         <style>
           @keyframes mg-flow { to { stroke-dashoffset: -24; } }
@@ -428,14 +458,14 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
         <div style="display:flex;flex-direction:column;background:var(--s1);border:1px solid var(--bd);border-radius:8px;overflow:hidden">
           <div style="padding:8px 12px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between">
             <div class="section-lbl" style="margin:0">LXMF Messages</div>
-            <button class="btn" onclick="clearLxmf()" style="font-size:10px">clear</button>
+            <button class="sys-btn" onclick="clearLxmf()" style="font-size:10px">clear</button>
           </div>
           <div class="lxmf-box" id="lxmf-box" style="flex:1;height:auto;border-radius:0;border:none"></div>
         </div>
         <div style="display:flex;flex-direction:column;background:var(--s1);border:1px solid var(--bd);border-radius:8px;overflow:hidden">
           <div style="padding:8px 12px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between">
             <div class="section-lbl" style="margin:0">RNS interfaces</div>
-            <button class="btn ok" onclick="loadRns()" style="font-size:10px">↻ refresh</button>
+            <button class="sys-btn teal" onclick="loadRns()" style="font-size:10px">↻ refresh</button>
           </div>
           <div id="rns-list" style="font-size:12px;line-height:2;padding:10px 12px;overflow-y:auto;flex:1"></div>
         </div>
@@ -446,7 +476,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
     <div class="panel" id="panel-i2p">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
         <div class="section-lbl" style="margin:0">I2P Integration</div>
-        <button class="btn ok" onclick="loadI2pStatus()" style="font-size:10px">↻ refresh</button>
+        <button class="sys-btn teal" onclick="loadI2pStatus()" style="font-size:10px">↻ refresh</button>
       </div>
 
       <!-- Status -->
@@ -465,10 +495,10 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
       <!-- Install / Control -->
       <div class="section-lbl" style="margin-bottom:8px">Daemon Control</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
-        <button class="btn ok" onclick="i2pAction('install')" style="font-size:11px">Install i2pd</button>
-        <button class="btn ok" onclick="i2pAction('start')" style="font-size:11px">Start</button>
-        <button class="btn wr" onclick="i2pAction('stop')" style="font-size:11px">Stop</button>
-        <button class="btn wr" onclick="i2pAction('restart')" style="font-size:11px">Restart</button>
+        <button class="sys-btn teal" onclick="i2pAction('install')" style="font-size:11px">Install i2pd</button>
+        <button class="sys-btn teal" onclick="i2pAction('start')" style="font-size:11px">Start</button>
+        <button class="sys-btn am" onclick="i2pAction('stop')" style="font-size:11px">Stop</button>
+        <button class="sys-btn am" onclick="i2pAction('restart')" style="font-size:11px">Restart</button>
       </div>
 
       <!-- Reticulum integration -->
@@ -478,7 +508,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
         <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
           <input id="i2p-peer-addr" placeholder="xxxxx.b32.i2p" style="flex:1;min-width:200px;background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:6px 10px;color:var(--tx);font-size:12px;font-family:var(--fn)">
           <input id="i2p-peer-name" placeholder="Interface name" value="I2P-Node" style="width:120px;background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:6px 10px;color:var(--tx);font-size:12px">
-          <button class="btn ok" onclick="i2pAddInterface()" style="font-size:11px">Add to config</button>
+          <button class="sys-btn teal" onclick="i2pAddInterface()" style="font-size:11px">Add to config</button>
         </div>
         <div id="i2p-rns-status" style="font-size:11px;color:var(--mu)"></div>
       </div>
@@ -487,7 +517,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
       <div class="section-lbl" style="margin-bottom:8px">Local Tunnel Setup</div>
       <div style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:12px 14px;margin-bottom:12px">
         <div style="font-size:11px;color:var(--mu);margin-bottom:8px">Create incoming I2P tunnel for this MeshGate (so others can connect anonymously):</div>
-        <button class="btn ok" onclick="i2pAction('setup_tunnel')" style="font-size:11px">Setup Reticulum tunnel in i2pd</button>
+        <button class="sys-btn teal" onclick="i2pAction('setup_tunnel')" style="font-size:11px">Setup Reticulum tunnel in i2pd</button>
         <div id="i2p-tunnel-result" style="margin-top:8px;font-size:11px;color:var(--teal);font-family:var(--fn)"></div>
       </div>
 
@@ -496,36 +526,16 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
     </div>
 
     <!-- NOMADNET -->
-    <div class="panel" id="panel-nomadnet">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-        <div class="section-lbl" style="margin:0">Nomadnet Node</div>
-        <button class="btn" onclick="loadNomadnet()" style="font-size:11px">↻ refresh</button>
-      </div>
-      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:12px 14px;margin-bottom:12px">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-          <span style="font-size:13px;font-weight:600;color:var(--tx)">nomadnet daemon</span>
-          <span id="nn-status-dot" style="width:8px;height:8px;border-radius:50%;background:#6b7280;display:inline-block"></span>
-          <span id="nn-status-txt" style="font-size:11px;color:var(--mu)">—</span>
+    <div class="panel" id="panel-nomadnet" style="height:100%">
+      <div style="display:flex;flex-direction:column;flex:1;min-height:0;gap:8px">
+        <div class="section-lbl" style="margin:0">Page Editor — index.mu</div>
+        <textarea id="nn-editor" style="flex:1;min-height:0;width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:10px;color:var(--tx);font-family:var(--fn);font-size:12px;resize:none;box-sizing:border-box" spellcheck="false"></textarea>
+        <div style="display:flex;gap:8px;align-items:center;flex-shrink:0">
+          <button class="sys-btn teal" onclick="nnSavePage()" style="font-size:11px">💾 Save &amp; Restart</button>
+          <a href="https://fr33n0w.github.io/micron-composer/" target="_blank" class="sys-btn" style="font-size:11px;text-decoration:none">🖊 Micron Composer</a>
         </div>
-        <div style="font-size:10px;color:var(--mu);margin-bottom:2px">Node Address</div>
-        <div id="nn-addr" style="font-size:11px;color:var(--teal);font-family:var(--fn);cursor:pointer" title="Click to copy" onclick="navigator.clipboard.writeText(this.innerText)">—</div>
+        <div id="nn-output" style="font-family:var(--fn);font-size:11px;color:var(--teal);background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:8px 10px;white-space:pre-wrap;display:none;flex-shrink:0"></div>
       </div>
-      <div style="margin-bottom:16px">
-        <div class="section-lbl" style="margin-bottom:8px">Daemon Control</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn ok" onclick="nnAction('start')" style="font-size:11px">Start</button>
-          <button class="btn wr" onclick="nnAction('stop')" style="font-size:11px">Stop</button>
-          <button class="btn wr" onclick="nnAction('restart')" style="font-size:11px">Restart</button>
-        </div>
-      </div>
-      <div style="margin-bottom:12px">
-        <div class="section-lbl" style="margin-bottom:8px">Page Editor — index.mu</div>
-        <textarea id="nn-editor" style="width:100%;height:320px;background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:10px;color:var(--tx);font-family:var(--fn);font-size:12px;resize:vertical;box-sizing:border-box" spellcheck="false"></textarea>
-        <div style="margin-top:8px">
-          <button class="btn ok" onclick="nnSavePage()" style="font-size:11px">💾 Save &amp; Restart</button>
-        </div>
-      </div>
-      <div id="nn-output" style="font-family:var(--fn);font-size:11px;color:var(--teal);background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:8px 10px;min-height:32px;white-space:pre-wrap;display:none"></div>
     </div>
 
     <!-- ADDRESSES -->
@@ -538,7 +548,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
         <div style="font-size:11px;color:var(--mu);margin-bottom:4px">🔹 LXMF Bridge</div>
         <div style="font-size:10px;color:var(--mu);margin-bottom:6px">For receiving commands from Reticulum to MQTT / Home Assistant. Add to Sideband as a contact.</div>
         <div id="ap-lxmf-bridge" style="font-family:var(--fn);font-size:12px;color:var(--teal);word-break:break-all;margin-bottom:8px">—</div>
-        <button class="btn" onclick="apCopy('ap-lxmf-bridge')" style="font-size:11px">📋 Copy</button>
+        <button class="sys-btn" onclick="apCopy('ap-lxmf-bridge')" style="font-size:11px">📋 Copy</button>
       </div>
 
 
@@ -548,7 +558,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
         <div style="font-size:11px;color:var(--mu);margin-bottom:4px">🔹 I2P Address (b32)</div>
         <div style="font-size:10px;color:var(--mu);margin-bottom:6px">Anonymous connection without public IP. Share with another gateway.</div>
         <div id="ap-i2p" style="font-family:var(--fn);font-size:12px;color:var(--teal);word-break:break-all;margin-bottom:8px">—</div>
-        <button class="btn" onclick="apCopy('ap-i2p')" style="font-size:11px">📋 Copy</button>
+        <button class="sys-btn" onclick="apCopy('ap-i2p')" style="font-size:11px">📋 Copy</button>
       </div>
 
       <!-- Nomadnet Node -->
@@ -556,7 +566,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
         <div style="font-size:11px;color:var(--mu);margin-bottom:4px">🌐 Nomadnet Node</div>
         <div style="font-size:10px;color:var(--mu);margin-bottom:6px">Gateway info page in the Reticulum network.</div>
         <div id="ap-nn-node" style="font-family:var(--fn);font-size:12px;color:var(--teal);word-break:break-all;margin-bottom:8px">—</div>
-        <button class="btn" onclick="apCopy('ap-nn-node')" style="font-size:11px">📋 Copy</button>
+        <button class="sys-btn" onclick="apCopy('ap-nn-node')" style="font-size:11px">📋 Copy</button>
       </div>
 
       <!-- Nomadnet Chat -->
@@ -564,7 +574,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
         <div style="font-size:11px;color:var(--mu);margin-bottom:4px">💬 Nomadnet Chat</div>
         <div style="font-size:10px;color:var(--mu);margin-bottom:6px">IRC-style chat in the Nomadnet network. Open in Nomadnet browser.</div>
         <div id="ap-nn-chat" style="font-family:var(--fn);font-size:12px;color:var(--teal);word-break:break-all;margin-bottom:8px">—</div>
-        <button class="btn" onclick="apCopy('ap-nn-chat')" style="font-size:11px">📋 Copy</button>
+        <button class="sys-btn" onclick="apCopy('ap-nn-chat')" style="font-size:11px">📋 Copy</button>
       </div>
 
       </div>
@@ -573,8 +583,16 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
 
     <!-- RBROWSER -->
     <div class="panel" id="panel-rbrowser">
-      <iframe id="rbrowser-frame" style="width:100%;height:calc(100vh - 160px);border:none;border-radius:8px;flex:1"></iframe>
-      <script>document.getElementById("rbrowser-frame").src="http://"+window.location.hostname+":5000";</script>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-shrink:0">
+        <a id="rbrowser-link" href="#" target="_blank" class="sys-btn teal" style="font-size:11px;text-decoration:none">↗ Открыть в браузере</a>
+        <span style="font-size:11px;color:var(--mu)">rBrowser · порт 5000</span>
+      </div>
+      <iframe id="rbrowser-frame" style="width:100%;height:calc(100vh - 200px);border:none;border-radius:8px;flex:1"></iframe>
+      <script>
+        var _rbHost = "http://"+window.location.hostname+":5000";
+        document.getElementById("rbrowser-frame").src = _rbHost;
+        document.getElementById("rbrowser-link").href = _rbHost;
+      </script>
     </div>
 
     <!-- LOGS -->
@@ -584,7 +602,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
           <option value="lxmf_bridge_mqtt">lxmf_bridge_mqtt</option>
           <option value="rnsd">rnsd</option>
         </select>
-        <button class="btn" onclick="loadLogs()">↻</button>
+        <button class="sys-btn" onclick="loadLogs()">↻</button>
       </div>
       <div class="log-box" id="log-box"></div>
     </div>
@@ -595,8 +613,8 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
       <div class="cfg-path" id="cfg-path"></div>
       <textarea id="cfg-area" spellcheck="false"></textarea>
       <div class="brow">
-        <button class="btn pr" onclick="saveConfig()">Save</button>
-        <button class="btn" onclick="downloadConfig()">↓ Download</button>
+        <button class="sys-btn teal" onclick="saveConfig()">Save</button>
+        <button class="sys-btn" onclick="downloadConfig()">↓ Download</button>
       </div>
     </div>
 
@@ -604,7 +622,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
     <div class="panel" id="panel-rnode">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
         <div class="section-lbl" style="margin:0">RNode</div>
-        <button class="btn ok" onclick="loadRnodePanel()" style="font-size:10px">↻ refresh</button>
+        <button class="sys-btn teal" onclick="loadRnodePanel()" style="font-size:10px">↻ refresh</button>
       </div>
       <div id="rnode-status" style="margin-bottom:12px"></div>
       <div id="rnode-metrics" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:16px"></div>
@@ -625,12 +643,12 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
 
     <!-- RMAP -->
     <div class="panel" id="panel-rmap">
-      <div style="max-width:600px">
+      <div style="width:100%">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
           <div class="section-lbl" style="margin:0">Public Nodes</div>
           <div style="display:flex;gap:6px">
-            <button class="btn ok" onclick="loadNodesMonitor()" style="font-size:10px">↻ check</button>
-            <button class="btn" onclick="showAddNode()" style="font-size:10px">+ add</button>
+            <button class="sys-btn teal" onclick="loadNodesMonitor()" style="font-size:10px">↻ check</button>
+            <button class="sys-btn" onclick="showAddNode()" style="font-size:10px">+ add</button>
           </div>
         </div>
         <div id="nodes-monitor-list"></div>
@@ -640,54 +658,68 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
             <input id="new-node-name" placeholder="Name" style="flex:1;min-width:80px;font-family:var(--fn);font-size:12px;padding:5px 8px;border:1px solid var(--bd);border-radius:5px;background:var(--bg);color:var(--tx)">
             <input id="new-node-host" placeholder="host" style="flex:2;min-width:120px;font-family:var(--fn);font-size:12px;padding:5px 8px;border:1px solid var(--bd);border-radius:5px;background:var(--bg);color:var(--tx)">
             <input id="new-node-port" placeholder="port" value="4242" style="width:60px;font-family:var(--fn);font-size:12px;padding:5px 8px;border:1px solid var(--bd);border-radius:5px;background:var(--bg);color:var(--tx)">
-            <button class="btn pr" onclick="addNode()">Add</button>
-            <button class="btn" onclick="hideAddNode()">Cancel</button>
+            <button class="sys-btn teal" onclick="addNode()">Add</button>
+            <button class="sys-btn" onclick="hideAddNode()">Cancel</button>
           </div>
         </div>
         <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--bd)">
           <div class="section-lbl">rnprobe</div>
           <div style="display:flex;gap:6px;margin-bottom:8px">
             <input id="probe-addr" placeholder="LXMF address" style="flex:1;font-family:var(--fn);font-size:12px;padding:5px 8px;border:1px solid var(--bd);border-radius:5px;background:var(--s1);color:var(--tx)">
-            <button class="btn ok" onclick="doProbe()">▶ probe</button>
+            <button class="sys-btn teal" onclick="doProbe()">▶ probe</button>
           </div>
           <div id="probe-result" style="font-size:12px;font-family:var(--fn);color:var(--mu);white-space:pre-wrap"></div>
         </div>
-      </div>
       </div>
     </div>
 
     <!-- SYSTEM -->
     <div class="panel" id="panel-system">
-      <div id="sys-info" style="line-height:2.2;margin-bottom:20px"></div>
       <div class="section-lbl">Backup & Restore</div>
-      <div class="brow" style="margin-bottom:20px">
-        <button class="btn ok" onclick="showBackupModal()">⬇ download backup</button>
-        <button class="btn wr" onclick="showRestoreModal()">↑ restore</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px">
+        <button class="sys-btn teal" onclick="showBackupModal()">Download Backup</button>
+        <button class="sys-btn am" onclick="showRestoreModal()">Restore</button>
       </div>
+
       <div class="section-lbl">Quick Commands</div>
       <div style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:10px 14px;margin-bottom:12px">
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
-          <button class="btn" onclick="runCmd('find_ports')" style="font-size:10px">🔌 find ports</button>
-          <button class="btn" onclick="runCmd('rnstatus')" style="font-size:10px">📡 rnstatus</button>
-          <button class="btn wr" onclick="runCmd('restart_rnsd')" style="font-size:10px">↺ restart rnsd</button>
-          <button class="btn wr" onclick="runCmd('restart_lxmf')" style="font-size:10px">↺ restart lxmf</button>
-          <button class="btn" onclick="runCmd('free_mem')" style="font-size:10px">💾 memory</button>
-          <button class="btn" onclick="runCmd('uptime')" style="font-size:10px">⏱ uptime</button>
-          <button class="btn" onclick="runCmd('chat_log_view')" style="font-size:10px">💬 chat log</button>
-          <button class="btn wr" onclick="if(confirm('Clear Nomadnet chat log?'))runCmd('chat_log_clear')" style="font-size:10px">🗑 clear chat</button>
+          <button class="sys-btn" onclick="runCmd('find_ports')">Ports</button>
+          <button class="sys-btn" onclick="runCmd('rnstatus')">RNStatus</button>
+          <button class="sys-btn am" onclick="runCmd('restart_rnsd')">Restart RNSD</button>
+          <button class="sys-btn am" onclick="runCmd('restart_lxmf')">Restart LXMF</button>
+          <button class="sys-btn" onclick="runCmd('free_mem')">Memory</button>
+          <button class="sys-btn" onclick="runCmd('uptime')">Uptime</button>
         </div>
         <div id="cmd-output" style="font-family:var(--fn);font-size:11px;color:var(--teal);background:var(--bg);border-radius:6px;padding:8px 10px;min-height:32px;white-space:pre-wrap;display:none"></div>
       </div>
 
+      <div class="section-lbl">RNS Version</div>
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:12px 14px;margin-bottom:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+          <div>
+            <div style="font-size:12px;color:var(--mu);margin-bottom:2px">Installed</div>
+            <div id="rns-cur-ver" style="font-family:var(--fn);font-size:13px;color:var(--tx)">—</div>
+          </div>
+          <div>
+            <div style="font-size:12px;color:var(--mu);margin-bottom:2px">Latest (PyPI)</div>
+            <div id="rns-latest-ver" style="font-family:var(--fn);font-size:13px;color:var(--tx)">—</div>
+          </div>
+          <button class="sys-btn teal" id="rns-update-btn" onclick="rnsUpdate()" style="display:none">Update RNS</button>
+        </div>
+        <div id="rns-update-status" style="font-family:var(--fn);font-size:11px;color:var(--teal);margin-top:8px;display:none"></div>
+      </div>
+
       <div class="section-lbl">System</div>
-      <div class="brow">
-        <button class="btn wr" onclick="svcAction('dashboard','restart')">↺ restart dashboard</button>
-        <button class="btn er" onclick="showRebootModal()">⏻ reboot</button>
-        <button class="btn er" onclick="showResetModal()" style="margin-top:8px;width:100%">🔑 Reset all identity</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="sys-btn am" onclick="svcAction('dashboard','restart')">Restart Dashboard</button>
+        <button class="sys-btn rd" onclick="showRebootModal()">Reboot</button>
+        <button class="sys-btn rd" onclick="showResetModal()">Reset All Identity</button>
       </div>
     </div>
 
   </div>
+</div>
 </div>
 <div class="toast" id="toast"></div>
 
@@ -705,8 +737,8 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
       • monitored_nodes.json
     </div>
     <div style="display:flex;gap:10px;justify-content:flex-end">
-      <button class="btn" onclick="closeModal('backup-modal')">Cancel</button>
-      <button class="btn ok" onclick="doBackupDownload()">⬇ Download</button>
+      <button class="sys-btn" onclick="closeModal('backup-modal')">Cancel</button>
+      <button class="sys-btn teal" onclick="doBackupDownload()">⬇ Download</button>
     </div>
   </div>
 </div>
@@ -718,8 +750,8 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
     <div style="font-size:12px;color:var(--mu);margin-bottom:16px;line-height:1.8">Select ZIP-file backupа:</div>
     <input type="file" id="restore-file" accept=".zip" style="font-size:12px;color:var(--tx);margin-bottom:16px;width:100%">
     <div style="display:flex;gap:10px;justify-content:flex-end">
-      <button class="btn" onclick="closeModal('restore-modal')">Cancel</button>
-      <button class="btn ok" onclick="doRestore()">↑ Restore</button>
+      <button class="sys-btn" onclick="closeModal('restore-modal')">Cancel</button>
+      <button class="sys-btn teal" onclick="doRestore()">↑ Restore</button>
     </div>
   </div>
 </div>
@@ -730,8 +762,8 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
     <div style="font-size:16px;font-weight:700;color:var(--rd);margin-bottom:12px">⚠ Reset Identity</div>
     <div style="font-size:13px;color:var(--mu);margin-bottom:20px">Reset: LXMF adress, I2P tonnel, Reticulum identity, chat history.<br><br></div>
     <div style="display:flex;gap:8px;justify-content:center">
-      <button class="btn" onclick="closeModal('reset-modal')">Cancel</button>
-      <button class="btn er" onclick="doResetIdentity()">Reset</button>
+      <button class="sys-btn" onclick="closeModal('reset-modal')">Cancel</button>
+      <button class="sys-btn rd" onclick="doResetIdentity()">Reset</button>
     </div>
     <div id="reset-status" style="margin-top:12px;font-size:12px;color:var(--mu)"></div>
   </div>
@@ -741,8 +773,8 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
     <div style="font-size:15px;font-weight:700;color:var(--rd);margin-bottom:8px">⏻ Rebooting</div>
     <div style="font-size:12px;color:var(--mu);margin-bottom:20px">Server will reboot. All services will temporarily stop.</div>
     <div style="display:flex;gap:10px;justify-content:flex-end">
-      <button class="btn" onclick="closeModal('reboot-modal')">Cancel</button>
-      <button class="btn er" onclick="doReboot()">⏻ Reboot</button>
+      <button class="sys-btn" onclick="closeModal('reboot-modal')">Cancel</button>
+      <button class="sys-btn rd" onclick="doReboot()">⏻ Reboot</button>
     </div>
   </div>
 </div>
@@ -761,9 +793,12 @@ function nav(id,el){
   document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
   el.classList.add("active");
   document.getElementById("panel-"+id).classList.add("active");
+  const main = document.querySelector(".main");
+  if(id==="rbrowser"){ main.style.overflow="hidden"; main.style.padding="0"; }
+  else { main.style.overflow=""; main.style.padding=""; }
   if(id==="chat") loadChat();
   if(id==="monitor"){ loadLxmf(); loadRns(); }
-  if(id==="logs") loadLogs();
+  if(id==="system") checkRnsVersion();
   if(id==="configs") loadConfigs();
 
   if(id==="nodes_monitor") loadNodesMonitor();
@@ -797,7 +832,7 @@ async function loadSystem(){
   const d=await r.json();
   document.getElementById("uptime-lbl").textContent="Uptime: "+d.uptime;
   document.getElementById("rns-ver-lbl").textContent="RNS: "+d.rns_version+" · Python: "+d.py_version;
-    try{const vr=await fetch(API+"/api/version").then(r=>r.json());const vl=document.getElementById("rns-ver-lbl");if(vl&&vr.version)vl.textContent+=" · Dashboard: v"+vr.version;}catch(e){}
+    try{const vr=await fetch(API+"/api/version").then(r=>r.json());const vl=document.getElementById("rns-ver-lbl");if(vl&&vr.version)vl.textContent+=" · Dashboard: v1.1.0";}catch(e){}
   document.getElementById("ip-lbl").textContent=d.ip;
   const cpu=d.cpu||0, ram=d.ram_total?Math.round(d.ram_used/d.ram_total*100):0;
   const disk=d.disk_total?Math.round(d.disk_used/d.disk_total*100):0;
@@ -838,9 +873,9 @@ async function loadServices(){
         <span class="badge ${s.status}">${esc(s.status)}</span>
       </div>
       <div class="svc-btns">
-        <button class="btn ok" onclick="svcAction('${s.name}','start')">▶ start</button>
-        <button class="btn er" onclick="svcAction('${s.name}','stop')">■ stop</button>
-        <button class="btn wr" onclick="svcAction('${s.name}','restart')">↺ restart</button>
+        <button class="sys-btn teal" onclick="svcAction('${s.name}','start')">▶ start</button>
+        <button class="sys-btn rd" onclick="svcAction('${s.name}','stop')">■ stop</button>
+        <button class="sys-btn am" onclick="svcAction('${s.name}','restart')">↺ restart</button>
       </div>
     </div>`).join("");
 }
@@ -887,6 +922,32 @@ async function doResetIdentity(){
       st.style.color="var(--rd)";st.textContent="Ошибка: "+d.error;
     }
   }catch(e){st.style.color="var(--rd)";st.textContent="Ошибка: "+e;}
+}
+async function checkRnsVersion(){
+  try{
+    const d = await fetch(API+"/api/rns_update_check").then(r=>r.json());
+    if(d.error) return;
+    document.getElementById("rns-cur-ver").textContent = d.current || "—";
+    document.getElementById("rns-latest-ver").textContent = d.latest || "—";
+    const btn = document.getElementById("rns-update-btn");
+    if(d.update_available){
+      btn.style.display = "block";
+      document.getElementById("rns-latest-ver").style.color = "var(--teal)";
+    } else {
+      btn.style.display = "none";
+      document.getElementById("rns-latest-ver").style.color = "var(--gr)";
+    }
+  }catch(e){}
+}
+async function rnsUpdate(){
+  const st = document.getElementById("rns-update-status");
+  st.style.display = "block";
+  st.textContent = "Обновление...";
+  try{
+    const d = await fetch(API+"/api/run_cmd",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({cmd:"rns_update"})}).then(r=>r.json());
+    st.textContent = d.output || d.error || "Готово";
+    setTimeout(checkRnsVersion, 3000);
+  }catch(e){ st.textContent = "Ошибка: "+e; }
 }
 function showRebootModal(){const m=document.getElementById("reboot-modal");m.style.display="flex";}
 function closeModal(id){document.getElementById(id).style.display="none";}
@@ -1156,7 +1217,7 @@ async function loadNodesMonitor(){
       <div style="display:flex;align-items:center;gap:8px">
         <div style="width:8px;height:8px;border-radius:50%;background:${n.status==="online"?"var(--gr)":"var(--rd)"}"></div>
         <span style="font-size:11px;color:${n.status==="online"?"var(--gr)":"var(--rd)"}">${n.status}</span>
-        <button class="btn er" style="font-size:10px;padding:2px 8px" onclick="removeNode('${esc(n.host)}',${n.port})">✕</button>
+        <button class="sys-btn rd" style="font-size:10px;padding:2px 8px" onclick="removeNode('${esc(n.host)}',${n.port})">✕</button>
       </div>
     </div>`).join("");
   // home nodes
