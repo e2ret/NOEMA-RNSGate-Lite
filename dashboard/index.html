@@ -625,7 +625,6 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
 
     <!-- RMAP -->
     <div class="panel" id="panel-rmap">
-      <!-- Public Nodes -->
       <div style="max-width:600px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
           <div class="section-lbl" style="margin:0">Public Nodes</div>
@@ -1263,7 +1262,6 @@ async function loadChat(){
   const r = await fetch(API+"/api/chat/address");
   const d = await r.json();
   if(d.address) document.getElementById("chat-my-addr").textContent = d.address;
-
   const cr = await fetch(API+"/api/chat/contacts");
   chatContacts = await cr.json();
   renderChatContacts();
@@ -1796,7 +1794,6 @@ async function loadAddressesPanel(){
     const d = await fetch(API+"/api/addresses").then(r=>r.json());
     if(d.lxmf_bridge) document.getElementById("ap-lxmf-bridge").textContent = d.lxmf_bridge;
   }catch(e){}
-
   try{
     const d = await fetch(API+"/api/nomadnet/status").then(r=>r.json());
     if(d.page_addr){
