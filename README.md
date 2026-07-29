@@ -1,12 +1,12 @@
 # NOEMA RNSGate Lite — LoRa · MQTT · I2P · Nomadnet
 
 <p align="left">
-  <img src="https://github.com/e2ret/NOEMA-RNSGate-Lite/blob/main/001.png" width="800" alt="Noema Power Card">
+  <img src="https://github.com/e2ret/NOEMA-RNSGate-Lite/blob/main/001.png" width="800" alt="NOEMA RNSGate Lite">
 </p>
 
 [🇷🇺 Читать на русском](#ru)
 
- for the Reticulum network, combining LoRa radio, LXMF messaging, MQTT integration with Home Assistant, anonymous I2P network, Nomadnet, and a modern web dashboard.
+**Reticulum Mesh Gateway** — a lightweight gateway for the Reticulum network, combining LoRa radio, LXMF messaging, MQTT integration with Home Assistant, anonymous I2P network, Nomadnet, and a modern web dashboard.
 
 ![RNS](https://img.shields.io/badge/RNS-1.4.2-teal) ![License](https://img.shields.io/badge/license-MIT-green)
 
@@ -77,7 +77,12 @@ The script will automatically:
 1. Connect an Ethernet cable to your router
 2. Find the device in your router's client list
 3. Open browser: `http://GATEWAY_IP:8081`
-4. SSH: `ssh root@GATEWAY_IP`
+4. SSH: `ssh root@GATEWAY_IP` (default password: `1234`)
+
+Configure Wi-Fi:
+```bash
+nmtui
+```
 
 ---
 
@@ -128,6 +133,8 @@ port = 1883
 username = username
 password = password
 ```
+
+After changes click **Save** in the dashboard — the service restarts automatically.
 
 Home Assistant automation example:
 
@@ -189,10 +196,47 @@ The Addresses tab contains all gateway addresses:
 
 | Address | Description |
 |---------|-------------|
-| LXMF Bridge | Receive commands from Reticulum → MQTT |
+| LXMF Bridge | Receive commands from Reticulum → MQTT. Add to Sideband as a contact |
 | I2P (b32) | Anonymous connection without public IP |
 | Nomadnet Node | Info page address |
 | Nomadnet Chat | IRC-style chat address |
+
+---
+
+## I2P
+
+`Dashboard → I2P`
+
+1. Click **Setup Reticulum tunnel in i2pd**
+2. Wait 2–5 minutes for the b32 address to appear
+3. Exchange addresses with another gateway
+4. Add their b32 → **Add to config**
+5. Start exchanging LXMF messages
+
+> ⚠️ Initial network stabilization takes 5–10 minutes. Reconnections every ~2 min are normal.
+
+---
+
+## Nomadnet Page
+
+The gateway automatically publishes an info page. Open in any Nomadnet client:
+
+```
+<node_address>:/page/index.mu
+```
+
+Edit: `Dashboard → Nomadnet → Page Editor`
+
+**Micron markup basics:**
+```
+`c          — center
+`f...`f     — large font
+`b...`b     — bold
+`[Title`]   — section header
+---         — divider
+```
+
+Use [Micron Composer](https://fr33n0w.github.io/micron-composer/) for visual editing — available directly from the Nomadnet tab.
 
 ---
 
@@ -206,6 +250,59 @@ Built-in browser for viewing Nomadnet pages without installing additional apps. 
 http://GATEWAY_IP:5000
 ```
 
+Features: multi-tab, favorites, known nodes list, ping, search.
+
+Based on [rBrowser](https://github.com/fr33n0w/rBrowser) — fr33n0w, MIT.
+
+---
+
+## Typical Use Cases
+
+**Local browser over LAN**
+```
+PC/Phone ──Wi-Fi──▶ NOEMA RNSGate
+```
+No setup needed. Open: `http://GATEWAY_IP:8081`
+
+**Sideband over TCP**
+```
+Smartphone ──TCP──▶ NOEMA RNSGate
+```
+Requires internet, port 4242.
+
+**Two gateways via I2P**
+```
+RNSGate ──I2P──▶ RNSGate
+```
+Anonymous, no public IP needed.
+
+**LoRa → Gateway → I2P**
+```
+Smartphone ──BT──▶ RNode ──LoRa──▶ RNSGate ──▶ I2P
+```
+Smartphone offline, internet only on the gateway.
+
+**Wi-Fi → Gateway → I2P**
+```
+Smartphone ──Wi-Fi──▶ RNSGate ──▶ I2P
+```
+No mobile internet needed on the smartphone.
+
+---
+
+## RNS Version Check
+
+`Dashboard → System → RNS Version`
+
+Shows installed vs latest PyPI version. If an update is available, the **Update RNS** button appears — click to update without SSH.
+
+---
+
+## Backup & Restore
+
+`Dashboard → System → Download Backup` — ZIP with configs and keys  
+`Dashboard → System → Restore` — restore from archive
+
 ---
 
 ## Reset Identity
@@ -213,6 +310,16 @@ http://GATEWAY_IP:5000
 `Dashboard → System → Reset All Identity`
 
 Use before selling the gateway. Deletes all identities, keys, history. Preserves configs and Nomadnet pages.
+
+What is deleted:
+- LXMF Bridge identity and keys
+- Reticulum identity
+- I2P keys (new b32 after reset)
+- Nomadnet identity (new node address)
+
+What is preserved:
+- Reticulum and MQTT configuration
+- Nomadnet pages
 
 > ⚠️ Irreversible. Make a backup first.
 
@@ -245,10 +352,14 @@ Use before selling the gateway. Deletes all identities, keys, history. Preserves
 
 ## Credits
 
-- **Mark Qvist** — Reticulum, LXMF, Nomadnet
-- **SebastianObi** — lxmf-tools
-- **fr33n0w** — rBrowser
-- **PurpleI2P Team** — i2pd
+- [Reticulum (RNS)](https://github.com/markqvist/Reticulum) — Mark Qvist, MIT
+- [LXMF](https://github.com/markqvist/LXMF) — Mark Qvist, MIT
+- [Nomadnet](https://github.com/markqvist/NomadNet) — Mark Qvist, GPL-3.0
+- [Flask](https://flask.palletsprojects.com/) — Pallets, BSD
+- [paho-mqtt](https://github.com/eclipse/paho.mqtt.python) — Eclipse, EPL/EDL
+- [rBrowser](https://github.com/fr33n0w/rBrowser) — fr33n0w, MIT
+- [lxmf-tools](https://github.com/SebastianObi/LXMF-Tools) — SebastianObi
+- [i2pd](https://github.com/PurpleI2P/i2pd) — PurpleI2P, BSD
 
 ---
 
@@ -329,7 +440,12 @@ git clone https://github.com/e2ret/NOEMA-RNSGate-Lite.git && cd NOEMA-RNSGate-Li
 1. Подключите Ethernet-кабель к роутеру
 2. Найдите устройство в списке клиентов роутера
 3. Откройте браузер: `http://IP_ШЛЮЗА:8081`
-4. SSH: `ssh root@IP_ШЛЮЗА`
+4. SSH: `ssh root@IP_ШЛЮЗА` (пароль по умолчанию: `1234`)
+
+Настройка Wi-Fi:
+```bash
+nmtui
+```
 
 ---
 
@@ -380,6 +496,8 @@ port = 1883
 username = username
 password = password
 ```
+
+После изменений нажмите **Save** в дашборде — сервис перезапустится автоматически.
 
 Пример автоматизации Home Assistant:
 
@@ -441,10 +559,47 @@ Host: IP_ШЛЮЗА  Port: 4242
 
 | Адрес | Описание |
 |-------|----------|
-| LXMF Bridge | Приём команд из Reticulum → MQTT |
+| LXMF Bridge | Приём команд из Reticulum → MQTT. Добавьте в Sideband как контакт |
 | I2P (b32) | Анонимное подключение без публичного IP |
 | Nomadnet Node | Адрес страницы-визитки |
 | Nomadnet Chat | IRC-style чат |
+
+---
+
+## I2P
+
+`Dashboard → I2P`
+
+1. Нажмите **Setup Reticulum tunnel in i2pd**
+2. Подождите 2–5 минут, пока появится b32-адрес
+3. Обменяйтесь адресами с другим шлюзом
+4. Добавьте его b32 → **Add to config**
+5. Начните обмен LXMF-сообщениями
+
+> ⚠️ Первичная стабилизация сети занимает 5–10 минут. Переподключения каждые ~2 мин — норма.
+
+---
+
+## Страница Nomadnet
+
+Шлюз автоматически публикует страницу-визитку. Открыть в любом Nomadnet клиенте:
+
+```
+<node_address>:/page/index.mu
+```
+
+Редактирование: `Dashboard → Nomadnet → Page Editor`
+
+**Основы разметки Micron:**
+```
+`c          — центрирование
+`f...`f     — крупный шрифт
+`b...`b     — жирный
+`[Заголовок`] — раздел
+---         — разделитель
+```
+
+Используйте [Micron Composer](https://fr33n0w.github.io/micron-composer/) для визуального редактирования — кнопка доступна прямо во вкладке Nomadnet.
 
 ---
 
@@ -458,6 +613,59 @@ Host: IP_ШЛЮЗА  Port: 4242
 http://IP_ШЛЮЗА:5000
 ```
 
+Возможности: мультитаб, избранное, список известных нод, ping, поиск.
+
+Основан на [rBrowser](https://github.com/fr33n0w/rBrowser) — fr33n0w, MIT.
+
+---
+
+## Типовые сценарии
+
+**Браузер по LAN**
+```
+ПК/Телефон ──Wi-Fi──▶ NOEMA RNSGate
+```
+Без настройки. Открыть: `http://IP_ШЛЮЗА:8081`
+
+**Sideband по TCP**
+```
+Смартфон ──TCP──▶ NOEMA RNSGate
+```
+Нужен интернет, порт 4242.
+
+**Два шлюза через I2P**
+```
+RNSGate ──I2P──▶ RNSGate
+```
+Анонимно, без публичного IP.
+
+**LoRa → Шлюз → I2P**
+```
+Смартфон ──BT──▶ RNode ──LoRa──▶ RNSGate ──▶ I2P
+```
+Смартфон офлайн, интернет только на шлюзе.
+
+**Wi-Fi → Шлюз → I2P**
+```
+Смартфон ──Wi-Fi──▶ RNSGate ──▶ I2P
+```
+Мобильный интернет не нужен.
+
+---
+
+## Проверка версии RNS
+
+`Dashboard → System → RNS Version`
+
+Показывает установленную и актуальную версию с PyPI. При наличии обновления появляется кнопка **Update RNS** — обновление без SSH.
+
+---
+
+## Backup & Restore
+
+`Dashboard → System → Download Backup` — ZIP с конфигами и ключами  
+`Dashboard → System → Restore` — восстановление из архива
+
 ---
 
 ## Сброс идентификаторов
@@ -465,6 +673,16 @@ http://IP_ШЛЮЗА:5000
 `Dashboard → System → Reset All Identity`
 
 Используйте перед продажей шлюза. Удаляет все identity, ключи, историю. Сохраняет конфиги и страницы Nomadnet.
+
+Что удаляется:
+- LXMF Bridge identity и ключи
+- Reticulum identity
+- I2P ключи (новый b32 после сброса)
+- Nomadnet identity (новый адрес node)
+
+Что сохраняется:
+- Конфигурация Reticulum и MQTT
+- Страницы Nomadnet
 
 > ⚠️ Необратимо. Сделайте бэкап заранее.
 
