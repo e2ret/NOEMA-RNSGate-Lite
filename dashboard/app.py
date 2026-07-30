@@ -27,6 +27,8 @@ _RNS_BIN = os.path.dirname(_find_rns_bin("rnstatus"))
 SERVICES = ["lxmf_bridge_mqtt", "rnsd", "i2pd", "nomadnet", "rbrowser"]
 
 NOMADNET_PAGE = f"{_HOME}/.nomadnetwork/storage/pages/index.mu"
+NOMADNET_PAGES_DIR = f"{_HOME}/.nomadnetwork/storage/pages"
+SCRIPTS_DIR = f"{_HOME}/NOEMA-RNSGate-Lite/scripts"
 NOMADNET_ADDR_FILE = f"{_HOME}/.nomadnetwork/storage/hashes"
 
 CONFIGS = {
@@ -983,7 +985,152 @@ def nomadnet_page_save():
     except Exception as e:
         return jsonify({"ok": False, "error": str(e)})
 
-@app.route("/api/version")
+# Multi-page support
+@app.route("/api/nomadnet/pages")
+def nomadnet_pages_list():
+    SYSTEM_PAGES = {"fullchat.mu", "last100.mu", "meshchat.mu", "nomadnet.mu"}
+    try:
+        files = [f for f in os.listdir(NOMADNET_PAGES_DIR) if f.endswith(".mu") and f not in SYSTEM_PAGES]
+        return jsonify(sorted(files))
+    except:
+        return jsonify([])
+
+@app.route("/api/nomadnet/pages/<name>")
+def nomadnet_page_read(name):
+    if not name.endswith(".mu") or "/" in name:
+        return jsonify({"ok": False, "error": "Invalid name"})
+    path = os.path.join(NOMADNET_PAGES_DIR, name)
+    try:
+        return jsonify({"content": open(path).read(), "path": path})
+    except:
+        return jsonify({"content": "", "path": path})
+
+@app.route("/api/nomadnet/pages/<name>", methods=["POST"])
+def nomadnet_page_save_named(name):
+    if not name.endswith(".mu") or "/" in name:
+        return jsonify({"ok": False, "error": "Invalid name"})
+    content = (request.json or {}).get("content", "")
+    path = os.path.join(NOMADNET_PAGES_DIR, name)
+    try:
+        os.makedirs(NOMADNET_PAGES_DIR, exist_ok=True)
+        open(path, "w").write(content)
+        sh("sudo systemctl restart nomadnet")
+        return jsonify({"ok": True})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)})
+
+@app.route("/api/nomadnet/pages/<name>", methods=["DELETE"])
+def nomadnet_page_delete(name):
+    if not name.endswith(".mu") or "/" in name or name == "index.mu":
+        return jsonify({"ok": False, "error": "Cannot delete"})
+    path = os.path.join(NOMADNET_PAGES_DIR, name)
+    try:
+        os.remove(path)
+        return jsonify({"ok": True})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)})
+
+# Scripts support
+@app.route("/api/scripts")
+def scripts_list():
+    try:
+        os.makedirs(SCRIPTS_DIR, exist_ok=True)
+        files = [f for f in os.listdir(SCRIPTS_DIR) if f.endswith(".py")]
+        return jsonify(sorted(files))
+    except:
+        return jsonify([])
+
+@app.route("/api/scripts/<name>")
+def script_read(name):
+    if not name.endswith(".py") or "/" in name:
+        return jsonify({"ok": False, "error": "Invalid name"})
+    path = os.path.join(SCRIPTS_DIR, name)
+    try:
+        return jsonify({"content": open(path).read(), "path": path})
+    except:
+        return jsonify({"content": "", "path": path})
+
+@app.route("/api/scripts/<name>", methods=["POST"])
+def script_save(name):
+    if not name.endswith(".py") or "/" in name:
+        return jsonify({"ok": False, "error": "Invalid name"})
+    content = (request.json or {}).get("content", "")
+    path = os.path.join(SCRIPTS_DIR, name)
+    try:
+        os.makedirs(SCRIPTS_DIR, exist_ok=True)
+        open(path, "w").write(content)
+        return jsonify({"ok": True})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)})
+
+@app.route("/api/scripts/<name>", methods=["DELETE"])
+def script_delete(name):
+    if not name.endswith(".py") or "/" in name:
+        return jsonify({"ok": False, "error": "Invalid name"})
+    path = os.path.join(SCRIPTS_DIR, name)
+    try:
+        os.remove(path)
+        return jsonify({"ok": True})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)})
+
+@app.route("/api/scripts/<name>/run", methods=["POST"])
+def script_run(name):
+    if not name.endswith(".py") or "/" in name:
+        return jsonify({"ok": False, "error": "Invalid name"})
+    path = os.path.join(SCRIPTS_DIR, name)
+    try:
+        venv_python = f"{_HOME}/NOEMA-RNSGate-Lite/.venv/bin/python3"
+        out, rc = sh(f"{venv_python} {path} 2>&1")
+        return jsonify({"ok": rc == 0, "output": out})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)})
+
+@app.route("/api/scripts/<name>/cron")
+def script_cron_get(name):
+    if not name.endswith(".py") or "/" in name:
+        return jsonify({"ok": False, "error": "Invalid name"})
+    path = os.path.join(SCRIPTS_DIR, name)
+    try:
+        venv_python = f"{_HOME}/NOEMA-RNSGate-Lite/.venv/bin/python3"
+        crontab_out, _ = sh("crontab -l 2>/dev/null")
+        marker = f"# noema-script:{name}"
+        schedule = None
+        for line in crontab_out.splitlines():
+            if marker in line and not line.strip().startswith("#"):
+                parts = line.split()
+                schedule = " ".join(parts[:5])
+                break
+        return jsonify({"ok": True, "schedule": schedule, "enabled": schedule is not None})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)})
+
+@app.route("/api/scripts/<name>/cron", methods=["POST"])
+def script_cron_set(name):
+    if not name.endswith(".py") or "/" in name:
+        return jsonify({"ok": False, "error": "Invalid name"})
+    path = os.path.join(SCRIPTS_DIR, name)
+    data = request.json or {}
+    schedule = data.get("schedule")  # None = disable
+    try:
+        venv_python = f"{_HOME}/NOEMA-RNSGate-Lite/.venv/bin/python3"
+        marker = f"# noema-script:{name}"
+        crontab_out, _ = sh("crontab -l 2>/dev/null")
+        lines = [l for l in crontab_out.splitlines() if marker not in l]
+        if schedule:
+            lines.append(f"{schedule} {venv_python} {path} >> /tmp/{name}.log 2>&1 {marker}")
+        new_crontab = "\n".join(lines) + "\n"
+        import tempfile
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.cron', delete=False) as f:
+            f.write(new_crontab)
+            tmp = f.name
+        sh(f"crontab {tmp}")
+        os.unlink(tmp)
+        return jsonify({"ok": True, "schedule": schedule, "enabled": schedule is not None})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)})
+
+
 def version(): return jsonify({"version": __version__})
 @app.route("/api/rns_update_check")
 def rns_update_check():

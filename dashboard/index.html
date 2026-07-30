@@ -110,15 +110,24 @@ body{
   align-items:center;
   justify-content:center;
   min-height:52px;
-  flex-shrink:0
+  flex-shrink:0;
+  position:relative
 }
 .sidebar::-webkit-scrollbar{display:none}
-
-.nav-sep{
-  width:1px;height:20px;
-  background:var(--bd);
-  margin:0 6px;
-  flex-shrink:0
+.nav-sep{width:1px;height:20px;background:var(--bd);margin:0 6px;flex-shrink:0}
+@media(max-width:768px){
+  .sidebar{justify-content:flex-start;flex-wrap:wrap;padding:6px 8px;gap:4px}
+  .nav-item{font-size:13px;padding:6px 10px}
+  .nav-sep{display:none}
+  .topbar{padding:8px 12px}
+  .logo b{font-size:14px}
+  .logo img{height:28px;width:28px}
+  #uptime-lbl,#rns-ver-lbl{font-size:10px}
+  #clock-lbl{display:none}
+  .metrics{grid-template-columns:repeat(3,1fr);gap:6px;padding:6px 8px}
+  .mc{padding:8px 10px}
+  .lb{font-size:9px}
+  .vl{font-size:22px}
 }
 
 .nav-item{
@@ -146,13 +155,14 @@ body{
   cursor:pointer;
   transition:.15s;
   border-radius:10px;
-  border:none;
+  border:1px solid rgba(255,255,255,.08);
   background:rgba(255,255,255,.06);
-  font-size:15px;font-weight:600;
+  font-size:15px;font-weight:500;
   font-family:var(--fn);
   letter-spacing:.06em;
   text-transform:uppercase;
   white-space:nowrap;
+  line-height:1;
 }
 .sys-btn:hover{background:rgba(255,255,255,.1);}
 .sys-btn.teal{color:var(--teal);}
@@ -186,7 +196,7 @@ body{
 .svc:last-child{border-bottom:none}
 .svc-n{font-size:14px;font-weight:600;font-family:var(--mono);color:var(--tx)}
 
-.badge{font-size:11px;padding:4px 10px;border-radius:8px;font-weight:600;letter-spacing:.03em}
+.badge{font-size:15px;padding:7px 16px;border-radius:10px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;line-height:1;display:inline-flex;align-items:center}
 .badge.active{background:rgba(20,184,166,.15);color:var(--gr);border:1px solid rgba(20,184,166,.25)}
 .badge.inactive,.badge.failed{background:rgba(239,68,68,.15);color:var(--rd);border:1px solid rgba(239,68,68,.25)}
 
@@ -206,8 +216,10 @@ select{
   border-radius:10px;color:var(--tx)
 }
 
-.cfg-tabs{display:flex;gap:2px;margin-bottom:12px;border-bottom:1px solid var(--bd)}
-.ctab{font-size:12px;padding:8px 16px;cursor:pointer;color:var(--mu);border-bottom:2px solid transparent;margin-bottom:-1px;font-weight:500}
+.cfg-tabs{display:flex;gap:4px;margin-bottom:12px}
+.ctab{font-size:15px;padding:7px 16px;cursor:pointer;color:var(--mu);border-radius:10px;border:1px solid transparent;font-weight:500;text-transform:uppercase;letter-spacing:.06em;transition:.15s}
+.ctab:hover{color:var(--tx);background:rgba(255,255,255,.05)}
+.ctab.active{color:#fff;background:rgba(20,184,166,.15);border-color:rgba(20,184,166,.3);font-weight:600}
 .ctab.active{color:var(--teal);border-bottom-color:var(--teal);font-weight:600}
 .ctab:hover:not(.active){color:var(--tx)}
 .cfg-path{font-size:11px;color:var(--mu);margin-bottom:8px;font-family:var(--mono)}
@@ -269,13 +281,11 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
     <div style="font-size:11px;color:var(--mu);margin-top:2px" id="uptime-lbl">—</div>
     <div style="font-size:11px;color:var(--mu);margin-top:1px" id="rns-ver-lbl">—</div>
     <div style="font-size:11px;color:var(--mu);margin-top:1px" id="clock-lbl">—</div>
+    <div style="margin-top:4px"><div class="pill" style="display:inline-flex"><div class="dot" id="dot"></div><span id="ip-lbl">—</span></div></div>
   </div>
   <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
     <div style="display:flex;gap:6px;align-items:center">
-      <div class="pill"><div class="dot" id="dot"></div><span id="ip-lbl">—</span></div>
-      <button class="sys-btn teal" onclick="refreshAll()">↻</button>
     </div>
-    <div class="pill" onclick="showQR()" title="LXMF Bridge">LXMF <span id="lxmf-addr-lbl">—</span></div>
   </div>
 </div>
 <div class="metrics">
@@ -298,7 +308,6 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
     <div class="nav-item"       onclick="nav('rmap',this);loadNodesMonitor();">Network</div>
     <div class="nav-item"       onclick="nav('i2p',this)">I2P</div>
     <div class="nav-item"       onclick="nav('nomadnet',this);loadNomadnet();">Nomadnet</div>
-    <div class="nav-item"       onclick="nav('rbrowser',this)">Browser</div>
     <div class="nav-sep"></div>
     <div class="nav-item"       onclick="nav('logs',this)">Logs</div>
     <div class="nav-item"       onclick="nav('system',this)">System</div>
@@ -458,14 +467,14 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
         <div style="display:flex;flex-direction:column;background:var(--s1);border:1px solid var(--bd);border-radius:8px;overflow:hidden">
           <div style="padding:8px 12px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between">
             <div class="section-lbl" style="margin:0">LXMF Messages</div>
-            <button class="sys-btn" onclick="clearLxmf()" style="font-size:10px">clear</button>
+            <button class="sys-btn" onclick="clearLxmf()">CLEAR</button>
           </div>
           <div class="lxmf-box" id="lxmf-box" style="flex:1;height:auto;border-radius:0;border:none"></div>
         </div>
         <div style="display:flex;flex-direction:column;background:var(--s1);border:1px solid var(--bd);border-radius:8px;overflow:hidden">
           <div style="padding:8px 12px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between">
             <div class="section-lbl" style="margin:0">RNS interfaces</div>
-            <button class="sys-btn teal" onclick="loadRns()" style="font-size:10px">↻ refresh</button>
+            <button class="sys-btn teal" onclick="loadRns()">REFRESH</button>
           </div>
           <div id="rns-list" style="font-size:12px;line-height:2;padding:10px 12px;overflow-y:auto;flex:1"></div>
         </div>
@@ -476,7 +485,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
     <div class="panel" id="panel-i2p">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
         <div class="section-lbl" style="margin:0">I2P Integration</div>
-        <button class="sys-btn teal" onclick="loadI2pStatus()" style="font-size:10px">↻ refresh</button>
+        <button class="sys-btn teal" onclick="loadI2pStatus()">REFRESH</button>
       </div>
 
       <!-- Status -->
@@ -495,10 +504,10 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
       <!-- Install / Control -->
       <div class="section-lbl" style="margin-bottom:8px">Daemon Control</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
-        <button class="sys-btn teal" onclick="i2pAction('install')" style="font-size:11px">Install i2pd</button>
-        <button class="sys-btn teal" onclick="i2pAction('start')" style="font-size:11px">Start</button>
-        <button class="sys-btn am" onclick="i2pAction('stop')" style="font-size:11px">Stop</button>
-        <button class="sys-btn am" onclick="i2pAction('restart')" style="font-size:11px">Restart</button>
+        <button class="sys-btn teal" onclick="i2pAction('install')">INSTALL I2PD</button>
+        <button class="sys-btn teal" onclick="i2pAction('start')">START</button>
+        <button class="sys-btn am" onclick="i2pAction('stop')">STOP</button>
+        <button class="sys-btn am" onclick="i2pAction('restart')">RESTART</button>
       </div>
 
       <!-- Reticulum integration -->
@@ -508,7 +517,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
         <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
           <input id="i2p-peer-addr" placeholder="xxxxx.b32.i2p" style="flex:1;min-width:200px;background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:6px 10px;color:var(--tx);font-size:12px;font-family:var(--fn)">
           <input id="i2p-peer-name" placeholder="Interface name" value="I2P-Node" style="width:120px;background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:6px 10px;color:var(--tx);font-size:12px">
-          <button class="sys-btn teal" onclick="i2pAddInterface()" style="font-size:11px">Add to config</button>
+          <button class="sys-btn teal" onclick="i2pAddInterface()">ADD TO CONFIG</button>
         </div>
         <div id="i2p-rns-status" style="font-size:11px;color:var(--mu)"></div>
       </div>
@@ -517,7 +526,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
       <div class="section-lbl" style="margin-bottom:8px">Local Tunnel Setup</div>
       <div style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:12px 14px;margin-bottom:12px">
         <div style="font-size:11px;color:var(--mu);margin-bottom:8px">Create incoming I2P tunnel for this MeshGate (so others can connect anonymously):</div>
-        <button class="sys-btn teal" onclick="i2pAction('setup_tunnel')" style="font-size:11px">Setup Reticulum tunnel in i2pd</button>
+        <button class="sys-btn teal" onclick="i2pAction('setup_tunnel')">SETUP I2P TUNNEL</button>
         <div id="i2p-tunnel-result" style="margin-top:8px;font-size:11px;color:var(--teal);font-family:var(--fn)"></div>
       </div>
 
@@ -528,12 +537,61 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
     <!-- NOMADNET -->
     <div class="panel" id="panel-nomadnet" style="height:100%">
       <div style="display:flex;flex-direction:column;flex:1;min-height:0;gap:8px">
-        <div class="section-lbl" style="margin:0">Page Editor — index.mu</div>
-        <textarea id="nn-editor" style="flex:1;min-height:0;width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:10px;color:var(--tx);font-family:var(--fn);font-size:12px;resize:none;box-sizing:border-box" spellcheck="false"></textarea>
-        <div style="display:flex;gap:8px;align-items:center;flex-shrink:0">
-          <button class="sys-btn teal" onclick="nnSavePage()" style="font-size:11px">💾 Save &amp; Restart</button>
-          <a href="https://fr33n0w.github.io/micron-composer/" target="_blank" class="sys-btn" style="font-size:11px;text-decoration:none">🖊 Micron Composer</a>
+
+        <!-- Top buttons -->
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0;flex-wrap:wrap;gap:6px">
+          <div style="display:flex;gap:4px">
+            <button class="sys-btn teal" id="nn-tab-pages" onclick="nnTab('pages')">PAGES</button>
+            <button class="sys-btn" id="nn-tab-scripts" onclick="nnTab('scripts')">SCRIPTS</button>
+          </div>
+          <div style="display:flex;gap:6px">
+            <a id="nn-rbrowser-link" href="#" target="_blank" class="sys-btn teal" style="text-decoration:none">OPEN RBROWSER</a>
+            <a id="nn-chat-link" href="#" target="_blank" class="sys-btn" style="text-decoration:none">NOMADNET CHAT</a>
+          </div>
+          <script>
+            document.getElementById("nn-rbrowser-link").href="http://"+window.location.hostname+":5000";
+            fetch("/api/nomadnet/status").then(r=>r.json()).then(d=>{
+              if(d.page_addr) document.getElementById("nn-chat-link").href="http://"+window.location.hostname+":5000/?url="+encodeURIComponent(d.page_addr+":/page/nomadnet.mu");
+            }).catch(()=>{});
+          </script>
         </div>
+
+        <!-- File tabs -->
+        <div id="nn-file-tabs" style="display:flex;gap:4px;flex-wrap:wrap;flex-shrink:0"></div>
+
+        <!-- Current file label -->
+        <div id="nn-file-label" style="font-size:11px;color:var(--mu);flex-shrink:0">—</div>
+
+        <!-- Editor -->
+        <textarea id="nn-editor" style="flex:1;min-height:0;width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:10px;color:var(--tx);font-family:var(--fn);font-size:12px;resize:none;box-sizing:border-box" spellcheck="false"></textarea>
+
+        <!-- Action buttons -->
+        <div style="display:flex;gap:8px;align-items:center;flex-shrink:0;flex-wrap:wrap">
+          <button class="sys-btn teal" onclick="nnSave()">SAVE</button>
+          <button class="sys-btn rd" id="nn-delete-btn" onclick="nnDelete()" style="display:none">DELETE</button>
+          <button class="sys-btn am" id="nn-run-btn" onclick="nnRun()" style="display:none">RUN</button>
+          <button class="sys-btn" onclick="nnNewFile()">+ NEW</button>
+          <a id="nn-micron-btn" href="https://fr33n0w.github.io/micron-composer/" target="_blank" class="sys-btn" style="text-decoration:none">MICRON COMPOSER</a>
+        </div>
+
+        <!-- Cron block (scripts only) -->
+        <div id="nn-cron-block" style="display:none;background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:10px 14px;flex-shrink:0">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <span style="font-size:13px;color:var(--mu);text-transform:uppercase;letter-spacing:.06em">Schedule</span>
+            <select id="nn-cron-select" style="font-family:var(--fn);font-size:13px;padding:5px 10px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);cursor:pointer">
+              <option value="">— disabled —</option>
+              <option value="*/5 * * * *">Every 5 min</option>
+              <option value="*/15 * * * *">Every 15 min</option>
+              <option value="*/30 * * * *">Every 30 min</option>
+              <option value="0 * * * *">Every hour</option>
+              <option value="0 */6 * * *">Every 6 hours</option>
+              <option value="0 0 * * *">Every day</option>
+            </select>
+            <button class="sys-btn teal" onclick="nnCronSave()">APPLY</button>
+            <span id="nn-cron-status" style="font-size:12px;color:var(--mu)"></span>
+          </div>
+        </div>
+
         <div id="nn-output" style="font-family:var(--fn);font-size:11px;color:var(--teal);background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:8px 10px;white-space:pre-wrap;display:none;flex-shrink:0"></div>
       </div>
     </div>
@@ -548,7 +606,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
         <div style="font-size:11px;color:var(--mu);margin-bottom:4px">🔹 LXMF Bridge</div>
         <div style="font-size:10px;color:var(--mu);margin-bottom:6px">For receiving commands from Reticulum to MQTT / Home Assistant. Add to Sideband as a contact.</div>
         <div id="ap-lxmf-bridge" style="font-family:var(--fn);font-size:12px;color:var(--teal);word-break:break-all;margin-bottom:8px">—</div>
-        <button class="sys-btn" onclick="apCopy('ap-lxmf-bridge')" style="font-size:11px">📋 Copy</button>
+        <button class="sys-btn teal" onclick="apCopy('ap-lxmf-bridge')">COPY</button>
       </div>
 
 
@@ -558,7 +616,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
         <div style="font-size:11px;color:var(--mu);margin-bottom:4px">🔹 I2P Address (b32)</div>
         <div style="font-size:10px;color:var(--mu);margin-bottom:6px">Anonymous connection without public IP. Share with another gateway.</div>
         <div id="ap-i2p" style="font-family:var(--fn);font-size:12px;color:var(--teal);word-break:break-all;margin-bottom:8px">—</div>
-        <button class="sys-btn" onclick="apCopy('ap-i2p')" style="font-size:11px">📋 Copy</button>
+        <button class="sys-btn teal" onclick="apCopy('ap-i2p')">COPY</button>
       </div>
 
       <!-- Nomadnet Node -->
@@ -566,7 +624,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
         <div style="font-size:11px;color:var(--mu);margin-bottom:4px">🌐 Nomadnet Node</div>
         <div style="font-size:10px;color:var(--mu);margin-bottom:6px">Gateway info page in the Reticulum network.</div>
         <div id="ap-nn-node" style="font-family:var(--fn);font-size:12px;color:var(--teal);word-break:break-all;margin-bottom:8px">—</div>
-        <button class="sys-btn" onclick="apCopy('ap-nn-node')" style="font-size:11px">📋 Copy</button>
+        <button class="sys-btn teal" onclick="apCopy('ap-nn-node')">COPY</button>
       </div>
 
       <!-- Nomadnet Chat -->
@@ -574,7 +632,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
         <div style="font-size:11px;color:var(--mu);margin-bottom:4px">💬 Nomadnet Chat</div>
         <div style="font-size:10px;color:var(--mu);margin-bottom:6px">IRC-style chat in the Nomadnet network. Open in Nomadnet browser.</div>
         <div id="ap-nn-chat" style="font-family:var(--fn);font-size:12px;color:var(--teal);word-break:break-all;margin-bottom:8px">—</div>
-        <button class="sys-btn" onclick="apCopy('ap-nn-chat')" style="font-size:11px">📋 Copy</button>
+        <button class="sys-btn teal" onclick="apCopy('ap-nn-chat')">COPY</button>
       </div>
 
       </div>
@@ -584,7 +642,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
     <!-- RBROWSER -->
     <div class="panel" id="panel-rbrowser">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-shrink:0">
-        <a id="rbrowser-link" href="#" target="_blank" class="sys-btn teal" style="font-size:11px;text-decoration:none">↗ Открыть в браузере</a>
+        <a id="rbrowser-link" href="#" target="_blank" class="sys-btn teal" style="text-decoration:none">OPEN RBROWSER</a>
         <span style="font-size:11px;color:var(--mu)">rBrowser · порт 5000</span>
       </div>
       <iframe id="rbrowser-frame" style="width:100%;height:calc(100vh - 200px);border:none;border-radius:8px;flex:1"></iframe>
@@ -614,7 +672,6 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
       <textarea id="cfg-area" spellcheck="false"></textarea>
       <div class="brow">
         <button class="sys-btn teal" onclick="saveConfig()">Save</button>
-        <button class="sys-btn" onclick="downloadConfig()">↓ Download</button>
       </div>
     </div>
 
@@ -622,7 +679,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
     <div class="panel" id="panel-rnode">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
         <div class="section-lbl" style="margin:0">RNode</div>
-        <button class="sys-btn teal" onclick="loadRnodePanel()" style="font-size:10px">↻ refresh</button>
+        <button class="sys-btn teal" onclick="loadRnodePanel()">REFRESH</button>
       </div>
       <div id="rnode-status" style="margin-bottom:12px"></div>
       <div id="rnode-metrics" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:16px"></div>
@@ -647,8 +704,8 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
           <div class="section-lbl" style="margin:0">Public Nodes</div>
           <div style="display:flex;gap:6px">
-            <button class="sys-btn teal" onclick="loadNodesMonitor()" style="font-size:10px">↻ check</button>
-            <button class="sys-btn" onclick="showAddNode()" style="font-size:10px">+ add</button>
+            <button class="sys-btn teal" onclick="loadNodesMonitor()">CHECK</button>
+            <button class="sys-btn" onclick="showAddNode()">ADD</button>
           </div>
         </div>
         <div id="nodes-monitor-list"></div>
@@ -705,7 +762,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
             <div style="font-size:12px;color:var(--mu);margin-bottom:2px">Latest (PyPI)</div>
             <div id="rns-latest-ver" style="font-family:var(--fn);font-size:13px;color:var(--tx)">—</div>
           </div>
-          <button class="sys-btn teal" id="rns-update-btn" onclick="rnsUpdate()" style="display:none">Update RNS</button>
+          <button class="sys-btn teal" id="rns-update-btn" onclick="rnsUpdate()" style="display:none">UPDATE RNS</button>
         </div>
         <div id="rns-update-status" style="font-family:var(--fn);font-size:11px;color:var(--teal);margin-top:8px;display:none"></div>
       </div>
@@ -788,6 +845,8 @@ const API="";
 let cfgData={},curCfg=null;
 let lxmfMsgs=[];
 
+function toggleBurger(){const m=document.getElementById("burger-menu");m.classList.toggle("open");}
+function closeBurger(){document.getElementById("burger-menu").classList.remove("open");}
 function nav(id,el){
   document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
   document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
@@ -1189,8 +1248,15 @@ async function saveConfig(){
   const content=document.getElementById("cfg-area").value;
   const r=await fetch(API+"/api/configs/"+curCfg,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({content})});
   const d=await r.json();
-  if(d.ok) toast("Saved");
-  else toast("Error: "+d.error,false);
+  if(d.ok){
+    toast("Saved");
+    const svcMap={"lxmf_bridge_mqtt":"lxmf_bridge_mqtt","nomadnet":"nomadnet","reticulum":"rnsd"};
+    const svc=svcMap[curCfg];
+    if(svc){
+      await fetch(API+"/api/services/"+svc+"/restart",{method:"POST"});
+      toast("Restarting "+svc+"...");
+    }
+  } else toast("Error: "+d.error,false);
 }
 
 function downloadConfig(){
@@ -1217,7 +1283,7 @@ async function loadNodesMonitor(){
       <div style="display:flex;align-items:center;gap:8px">
         <div style="width:8px;height:8px;border-radius:50%;background:${n.status==="online"?"var(--gr)":"var(--rd)"}"></div>
         <span style="font-size:11px;color:${n.status==="online"?"var(--gr)":"var(--rd)"}">${n.status}</span>
-        <button class="sys-btn rd" style="font-size:10px;padding:2px 8px" onclick="removeNode('${esc(n.host)}',${n.port})">✕</button>
+        <button class="sys-btn rd" onclick="removeNode('${esc(n.host)}',${n.port})">✕</button>
       </div>
     </div>`).join("");
   // home nodes
@@ -1887,6 +1953,10 @@ function apCopy(id){
   }
 }
 
+// Nomadnet Pages + Scripts Manager
+let nnCurrentTab = 'pages';
+let nnCurrentFile = null;
+
 async function loadNomadnet(){
   try{
     const r = await fetch(API+"/api/nomadnet/status");
@@ -1898,12 +1968,119 @@ async function loadNomadnet(){
     if(txt) txt.textContent = d.status;
     if(addr) addr.textContent = d.page_addr || "—";
   }catch(e){}
+  nnTab('pages');
+}
+
+async function nnTab(tab){
+  nnCurrentTab = tab;
+  document.getElementById("nn-tab-pages").className = tab==='pages' ? "sys-btn teal" : "sys-btn";
+  document.getElementById("nn-tab-scripts").className = tab==='scripts' ? "sys-btn teal" : "sys-btn";
+  const micron = document.getElementById("nn-micron-btn");
+  if(micron) micron.style.display = tab==='pages' ? '' : 'none';
+  const runBtn = document.getElementById("nn-run-btn");
+  if(runBtn) runBtn.style.display = tab==='scripts' ? '' : 'none';
+  await nnLoadFiles();
+}
+
+async function nnLoadFiles(){
+  const url = nnCurrentTab==='pages' ? API+"/api/nomadnet/pages" : API+"/api/scripts";
   try{
-    const r = await fetch(API+"/api/nomadnet/page");
-    const d = await r.json();
-    const ed = document.getElementById("nn-editor");
-    if(ed && d.content) ed.value = d.content;
+    const files = await fetch(url).then(r=>r.json());
+    const tabs = document.getElementById("nn-file-tabs");
+    tabs.innerHTML = files.map(f=>`<button class="sys-btn" onclick="nnOpenFile('${f}')" id="nn-ft-${f.replace('.','_')}">${f}</button>`).join('');
+    if(files.length > 0) nnOpenFile(files[0]);
+    else { document.getElementById("nn-editor").value=''; document.getElementById("nn-file-label").textContent='—'; }
   }catch(e){}
+}
+
+async function nnOpenFile(name){
+  nnCurrentFile = name;
+  const url = nnCurrentTab==='pages' ? API+"/api/nomadnet/pages/"+name : API+"/api/scripts/"+name;
+  try{
+    const d = await fetch(url).then(r=>r.json());
+    document.getElementById("nn-editor").value = d.content || '';
+    document.getElementById("nn-file-label").textContent = d.path || name;
+    document.querySelectorAll("#nn-file-tabs button").forEach(b=>b.className="sys-btn");
+    const btn = document.getElementById("nn-ft-"+name.replace('.','_'));
+    if(btn) btn.className="sys-btn teal";
+    const del = document.getElementById("nn-delete-btn");
+    if(del) del.style.display = name==='index.mu' ? 'none' : '';
+    // cron block
+    const cronBlock = document.getElementById("nn-cron-block");
+    if(cronBlock) cronBlock.style.display = nnCurrentTab==='scripts' ? '' : 'none';
+    if(nnCurrentTab==='scripts') await nnCronLoad();
+  }catch(e){}
+}
+
+async function nnCronLoad(){
+  if(!nnCurrentFile) return;
+  try{
+    const d = await fetch(API+"/api/scripts/"+nnCurrentFile+"/cron").then(r=>r.json());
+    const sel = document.getElementById("nn-cron-select");
+    const st = document.getElementById("nn-cron-status");
+    if(sel) sel.value = d.schedule || "";
+    if(st) st.textContent = d.enabled ? "✓ active: "+d.schedule : "";
+  }catch(e){}
+}
+
+async function nnCronSave(){
+  if(!nnCurrentFile) return;
+  const sel = document.getElementById("nn-cron-select");
+  const st = document.getElementById("nn-cron-status");
+  const schedule = sel.value || null;
+  try{
+    const d = await fetch(API+"/api/scripts/"+nnCurrentFile+"/cron",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({schedule})}).then(r=>r.json());
+    if(st) st.textContent = d.enabled ? "✓ active: "+d.schedule : "disabled";
+  }catch(e){ if(st) st.textContent="Error"; }
+}
+
+async function nnSave(){
+  if(!nnCurrentFile) return;
+  const content = document.getElementById("nn-editor").value;
+  const url = nnCurrentTab==='pages' ? API+"/api/nomadnet/pages/"+nnCurrentFile : API+"/api/scripts/"+nnCurrentFile;
+  const out = document.getElementById("nn-output");
+  try{
+    const d = await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({content})}).then(r=>r.json());
+    out.style.display="block";
+    out.style.color = d.ok ? "var(--teal)" : "var(--rd)";
+    out.textContent = d.ok ? "✓ Saved" : ("Error: "+d.error);
+    setTimeout(()=>out.style.display="none",3000);
+  }catch(e){ out.style.display="block"; out.textContent="Error: "+e; }
+}
+
+async function nnDelete(){
+  if(!nnCurrentFile || nnCurrentFile==='index.mu') return;
+  if(!confirm("Delete "+nnCurrentFile+"?")) return;
+  const url = nnCurrentTab==='pages' ? API+"/api/nomadnet/pages/"+nnCurrentFile : API+"/api/scripts/"+nnCurrentFile;
+  await fetch(url,{method:"DELETE"});
+  nnCurrentFile = null;
+  await nnLoadFiles();
+}
+
+async function nnRun(){
+  if(!nnCurrentFile || nnCurrentTab!=='scripts') return;
+  const out = document.getElementById("nn-output");
+  out.style.display="block"; out.textContent="Running..."; out.style.color="var(--mu)";
+  try{
+    const d = await fetch(API+"/api/scripts/"+nnCurrentFile+"/run",{method:"POST"}).then(r=>r.json());
+    out.style.color = d.ok ? "var(--teal)" : "var(--rd)";
+    out.textContent = d.output || d.error || "(no output)";
+  }catch(e){ out.style.color="var(--rd)"; out.textContent="Error: "+e; }
+}
+
+async function nnNewFile(){
+  const ext = nnCurrentTab==='pages' ? '.mu' : '.py';
+  const name = prompt("File name (without extension):");
+  if(!name) return;
+  const filename = name.replace(/[^a-z0-9_\-]/gi,'_') + ext;
+  const url = nnCurrentTab==='pages' ? API+"/api/nomadnet/pages/"+filename : API+"/api/scripts/"+filename;
+  await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({content:""})});
+  await nnLoadFiles();
+  nnOpenFile(filename);
+}
+
+async function nnSavePage(){
+  await nnSave();
 }
 async function nnAction(action){
   const out = document.getElementById("nn-output");
@@ -1913,17 +2090,6 @@ async function nnAction(action){
     const d = await r.json();
     if(out) out.textContent = action+" → "+d.status;
     setTimeout(loadNomadnet, 2000);
-  }catch(e){ if(out) out.textContent = "Error: "+e; }
-}
-async function nnSavePage(){
-  const ed = document.getElementById("nn-editor");
-  const out = document.getElementById("nn-output");
-  const content = ed?.value || "";
-  if(out){ out.style.display="block"; out.textContent="Saving..."; }
-  try{
-    const r = await fetch(API+"/api/nomadnet/page",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({content})});
-    const d = await r.json();
-    if(out) out.textContent = d.ok?"✓ Saved & restarted":("Error: "+d.error);
   }catch(e){ if(out) out.textContent = "Error: "+e; }
 }
 
