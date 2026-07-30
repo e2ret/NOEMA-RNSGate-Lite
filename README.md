@@ -30,7 +30,7 @@ The author is not responsible for failures, data loss, or any other consequences
 - LXMF Bridge → MQTT (receive commands from Reticulum → Home Assistant)
 - MQTT Bridge for Home Assistant automations
 - I2P Anonymous Network
-- Nomadnet Node + page editor
+- Nomadnet Node + multi-page editor + scripts with cron scheduler
 - rBrowser — built-in Nomadnet browser
 - Web dashboard with monitoring and management
 - All gateway addresses in one place (Addresses tab)
@@ -97,8 +97,7 @@ nmtui
 | RNode | LoRa telemetry |
 | Network | Public nodes + RNprobe |
 | I2P | Anonymous network |
-| Nomadnet | Info page, editor, Micron Composer |
-| Browser | Built-in Nomadnet browser (rBrowser) |
+| Nomadnet | Pages editor, scripts, rBrowser |
 | Logs | Service logs |
 | System | Commands, backup, RNS update, reset identity |
 
@@ -217,15 +216,19 @@ The Addresses tab contains all gateway addresses:
 
 ---
 
-## Nomadnet Page
+## Nomadnet
+
+`Dashboard → Nomadnet`
+
+### Pages editor
+
+Multi-page editor for `.mu` files. Switch between pages using tabs, create new pages with **+ NEW**, delete with **DELETE** (index.mu is protected).
 
 The gateway automatically publishes an info page. Open in any Nomadnet client:
 
 ```
 <node_address>:/page/index.mu
 ```
-
-Edit: `Dashboard → Nomadnet → Page Editor`
 
 **Micron markup basics:**
 ```
@@ -236,23 +239,32 @@ Edit: `Dashboard → Nomadnet → Page Editor`
 ---         — divider
 ```
 
-Use [Micron Composer](https://fr33n0w.github.io/micron-composer/) for visual editing — available directly from the Nomadnet tab.
+Use [Micron Composer](https://fr33n0w.github.io/micron-composer/) for visual editing — button available directly in the Nomadnet tab.
 
----
+### Scripts
 
-## Nomadnet Browser
+Python scripts stored in `~/NOEMA-RNSGate-Lite/scripts/`. Each script can be:
+- Edited in the browser
+- Run manually with **RUN** — output shown immediately
+- Scheduled with cron via the **Schedule** selector (every 5/15/30 min, hourly, daily)
 
-`Dashboard → Browser`
+Example — weather update script that writes to `index.mu` using markers:
 
-Built-in browser for viewing Nomadnet pages without installing additional apps. Runs on port 5000. Also accessible directly:
+```python
+# In index.mu, add markers where weather should appear:
+# ##WEATHER_START##
+# ##WEATHER_END##
+
+# Script reads weather and replaces content between markers
+```
+
+### Nomadnet Browser (rBrowser)
+
+Built-in browser for viewing Nomadnet pages. Open via **OPEN RBROWSER** button or directly:
 
 ```
 http://GATEWAY_IP:5000
 ```
-
-Features: multi-tab, favorites, known nodes list, ping, search.
-
-Based on [rBrowser](https://github.com/fr33n0w/rBrowser) — fr33n0w, MIT.
 
 ---
 
@@ -320,6 +332,7 @@ What is deleted:
 What is preserved:
 - Reticulum and MQTT configuration
 - Nomadnet pages
+- Scripts
 
 > ⚠️ Irreversible. Make a backup first.
 
@@ -328,11 +341,12 @@ What is preserved:
 ## File Locations
 
 ```
-~/lxmf-tools/config.cfg.owr              — MQTT config
-~/.reticulum/config                       — Reticulum / LoRa config
-~/lxmf-tools/identity                     — LXMF Bridge key
-~/.nomadnetwork/storage/pages/index.mu    — Nomadnet main page
-~/.nomadnetwork/config                    — Nomadnet config
+~/lxmf-tools/config.cfg.owr                    — MQTT config
+~/.reticulum/config                              — Reticulum / LoRa config
+~/lxmf-tools/identity                            — LXMF Bridge key
+~/.nomadnetwork/storage/pages/index.mu           — Nomadnet main page
+~/.nomadnetwork/config                           — Nomadnet config
+~/NOEMA-RNSGate-Lite/scripts/                   — Python scripts
 ```
 
 ---
@@ -393,7 +407,7 @@ What is preserved:
 - LXMF Bridge → MQTT (приём команд из Reticulum → Home Assistant)
 - MQTT Bridge для автоматизаций Home Assistant
 - Анонимная сеть I2P
-- Nomadnet Node + редактор страниц
+- Nomadnet Node + многостраничный редактор + скрипты с планировщиком
 - rBrowser — встроенный Nomadnet браузер
 - Веб-дашборд с мониторингом и управлением
 - Все адреса шлюза в одном месте (вкладка Addresses)
@@ -460,8 +474,7 @@ nmtui
 | RNode | Телеметрия LoRa |
 | Network | Публичные узлы + RNprobe |
 | I2P | Анонимная сеть |
-| Nomadnet | Страница-визитка, редактор, Micron Composer |
-| Browser | Встроенный Nomadnet браузер (rBrowser) |
+| Nomadnet | Редактор страниц, скрипты, rBrowser |
 | Logs | Журналы сервисов |
 | System | Команды, бэкап, обновление RNS, сброс identity |
 
@@ -580,7 +593,13 @@ Host: IP_ШЛЮЗА  Port: 4242
 
 ---
 
-## Страница Nomadnet
+## Nomadnet
+
+`Dashboard → Nomadnet`
+
+### Редактор страниц
+
+Многостраничный редактор `.mu` файлов. Переключение между страницами через вкладки, создание новых через **+ NEW**, удаление через **DELETE** (index.mu защищён от удаления).
 
 Шлюз автоматически публикует страницу-визитку. Открыть в любом Nomadnet клиенте:
 
@@ -588,34 +607,41 @@ Host: IP_ШЛЮЗА  Port: 4242
 <node_address>:/page/index.mu
 ```
 
-Редактирование: `Dashboard → Nomadnet → Page Editor`
-
 **Основы разметки Micron:**
 ```
-`c          — центрирование
-`f...`f     — крупный шрифт
-`b...`b     — жирный
+`c            — центрирование
+`f...`f       — крупный шрифт
+`b...`b       — жирный
 `[Заголовок`] — раздел
----         — разделитель
+---           — разделитель
 ```
 
 Используйте [Micron Composer](https://fr33n0w.github.io/micron-composer/) для визуального редактирования — кнопка доступна прямо во вкладке Nomadnet.
 
----
+### Скрипты
 
-## Nomadnet Browser
+Python скрипты хранятся в `~/NOEMA-RNSGate-Lite/scripts/`. Каждый скрипт можно:
+- Редактировать прямо в браузере
+- Запустить вручную кнопкой **RUN** — вывод отображается сразу
+- Запустить по расписанию через **Schedule** (каждые 5/15/30 мин, час, день)
 
-`Dashboard → Browser`
+Пример — скрипт обновления погоды, записывающий данные в `index.mu` через маркеры:
 
-Встроенный браузер для просмотра Nomadnet страниц без установки дополнительных приложений. Работает на порту 5000. Также доступен напрямую:
+```python
+# В index.mu добавьте маркеры в нужном месте:
+# ##WEATHER_START##
+# ##WEATHER_END##
+
+# Скрипт читает погоду и заменяет содержимое между маркерами
+```
+
+### Nomadnet Browser (rBrowser)
+
+Встроенный браузер для просмотра Nomadnet страниц. Открыть через кнопку **OPEN RBROWSER** или напрямую:
 
 ```
 http://IP_ШЛЮЗА:5000
 ```
-
-Возможности: мультитаб, избранное, список известных нод, ping, поиск.
-
-Основан на [rBrowser](https://github.com/fr33n0w/rBrowser) — fr33n0w, MIT.
 
 ---
 
@@ -683,6 +709,7 @@ RNSGate ──I2P──▶ RNSGate
 Что сохраняется:
 - Конфигурация Reticulum и MQTT
 - Страницы Nomadnet
+- Скрипты
 
 > ⚠️ Необратимо. Сделайте бэкап заранее.
 
@@ -691,11 +718,12 @@ RNSGate ──I2P──▶ RNSGate
 ## Расположение файлов
 
 ```
-~/lxmf-tools/config.cfg.owr              — конфиг MQTT
-~/.reticulum/config                       — конфиг Reticulum / LoRa
-~/lxmf-tools/identity                     — ключ LXMF Bridge
-~/.nomadnetwork/storage/pages/index.mu    — главная страница Nomadnet
-~/.nomadnetwork/config                    — конфиг Nomadnet
+~/lxmf-tools/config.cfg.owr                    — конфиг MQTT
+~/.reticulum/config                              — конфиг Reticulum / LoRa
+~/lxmf-tools/identity                            — ключ LXMF Bridge
+~/.nomadnetwork/storage/pages/index.mu           — главная страница Nomadnet
+~/.nomadnetwork/config                           — конфиг Nomadnet
+~/NOEMA-RNSGate-Lite/scripts/                   — Python скрипты
 ```
 
 ---
