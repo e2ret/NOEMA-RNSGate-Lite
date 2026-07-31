@@ -930,15 +930,24 @@ def i2p_add_interface():
     try:
         cfg_path = os.path.expanduser("~/.reticulum/config")
         cfg = open(cfg_path).read()
-        block = f"""
-[[{name}]]
-  type = I2PInterface
-  enabled = yes
-  peers = {addr}
-"""
         if addr in cfg:
             return jsonify({"ok":False,"error":"address already in config"})
-        cfg += block
+        import re
+        # If I2PInterface block exists - add peer to it
+        pattern = r"(\[\[I2P-Node\]\][^\[]*peers\s*=\s*)([^\n]+)"
+        match = re.search(pattern, cfg)
+        if match:
+            current_peers = match.group(2).strip()
+            new_peers = current_peers + ", " + addr
+            cfg = cfg[:match.start(2)] + new_peers + cfg[match.end(2):]
+        else:
+            block = f"""
+  [[{name}]]
+    type = I2PInterface
+    enabled = yes
+    peers = {addr}
+"""
+            cfg += block
         open(cfg_path,"w").write(cfg)
         return jsonify({"ok":True})
     except Exception as e:
