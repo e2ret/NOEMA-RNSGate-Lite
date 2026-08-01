@@ -683,7 +683,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
       </div>
       <div id="rnode-status" style="margin-bottom:12px"></div>
       <div id="rnode-metrics" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:16px"></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
         <div style="background:var(--s1);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;min-width:0;overflow:hidden">
           <div class="section-lbl" style="margin-bottom:8px">Airtime % (15s)</div>
           <div style="position:relative;height:160px"><canvas id="rnode-chart-airtime"></canvas></div>
@@ -1751,48 +1751,81 @@ async function loadRnodePanel(){
     const r = await fetch(API+"/api/rnstatus?_="+Date.now());
     const d = await r.json();
     const ifaces = d.interfaces||[];
-    const rnode = ifaces.find(i=>i.name&&i.name.includes("RNode"));
+    const rnodes = ifaces.filter(i=>i.name&&i.name.includes("RNode"));
 
     const statusEl = document.getElementById("rnode-status");
     const metricsEl = document.getElementById("rnode-metrics");
     if(!statusEl||!metricsEl) return;
 
-    if(!rnode){
+    if(!rnodes.length){
       statusEl.innerHTML = '<div style="color:var(--mu);font-size:13px">RNode not connected or not configured в ~/.reticulum/config</div>';
       metricsEl.innerHTML = '';
       return;
     }
 
-    const f = rnode.fields||{};
-    const isUp = f["Status"]==="Up";
+    // Render tabs
+    statusEl.innerHTML = `
+      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px" id="rnode-tabs">
+        ${rnodes.map((rnode,i) => {
+          const f = rnode.fields||{};
+          const isUp = f["Status"]==="Up";
+          return `<button class="sys-btn${i===0?' teal':''}" onclick="selectRnode(${i})" id="rnode-tab-${i}">
+            <span style="width:8px;height:8px;border-radius:50%;background:${isUp?"#4ade9a":"#f87171"};display:inline-block;margin-right:6px"></span>
+            ${esc(rnode.name.replace("RNodeInterface[","").replace("]",""))}
+          </button>`;
+        }).join("")}
+      </div>
+      <div id="rnode-selected-name" style="font-size:13px;font-weight:700;color:var(--tx);margin-bottom:8px"></div>
+    `;
 
-    statusEl.innerHTML = `<div style="display:flex;align-items:center;gap:10px">
+    window._rnodes = rnodes;
+    selectRnode(0);
+
+  }catch(e){}
+}
+
+function selectRnode(idx){
+  const rnodes = window._rnodes||[];
+  if(!rnodes[idx]) return;
+
+  // Update tabs
+  rnodes.forEach((_,i) => {
+    const tab = document.getElementById("rnode-tab-"+i);
+    if(tab) tab.className = "sys-btn"+(i===idx?" teal":"");
+  });
+
+  const rnode = rnodes[idx];
+  const f = rnode.fields||{};
+  const isUp = f["Status"]==="Up";
+
+  const nameEl = document.getElementById("rnode-selected-name");
+  if(nameEl) nameEl.innerHTML = `
+    <div style="display:flex;align-items:center;gap:8px">
       <div style="width:10px;height:10px;border-radius:50%;background:${isUp?"#4ade9a":"#f87171"};box-shadow:0 0 8px ${isUp?"#4ade9a60":"#f8717160"}"></div>
-      <div style="font-size:13px;font-weight:700;color:var(--tx)">${esc(rnode.name)}</div>
-      <div style="font-size:11px;color:${isUp?"var(--gr)":"var(--rd)"}">● ${isUp?"online":"offline"}</div>
+      <span>${esc(rnode.name)}</span>
+      <span style="font-size:11px;color:${isUp?"var(--gr)":"var(--rd)"}">● ${isUp?"online":"offline"}</span>
     </div>`;
 
-    const metrics = [
-      f["Battery"]    && {icon:"🔋", label:"Battery",   value: f["Battery"]},
-      f["Airtime"]    && {icon:"📡", label:"Airtime",    value: f["Airtime"].split(",")[0]},
-      f["Ch. Load"]   && {icon:"📶", label:"Ch. Load",   value: f["Ch. Load"].split(",")[0]},
-      f["CPU temp"]   && {icon:"🌡", label:"CPU Temp.",  value: f["CPU temp"]},
-      f["Noise Fl."]  && {icon:"📻", label:"Noise",        value: f["Noise Fl."]},
-      f["Rate"]       && {icon:"⚡", label:"Rate",        value: f["Rate"]},
-      f["Traffic"]    && {icon:"↕",  label:"Traffic",     value: f["Traffic"]},
-      f["Mode"]       && {icon:"⚙",  label:"Mode",      value: f["Mode"]},
-    ].filter(Boolean);
+  const metricsEl = document.getElementById("rnode-metrics");
+  const metrics = [
+    f["Battery"]    && {icon:"🔋", label:"Battery",   value: f["Battery"]},
+    f["Airtime"]    && {icon:"📡", label:"Airtime",    value: f["Airtime"].split(",")[0]},
+    f["Ch. Load"]   && {icon:"📶", label:"Ch. Load",   value: f["Ch. Load"].split(",")[0]},
+    f["CPU temp"]   && {icon:"🌡", label:"CPU Temp.",  value: f["CPU temp"]},
+    f["Noise Fl."]  && {icon:"📻", label:"Noise",      value: f["Noise Fl."]},
+    f["Rate"]       && {icon:"⚡", label:"Rate",       value: f["Rate"]},
+    f["Traffic"]    && {icon:"↕",  label:"Traffic",    value: f["Traffic"]},
+    f["Mode"]       && {icon:"⚙",  label:"Mode",       value: f["Mode"]},
+  ].filter(Boolean);
 
-    metricsEl.innerHTML = metrics.map(m=>`
-      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:8px 10px">
-        <div style="font-size:14px;margin-bottom:3px">${m.icon}</div>
-        <div style="font-size:9px;color:var(--mu);letter-spacing:.07em;text-transform:uppercase;margin-bottom:2px">${esc(m.label)}</div>
-        <div style="font-size:12px;font-weight:700;color:var(--teal)">${esc(m.value)}</div>
-      </div>`).join("");
+  if(metricsEl) metricsEl.innerHTML = metrics.map(m=>`
+    <div style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:8px 10px">
+      <div style="font-size:14px;margin-bottom:3px">${m.icon}</div>
+      <div style="font-size:9px;color:var(--mu);letter-spacing:.07em;text-transform:uppercase;margin-bottom:2px">${esc(m.label)}</div>
+      <div style="font-size:12px;font-weight:700;color:var(--teal)">${esc(m.value)}</div>
+    </div>`).join("");
 
-    // Load history for graphs
-    loadRnodeCharts();
-  }catch(e){}
+  loadRnodeCharts();
 }
 
 async function loadRnodeCharts(){
@@ -1838,6 +1871,107 @@ async function loadRnodeCharts(){
     });
   }catch(e){}
 }
+
+let _trafficCharts = {};
+async function loadTrafficCharts(){
+  try{
+    const r = await fetch(API+"/api/traffic/history");
+    const history = await r.json();
+    if(!history.length) return;
+
+    // Get all RNode interface names only
+    const ifaceNames = [...new Set(history.flatMap(h=>Object.keys(h.interfaces||{})))].filter(n=>n.includes("RNode"));
+    const container = document.getElementById("rnode-traffic-charts");
+    if(!container) return;
+
+    // Build canvases if needed
+    ifaceNames.forEach(name => {
+      const safeId = "tc-"+name.replace(/[^a-z0-9]/gi,"_");
+      if(!document.getElementById(safeId)){
+        const div = document.createElement("div");
+        div.style.cssText = "background:var(--s1);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;min-width:0;overflow:hidden";
+        const shortName = name.replace(/.*\[/,"").replace(/\].*/,"");
+        div.innerHTML = `<div class="section-lbl" style="margin-bottom:4px;font-size:10px">${esc(shortName)}</div><div style="position:relative;height:80px"><canvas id="${safeId}"></canvas></div>`;
+        container.appendChild(div);
+      }
+    });
+
+    // Parse traffic bytes from string like "↑1.2 MB  0 bps"
+    function parseBytes(str){
+      if(!str) return 0;
+      const m = str.match(/([\d.]+)\s*(B|KB|MB|GB)/i);
+      if(!m) return 0;
+      const v = parseFloat(m[1]);
+      const u = m[2].toUpperCase();
+      if(u==="GB") return v*1e9;
+      if(u==="MB") return v*1e6;
+      if(u==="KB") return v*1e3;
+      return v;
+    }
+
+    const labels = history.map(h=>{
+      const dt = new Date(h.ts*1000);
+      return dt.getHours()+":"+String(dt.getMinutes()).padStart(2,"0")+":"+String(dt.getSeconds()).padStart(2,"0");
+    });
+
+    const colors = ["#2dd4bf","#a78bfa","#f0a92e","#4ade9a","#f87171","#60a5fa","#fb923c","#e879f9"];
+
+    ifaceNames.forEach((name,ci) => {
+      const safeId = "tc-"+name.replace(/[^a-z0-9]/gi,"_");
+      const ctx = document.getElementById(safeId);
+      if(!ctx) return;
+
+      const txData = history.map(h=>{
+        const t = (h.interfaces||{})[name]||"";
+        const parts = t.split(/\s{2,}/);
+        return parseBytes(parts[0]||"");
+      });
+      const rxData = history.map(h=>{
+        const t = (h.interfaces||{})[name]||"";
+        const parts = t.split(/\s{2,}/);
+        return parseBytes(parts[1]||"");
+      });
+
+      const color = colors[ci % colors.length];
+      if(_trafficCharts[safeId]) _trafficCharts[safeId].destroy();
+      _trafficCharts[safeId] = new Chart(ctx, {
+        type:"line",
+        data:{
+          labels,
+          datasets:[
+            {label:"TX",data:txData,borderColor:color,backgroundColor:color+"20",borderWidth:1.5,pointRadius:0,fill:true,tension:.3},
+            {label:"RX",data:rxData,borderColor:"#a78bfa",backgroundColor:"#a78bfa10",borderWidth:1,pointRadius:0,fill:false,tension:.3}
+          ]
+        },
+        options:{
+          responsive:true,maintainAspectRatio:false,animation:false,
+          plugins:{legend:{display:true,labels:{color:"#8b90c0",font:{size:8},boxWidth:8}}},
+          scales:{
+            x:{display:false},
+            y:{ticks:{color:"#8b90c0",font:{size:8}},grid:{color:"#3d4270"}}
+          }
+        }
+      });
+    });
+  }catch(e){}
+}
+
+async function loadRnsLog(){
+  const el = document.getElementById("rns-log");
+  if(!el) return;
+  try{
+    const r = await fetch(API+"/api/rns/log?n=100");
+    const d = await r.json();
+    if(d.lines&&d.lines.length){
+      el.textContent = d.lines.join("\n");
+      el.scrollTop = el.scrollHeight;
+    } else {
+      el.textContent = "No log entries found. Check if rnsd is running.";
+    }
+  }catch(e){ el.textContent = "Error: "+e; }
+}
+
+
 
 async function runCmd(cmd){
   const out = document.getElementById("cmd-output");
