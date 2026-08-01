@@ -174,6 +174,42 @@ Find port: `Dashboard → System → Ports`
 
 ---
 
+## RNode WiFi Connection
+
+Supported boards: **Heltec LoRa32 v3**, **Heltec LoRa32 v4** (ESP32-S3).  
+Heltec v2 — USB only, WiFi not supported in RNode firmware.
+
+### Setup
+
+Connect RNode via USB and run:
+
+```bash
+rnodeconf /dev/ttyACM0 -N
+rnodeconf /dev/ttyACM0 --wifi sta --ssid YOUR_SSID --psk YOUR_PASSWORD
+```
+
+Disconnect USB, power via USB charger. The device will connect to WiFi automatically.
+
+Find the IP in your router client list, then add to Reticulum config:
+
+```ini
+[[RNode-WiFi]]
+  type = RNodeInterface
+  enabled = yes
+  port = tcp://RNODE_IP
+  frequency = 869525000
+  bandwidth = 125000
+  txpower = 17
+  spreadingfactor = 9
+  codingrate = 8
+```
+
+Restart rnsd: `Dashboard → System → RESTART RNSD`
+
+> ⚠️ WiFi network must be 2.4 GHz. ESP32 does not support 5 GHz.
+
+---
+
 ## Client Connection
 
 **Sideband (iOS / Android)**
@@ -548,6 +584,40 @@ action:
 ```
 
 Найти порт: `Dashboard → System → Ports`
+
+## Подключение RNode по WiFi
+
+Поддерживаемые платы: **Heltec LoRa32 v3**, **Heltec LoRa32 v4** (ESP32-S3).  
+Heltec v2 — только USB, WiFi в прошивке RNode не поддерживается.
+
+### Настройка
+
+Подключите RNode по USB и выполните:
+
+```bash
+rnodeconf /dev/ttyACM0 -N
+rnodeconf /dev/ttyACM0 --wifi sta --ssid ИМЯ_СЕТИ --psk ПАРОЛЬ
+```
+
+Отключите USB, подключите питание через зарядник. Устройство автоматически подключится к WiFi.
+
+Найдите IP в списке клиентов роутера и добавьте в конфиг Reticulum:
+
+```ini
+[[RNode-WiFi]]
+  type = RNodeInterface
+  enabled = yes
+  port = tcp://IP_НОДЫ
+  frequency = 869525000
+  bandwidth = 125000
+  txpower = 17
+  spreadingfactor = 9
+  codingrate = 8
+```
+
+Перезапустите rnsd: `Dashboard → System → RESTART RNSD`
+
+> ⚠️ Сеть WiFi должна быть 2.4 ГГц. ESP32 не поддерживает 5 ГГц.
 
 ---
 
