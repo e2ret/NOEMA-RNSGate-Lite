@@ -1825,12 +1825,13 @@ function selectRnode(idx){
       <div style="font-size:12px;font-weight:700;color:var(--teal)">${esc(m.value)}</div>
     </div>`).join("");
 
-  loadRnodeCharts();
+  loadRnodeCharts(rnode.name);
 }
 
-async function loadRnodeCharts(){
+async function loadRnodeCharts(rnodeName){
   try{
-    const r = await fetch(API+"/api/rnode/history");
+    const url = rnodeName ? API+"/api/rnode/history?iface="+encodeURIComponent(rnodeName) : API+"/api/rnode/history";
+    const r = await fetch(url);
     const data = await r.json();
     if(!data.length) return;
 

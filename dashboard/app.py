@@ -94,6 +94,7 @@ def collect_metrics():
                         traffic_str = fields.get("Traffic","0").replace("↑","").replace("↓","").strip()
                         rnode_history.append({
                             "ts": ts,
+                            "iface": iname,
                             "airtime": float(airtime_str.strip()) if airtime_str.strip().replace(".","").isdigit() else 0,
                             "noise": float(noise_str.strip()) if noise_str.strip().replace("-","").replace(".","").isdigit() else 0,
                             "traffic_raw": traffic_str,
@@ -301,7 +302,11 @@ def lxmf_address():
 
 @app.route("/api/rnode/history")
 def rnode_history_api():
-    return jsonify(list(rnode_history))
+    iface = request.args.get("iface")
+    data = list(rnode_history)
+    if iface:
+        data = [d for d in data if iface in d.get("iface","")]
+    return jsonify(data)
 
 @app.route("/api/rnstatus")
 def rnstatus():
