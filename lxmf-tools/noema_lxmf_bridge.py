@@ -10,7 +10,6 @@ import time
 import configparser
 import threading
 import paho.mqtt.client as mqtt_client
-os.environ["LXMFY_LANDLOCK"] = "0"
 from lxmfy import LXMFBot
 
 # ─── Config ──────────────────────────────────────────────────────────────────
@@ -131,6 +130,7 @@ bot = LXMFBot(
     first_message_enabled=True,
     message_persistence_enabled=True,
     reticulum_config_dir=os.path.join(os.path.expanduser("~"), ".reticulum"),
+    landlock_enabled=False,
 )
 _bot_ref = bot
 
