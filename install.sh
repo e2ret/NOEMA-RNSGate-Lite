@@ -390,23 +390,14 @@ fi
 
 # --- Get LXMF Bridge address ---
 echo "Getting LXMF Bridge address..."
-systemctl stop noema_lxmf_bridge 2>/dev/null || true
-sleep 5
-LXMF_ADDR=$("$PYTHON" -c "
-from lxmfy import LXMFBot
-import os
-os.makedirs('/var/lib/noema/lxmfy', exist_ok=True)
-os.makedirs('/var/lib/noema/lxmfy_config', exist_ok=True)
-bot = LXMFBot(name='LXMF Bridge', storage_type='json', storage_path='/var/lib/noema/lxmfy', config_path='/var/lib/noema/lxmfy_config')
-print(list(bot.router.delivery_destinations.values())[0].hexhash)
-" 2>&1 | grep -oE '[0-9a-f]{32}' | tail -1 || true)
+sleep 10
+LXMF_ADDR=$(journalctl -u noema_lxmf_bridge -n 100 --no-pager 2>/dev/null | grep -oE '[0-9a-f]{32}' | tail -1 || true)
 if [ -n "$LXMF_ADDR" ]; then
     echo -n "$LXMF_ADDR" > /var/lib/noema/lxmf_address
     echo "  LXMF Bridge address: $LXMF_ADDR"
 else
     echo "  [WARN] Could not get LXMF address, check dashboard after startup"
 fi
-systemctl start noema_lxmf_bridge 2>/dev/null || true
 
 # --- Calculate Nomadnet node address ---
 echo "Calculating Nomadnet node address..."
