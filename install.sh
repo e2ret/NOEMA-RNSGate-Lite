@@ -386,6 +386,24 @@ SVCEOF
     echo "  [OK] rbrowser.service installed"
 fi
 
+# --- Get LXMF Bridge address ---
+echo "Getting LXMF Bridge address..."
+sleep 5
+LXMF_ADDR=$("$PYTHON" -c "
+from lxmfy import LXMFBot
+import os
+os.makedirs('/var/lib/noema/lxmfy', exist_ok=True)
+os.makedirs('/var/lib/noema/lxmfy_config', exist_ok=True)
+bot = LXMFBot(name='LXMF Bridge', storage_type='json', storage_path='/var/lib/noema/lxmfy', config_path='/var/lib/noema/lxmfy_config')
+print(list(bot.router.delivery_destinations.values())[0].hexhash)
+" 2>/dev/null || true)
+if [ -n "$LXMF_ADDR" ]; then
+    echo -n "$LXMF_ADDR" > /var/lib/noema/lxmf_address
+    echo "  LXMF Bridge address: $LXMF_ADDR"
+else
+    echo "  [WARN] Could not get LXMF address, check dashboard after startup"
+fi
+
 # --- Calculate Nomadnet node address ---
 echo "Calculating Nomadnet node address..."
 sleep 10
