@@ -288,14 +288,14 @@ def rnprobe():
 def addresses():
     addrs = {}
     try:
-        addrs["lxmf_bridge"] = open("/var/lib/noema/lxmf_address").read().strip()
+        addrs["lxmf_bridge"] = open("/root/lxmf-tools/lxmf_address").read().strip()
     except: pass
     return jsonify(addrs)
 
 @app.route("/api/lxmf/address")
 def lxmf_address():
     try:
-        addr = open("/var/lib/noema/lxmf_address").read().strip()
+        addr = open("/root/lxmf-tools/lxmf_address").read().strip()
         return jsonify({"address": addr})
     except:
         return jsonify({"address": ""})
