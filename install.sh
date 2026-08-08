@@ -162,7 +162,7 @@ echo ""
 # --- lxmf-tools ---
 echo "[5/7] Setting up lxmf-tools..."
 mkdir -p "$LXMF_TOOLS_DIR"
-cp "$INSTALL_DIR/lxmf-tools/lxmf_bridge_mqtt.py" "$LXMF_TOOLS_DIR/lxmf_bridge_mqtt.py"
+cp "$INSTALL_DIR/lxmf-tools/noema_lxmf_bridge.py" "$LXMF_TOOLS_DIR/noema_lxmf_bridge.py"
 
 
 if [ -f "$LXMF_TOOLS_DIR/config.cfg.owr" ]; then
@@ -212,7 +212,7 @@ fi
 
 # Patch config.cfg after first run
 echo "      Initializing lxmf-tools config.cfg..."
-timeout 5 "$PYTHON" "$LXMF_TOOLS_DIR/lxmf_bridge_mqtt.py" -p "$LXMF_TOOLS_DIR" 2>/dev/null || true
+timeout 5 "$PYTHON" "$LXMF_TOOLS_DIR/noema_lxmf_bridge.py" 2>/dev/null || true
 if [ -f "$LXMF_TOOLS_DIR/config.cfg" ]; then
     sed -i "s/^host = .*/host = $MQTT_HOST/" "$LXMF_TOOLS_DIR/config.cfg"
     sed -i "s/^#\?password = .*/password = $MQTT_PASS/" "$LXMF_TOOLS_DIR/config.cfg"
@@ -262,9 +262,9 @@ install_service "rnsd" \
     "$INSTALL_DIR/.venv/bin/rnsd --config $RNS_CONFIG_DIR" \
     "$INSTALL_DIR"
 
-install_service "lxmf_bridge_mqtt" \
-    "LXMF Bridge MQTT Daemon" \
-    "$PYTHON $LXMF_TOOLS_DIR/lxmf_bridge_mqtt.py -p $LXMF_TOOLS_DIR" \
+install_service "noema_lxmf_bridge" \
+    "NOEMA LXMF Bridge" \
+    "$PYTHON $LXMF_TOOLS_DIR/noema_lxmf_bridge.py" \
     "$LXMF_TOOLS_DIR" \
     "network.target rnsd.service"
 
@@ -274,7 +274,7 @@ install_service "dashboard" \
     "$INSTALL_DIR/dashboard" \
     "network.target"
 
-SERVICES_LIST="rnsd lxmf_bridge_mqtt dashboard"
+SERVICES_LIST="rnsd noema_lxmf_bridge dashboard"
 
 # --- Nomadnet node ---
 echo "[7b] Setting up Nomadnet node..."
