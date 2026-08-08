@@ -10,12 +10,13 @@ import time
 import configparser
 import threading
 import paho.mqtt.client as mqtt_client
+os.environ["LXMFY_LANDLOCK"] = "0"
 from lxmfy import LXMFBot
 
 # ─── Config ──────────────────────────────────────────────────────────────────
 
 CONFIG_PATH  = "/etc/noema/bridge.cfg"
-STORAGE_PATH   = "/var/lib/noema/lxmfy"
+STORAGE_PATH   = os.path.join(os.path.expanduser("~"), "lxmf-tools", "lxmfy_data")
 ADDRESS_FILE   = "/root/lxmf-tools/lxmf_address"
 
 _cfg = configparser.ConfigParser()
@@ -113,7 +114,7 @@ def _handle_mqtt_to_lxmf(payload):
 
 # ─── Bot ─────────────────────────────────────────────────────────────────────
 
-CONFIG_DIR = "/var/lib/noema/lxmfy_config"
+CONFIG_DIR = os.path.join(os.path.expanduser("~"), "lxmf-tools", "lxmfy_config")
 os.makedirs(STORAGE_PATH, exist_ok=True)
 os.makedirs(CONFIG_DIR, exist_ok=True)
 
@@ -129,6 +130,7 @@ bot = LXMFBot(
     command_prefix="/",
     first_message_enabled=True,
     message_persistence_enabled=True,
+    reticulum_config_dir=os.path.join(os.path.expanduser("~"), ".reticulum"),
 )
 _bot_ref = bot
 
