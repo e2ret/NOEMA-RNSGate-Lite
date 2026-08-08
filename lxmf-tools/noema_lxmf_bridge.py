@@ -146,6 +146,16 @@ bot = LXMFBot(
 )
 _bot_ref = bot
 
+# Save address for dashboard
+try:
+    addr = list(bot.router.delivery_destinations.values())[0].hexhash
+    os.makedirs("/var/lib/noema", exist_ok=True)
+    with open(ADDRESS_FILE, "w") as f:
+        f.write(addr)
+    print(f"[NOEMA] Address: {addr}")
+except Exception as e:
+    print(f"[NOEMA] Could not save address: {e}")
+
 @bot.on_first_message()
 def welcome(sender, message):
     bot.send(sender,
