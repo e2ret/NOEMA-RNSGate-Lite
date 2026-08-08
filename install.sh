@@ -103,7 +103,6 @@ pip install --upgrade pip -q
 pip install \
     rns \
     lxmf \
-    lxmfy \
     flask \
     paho-mqtt \
     nomadnet \
@@ -163,55 +162,33 @@ echo ""
 # --- lxmf-tools ---
 echo "[5/7] Setting up lxmf-tools..."
 mkdir -p "$LXMF_TOOLS_DIR"
+mkdir -p /etc/noema
+mkdir -p /var/lib/noema/lxmfy
 cp "$INSTALL_DIR/lxmf-tools/noema_lxmf_bridge.py" "$LXMF_TOOLS_DIR/noema_lxmf_bridge.py"
 
-
-if [ -f "$LXMF_TOOLS_DIR/config.cfg.owr" ]; then
-    echo "      lxmf-tools config already exists, skipping."
+if [ -f "/etc/noema/bridge.cfg" ]; then
+    echo "      LXMF Bridge config already exists, skipping."
 else
-    cat > "$LXMF_TOOLS_DIR/config.cfg.owr" << EOF
-[main]
-enabled = True
-power = Yes
-
+    cat > /etc/noema/bridge.cfg << BRIDGECFG
 [lxmf]
-destination_name = lxmf
-destination_type = delivery
 display_name = LXMF Bridge
-announce_startup = Yes
-announce_startup_delay = 0
-signature_validated = No
 
 [mqtt]
 host = ${MQTT_HOST}
 port = ${MQTT_PORT}
-transport = tcp
-client_id = lxmf_mqtt_bridge
+client_id = noema_lxmf_bridge
 username = ${MQTT_USER}
 password = ${MQTT_PASS}
 
-[router]
-lxmf_to_mqtt = True
-mqtt_to_lxmf = True
-lxmf_announce_to_mqtt = False
-state_to_mqtt = True
-
 [topics]
-topic_send = message/lxmf/send
-topic_receive = message/lxmf/receive
-topic_announce = message/lxmf/announce
-topic_power = message/lxmf/power
-topic_state = message/lxmf/state
-topic_rm_power = message/lxmf/rm_power
-topic_rm_state = message/lxmf/rm_state
-state_interval = 60
-state_startup = Yes
-state_periodic = Yes
-EOF
-    echo "      Created lxmf-tools config."
+send     = message/lxmf/send
+receive  = message/lxmf/receive
+state    = message/lxmf/rm_state
+power    = message/lxmf/power
+rm_power = message/lxmf/rm_power
+BRIDGECFG
+    echo "      Created /etc/noema/bridge.cfg"
 fi
-
-
 
 # --- Serial port access for RNode ---
 if groups "$CURRENT_USER" | grep -qw dialout; then
@@ -259,7 +236,7 @@ install_service "rnsd" \
 install_service "noema_lxmf_bridge" \
     "NOEMA LXMF Bridge" \
     "$PYTHON $LXMF_TOOLS_DIR/noema_lxmf_bridge.py" \
-    "$LXMF_TOOLS_DIR" \
+    "/var/lib/noema" \
     "network.target rnsd.service"
 
 install_service "dashboard" \
