@@ -220,6 +220,8 @@ After=${AFTER}
 User=${CURRENT_USER}
 WorkingDirectory=${WORKDIR}
 Environment=HOME=${CURRENT_HOME}
+Environment=LXMFY_LANDLOCK=0
+Environment=LXMF_TOOLS_DIR=${LXMF_TOOLS_DIR}
 ExecStart=${EXEC}
 Restart=always
 RestartSec=10
