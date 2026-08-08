@@ -103,6 +103,7 @@ pip install --upgrade pip -q
 pip install \
     rns \
     lxmf \
+    lxmfy \
     flask \
     paho-mqtt \
     nomadnet \
@@ -164,6 +165,9 @@ echo "[5/7] Setting up lxmf-tools..."
 mkdir -p "$LXMF_TOOLS_DIR"
 mkdir -p /etc/noema
 mkdir -p /var/lib/noema/lxmfy
+mkdir -p /var/lib/noema/lxmfy_config
+touch /var/lib/noema/lxmf_address
+chmod 666 /var/lib/noema/lxmf_address
 cp "$INSTALL_DIR/lxmf-tools/noema_lxmf_bridge.py" "$LXMF_TOOLS_DIR/noema_lxmf_bridge.py"
 
 if [ -f "/etc/noema/bridge.cfg" ]; then
