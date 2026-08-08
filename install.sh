@@ -80,7 +80,9 @@ if [ -f "$I2PD_DEB" ]; then
         echo "      [WARN] i2pd service not available, skipping."
     fi
 else
-    echo "      [INFO] Bundled i2pd not found, trying apt..."
+    echo "      [INFO] Bundled i2pd not found, adding official repo..."
+    wget -q -O - https://repo.i2pd.xyz/.help/add_repo | sudo bash -s - 2>/dev/null || true
+    sudo apt-get update -qq 2>/dev/null || true
     sudo apt-get install -y i2pd 2>/dev/null || echo "      [WARN] i2pd not available via apt."
     if systemctl list-unit-files i2pd.service &>/dev/null; then
         sudo systemctl enable --now i2pd
