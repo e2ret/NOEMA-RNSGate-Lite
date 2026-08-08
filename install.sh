@@ -335,25 +335,6 @@ echo "      Services enabled."
 echo "      Starting services..."
 sudo systemctl start $SERVICES_LIST
 
-# --- Done ---
-echo ""
-echo "========================================"
-echo "  Installation complete!"
-echo "========================================"
-echo ""
-echo "  NOEMA RNSGate directory : $INSTALL_DIR"
-echo "  lxmf-tools         : $LXMF_TOOLS_DIR"
-echo "  Reticulum config   : $RNS_CONFIG_DIR/config"
-echo "  Python venv        : $INSTALL_DIR/.venv"
-echo "  Dashboard          : http://$(hostname -I | awk '{print $1}'):8081"
-echo ""
-echo "  Edit Reticulum config:"
-echo "    nano $RNS_CONFIG_DIR/config"
-echo ""
-echo "  Check status:"
-echo "    sudo systemctl status $SERVICES_LIST"
-echo ""
-
 # --- Install rBrowser ---
 echo "Installing rBrowser..."
 if [ ! -d "/root/rBrowser" ]; then
@@ -403,3 +384,30 @@ fi
 echo "Calculating Nomadnet node address..."
 sleep 10
 "$INSTALL_DIR/.venv/bin/python3" "$INSTALL_DIR/recalc_nn_addr.py" || true
+
+# --- Done ---
+LXMF_ADDR=$(cat "$LXMF_TOOLS_DIR/lxmf_address" 2>/dev/null || echo "check dashboard")
+NN_ADDR=$(cat "$INSTALL_DIR/.nomadnetwork/node_address" 2>/dev/null || echo "check dashboard")
+IP=$(hostname -I | awk '{print $1}')
+
+echo ""
+echo "========================================"
+echo "  Installation complete!"
+echo "========================================"
+echo ""
+echo "  Dashboard          : http://${IP}:8081"
+echo "  LXMF Bridge address: $LXMF_ADDR"
+echo "  Nomadnet address   : $NN_ADDR"
+echo ""
+echo "  NOEMA RNSGate dir  : $INSTALL_DIR"
+echo "  lxmf-tools         : $LXMF_TOOLS_DIR"
+echo "  Reticulum config   : $RNS_CONFIG_DIR/config"
+echo "  LXMF Bridge config : /etc/noema/bridge.cfg"
+echo "  Python venv        : $INSTALL_DIR/.venv"
+echo ""
+echo "  Edit Reticulum config:"
+echo "    nano $RNS_CONFIG_DIR/config"
+echo ""
+echo "  Check status:"
+echo "    systemctl status $SERVICES_LIST"
+echo ""
