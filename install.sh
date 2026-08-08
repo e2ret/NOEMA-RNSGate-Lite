@@ -166,10 +166,6 @@ echo ""
 echo "[5/7] Setting up lxmf-tools..."
 mkdir -p "$LXMF_TOOLS_DIR"
 mkdir -p /etc/noema
-mkdir -p /var/lib/noema/lxmfy
-mkdir -p /var/lib/noema/lxmfy_config
-touch /var/lib/noema/lxmf_address
-chmod 666 /var/lib/noema/lxmf_address
 cp "$INSTALL_DIR/lxmf-tools/noema_lxmf_bridge.py" "$LXMF_TOOLS_DIR/noema_lxmf_bridge.py"
 
 if [ -f "/etc/noema/bridge.cfg" ]; then
@@ -393,7 +389,7 @@ echo "Getting LXMF Bridge address..."
 sleep 10
 LXMF_ADDR=$(journalctl -u noema_lxmf_bridge -n 100 --no-pager 2>/dev/null | grep -oE '[0-9a-f]{32}' | tail -1 || true)
 if [ -n "$LXMF_ADDR" ]; then
-    echo -n "$LXMF_ADDR" > /var/lib/noema/lxmf_address
+    echo -n "$LXMF_ADDR" > "$LXMF_TOOLS_DIR/lxmf_address"
     echo "  LXMF Bridge address: $LXMF_ADDR"
 else
     echo "  [WARN] Could not get LXMF address, check dashboard after startup"
