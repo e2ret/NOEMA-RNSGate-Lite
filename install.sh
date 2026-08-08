@@ -223,6 +223,8 @@ Environment=HOME=${CURRENT_HOME}
 Environment=LXMFY_LANDLOCK=0
 Environment=LXMF_TOOLS_DIR=${LXMF_TOOLS_DIR}
 ExecStart=${EXEC}
+StandardOutput=journal
+StandardError=journal
 Restart=always
 RestartSec=10
 
@@ -239,7 +241,7 @@ install_service "rnsd" \
 
 install_service "noema_lxmf_bridge" \
     "NOEMA LXMF Bridge" \
-    "$PYTHON $LXMF_TOOLS_DIR/noema_lxmf_bridge.py" \
+    "$PYTHON -u $LXMF_TOOLS_DIR/noema_lxmf_bridge.py" \
     "$LXMF_TOOLS_DIR" \
     "network.target rnsd.service"
 
