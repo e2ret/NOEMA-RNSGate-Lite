@@ -794,6 +794,24 @@ RNSGate ──I2P──▶ RNSGate
 ~/.nomadnetwork/config                           — конфиг Nomadnet
 ~/NOEMA-RNSGate-Lite/scripts/                   — Python скрипты
 ```
+---
+
+## Удаление FULL
+
+```
+systemctl disable --now rnsd dashboard noema_lxmf_bridge lxmf_bridge_mqtt lxmf_group_chat nomadnet rbrowser i2pd wardrive-bot wardrive-map 2>/dev/null; rm -f /etc/systemd/system/{rnsd,dashboard,noema_lxmf_bridge,lxmf_bridge_mqtt,lxmf_group_chat,nomadnet,rbrowser,wardrive-bot,wardrive-map}.service; rm -rf /root/NOEMA-RNSGate /root/NOEMA-RNSGate-Lite /root/lxmf-tools /root/rBrowser /opt/rns-wardrive-tools /root/.reticulum /root/.nomadnetwork /etc/noema /var/lib/noema; systemctl daemon-reload; echo "DONE"
+```
+
+## Удаление LITE
+
+```
+systemctl disable --now rnsd dashboard noema_lxmf_bridge lxmf_bridge_mqtt nomadnet rbrowser i2pd wardrive-bot wardrive-map 2>/dev/null; rm -f /etc/systemd/system/{rnsd,dashboard,noema_lxmf_bridge,lxmf_bridge_mqtt,nomadnet,rbrowser,wardrive-bot,wardrive-map}.service; rm -rf /root/NOEMA-RNSGate-Lite /root/lxmf-tools /root/rBrowser /opt/rns-wardrive-tools /root/.reticulum /root/.nomadnetwork /etc/noema /var/lib/noema; systemctl daemon-reload; echo "DONE"
+```
+
+## Установка
+```
+cd /root && git clone https://github.com/e2ret/NOEMA-RNSGate-Lite.git && cd NOEMA-RNSGate-Lite && sudo bash install.sh
+```
 
 ---
 
