@@ -152,8 +152,37 @@ action:
         } | to_json }}
 ```
 
----
 
+## LXMF Bridge Bot
+
+The LXMF Bridge (`noema_lxmf_bridge`) is a bot that bridges Reticulum ↔ MQTT ↔ Home Assistant.
+
+**Add to Sideband:** copy the address from `Dashboard → Addresses → LXMF Bridge`.
+
+**Built-in commands:**
+
+| Command | Description |
+|---------|-------------|
+| `/help` | Show available commands |
+| `/ping` | Check connection (replies 🏓 Pong!) |
+| `/status` | MQTT connection status |
+| `/info` | Gateway info |
+
+**Config:** `Dashboard → Configs → noema_lxmf_bridge` → `/etc/noema/bridge.cfg`
+
+```ini
+[lxmf]
+display_name = LXMF Bridge
+
+[mqtt]
+host = 192.168.1.100
+port = 1883
+client_id = noema_lxmf_bridge
+username = username
+password = password
+```
+
+---
 ## LoRa / RNode Configuration
 
 `Dashboard → Configs → Reticulum`
@@ -564,8 +593,37 @@ action:
         } | to_json }}
 ```
 
----
 
+## LXMF Bridge Bot
+
+LXMF Bridge (`noema_lxmf_bridge`) — бот-мост между Reticulum ↔ MQTT ↔ Home Assistant.
+
+**Добавить в Sideband:** скопируй адрес из `Dashboard → Addresses → LXMF Bridge`.
+
+**Встроенные команды:**
+
+| Команда | Описание |
+|---------|----------|
+| `/help` | Список команд |
+| `/ping` | Проверка связи (ответ 🏓 Pong!) |
+| `/status` | Статус MQTT подключения |
+| `/info` | Информация о шлюзе |
+
+**Конфиг:** `Dashboard → Configs → noema_lxmf_bridge` → `/etc/noema/bridge.cfg`
+
+```ini
+[lxmf]
+display_name = LXMF Bridge
+
+[mqtt]
+host = 192.168.1.100
+port = 1883
+client_id = noema_lxmf_bridge
+username = username
+password = password
+```
+
+---
 ## Настройка LoRa / RNode
 
 `Dashboard → Configs → Reticulum`
@@ -793,24 +851,6 @@ RNSGate ──I2P──▶ RNSGate
 ~/.nomadnetwork/storage/pages/index.mu           — главная страница Nomadnet
 ~/.nomadnetwork/config                           — конфиг Nomadnet
 ~/NOEMA-RNSGate-Lite/scripts/                   — Python скрипты
-```
----
-
-## Удаление FULL
-
-```
-systemctl disable --now rnsd dashboard noema_lxmf_bridge lxmf_bridge_mqtt lxmf_group_chat nomadnet rbrowser i2pd wardrive-bot wardrive-map 2>/dev/null; rm -f /etc/systemd/system/{rnsd,dashboard,noema_lxmf_bridge,lxmf_bridge_mqtt,lxmf_group_chat,nomadnet,rbrowser,wardrive-bot,wardrive-map}.service; rm -rf /root/NOEMA-RNSGate /root/NOEMA-RNSGate-Lite /root/lxmf-tools /root/rBrowser /opt/rns-wardrive-tools /root/.reticulum /root/.nomadnetwork /etc/noema /var/lib/noema; systemctl daemon-reload; echo "DONE"
-```
-
-## Удаление LITE
-
-```
-systemctl disable --now rnsd dashboard noema_lxmf_bridge lxmf_bridge_mqtt nomadnet rbrowser i2pd wardrive-bot wardrive-map 2>/dev/null; rm -f /etc/systemd/system/{rnsd,dashboard,noema_lxmf_bridge,lxmf_bridge_mqtt,nomadnet,rbrowser,wardrive-bot,wardrive-map}.service; rm -rf /root/NOEMA-RNSGate-Lite /root/lxmf-tools /root/rBrowser /opt/rns-wardrive-tools /root/.reticulum /root/.nomadnetwork /etc/noema /var/lib/noema; systemctl daemon-reload; echo "DONE"
-```
-
-## Установка
-```
-cd /root && git clone https://github.com/e2ret/NOEMA-RNSGate-Lite.git && cd NOEMA-RNSGate-Lite && sudo bash install.sh
 ```
 
 ---
