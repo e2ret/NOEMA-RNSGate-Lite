@@ -382,7 +382,7 @@ TimeoutStartSec=30
 WantedBy=multi-user.target
 SVCEOF
     systemctl daemon-reload
-    systemctl enable rbrowser
+    systemctl enable --now rbrowser
     echo "  [OK] rbrowser.service installed"
 fi
 
@@ -397,7 +397,7 @@ os.makedirs('/var/lib/noema/lxmfy', exist_ok=True)
 os.makedirs('/var/lib/noema/lxmfy_config', exist_ok=True)
 bot = LXMFBot(name='LXMF Bridge', storage_type='json', storage_path='/var/lib/noema/lxmfy', config_path='/var/lib/noema/lxmfy_config')
 print(list(bot.router.delivery_destinations.values())[0].hexhash)
-" 2>/dev/null || true)
+" 2>/dev/null | grep -E '^[0-9a-f]{32}$' || true)
 if [ -n "$LXMF_ADDR" ]; then
     echo -n "$LXMF_ADDR" > /var/lib/noema/lxmf_address
     echo "  LXMF Bridge address: $LXMF_ADDR"
