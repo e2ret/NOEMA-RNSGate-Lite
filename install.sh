@@ -391,7 +391,7 @@ fi
 # --- Get LXMF Bridge address ---
 echo "Getting LXMF Bridge address..."
 systemctl stop noema_lxmf_bridge 2>/dev/null || true
-sleep 2
+sleep 5
 LXMF_ADDR=$("$PYTHON" -c "
 from lxmfy import LXMFBot
 import os
