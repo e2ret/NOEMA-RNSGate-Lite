@@ -15,7 +15,8 @@ from lxmfy import LXMFBot
 # ─── Config ──────────────────────────────────────────────────────────────────
 
 CONFIG_PATH  = "/etc/noema/bridge.cfg"
-STORAGE_PATH = "/var/lib/noema/lxmfy"
+STORAGE_PATH   = "/var/lib/noema/lxmfy"
+ADDRESS_FILE   = "/var/lib/noema/lxmf_address"
 
 _cfg = configparser.ConfigParser()
 _cfg.read(CONFIG_PATH)
