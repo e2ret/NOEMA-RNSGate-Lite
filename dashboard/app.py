@@ -24,7 +24,7 @@ def _find_rns_bin(name):
     return found or name
 _RNS_BIN = os.path.dirname(_find_rns_bin("rnstatus"))
 
-SERVICES = ["lxmf_bridge_mqtt", "rnsd", "i2pd", "nomadnet", "rbrowser"]
+SERVICES = ["noema_lxmf_bridge", "rnsd", "i2pd", "nomadnet", "rbrowser"]
 
 NOMADNET_PAGE = f"{_HOME}/.nomadnetwork/storage/pages/index.mu"
 NOMADNET_PAGES_DIR = f"{_HOME}/.nomadnetwork/storage/pages"
@@ -32,7 +32,7 @@ SCRIPTS_DIR = f"{_HOME}/NOEMA-RNSGate-Lite/scripts"
 NOMADNET_ADDR_FILE = f"{_HOME}/.nomadnetwork/storage/hashes"
 
 CONFIGS = {
-    "lxmf_bridge_mqtt": f"{_HOME}/lxmf-tools/config.cfg.owr",
+    "noema_lxmf_bridge": f"{_HOME}/lxmf-tools/config.cfg.owr",
     "reticulum": f"{_HOME}/.reticulum/config",
     "nomadnet": f"{_HOME}/.nomadnetwork/config",
 }
@@ -365,8 +365,8 @@ def save_config(name):
     content = (request.json or {}).get("content", "")
     try:
         open(CONFIGS[name], "w").write(content)
-        if name == "lxmf_bridge_mqtt":
-            sh("sudo systemctl restart lxmf_bridge_mqtt")
+        if name == "noema_lxmf_bridge":
+            sh("sudo systemctl restart noema_lxmf_bridge")
         elif name == "reticulum":
             sh("sudo systemctl restart rnsd")
         return jsonify({"ok": True})
@@ -375,7 +375,7 @@ def save_config(name):
 
 @app.route("/api/logs/<name>")
 def get_log(name):
-    allowed = {"rnsd": "rnsd", "lxmf_bridge_mqtt": "lxmf_bridge_mqtt"}
+    allowed = {"rnsd": "rnsd", "noema_lxmf_bridge": "noema_lxmf_bridge"}
     if name not in allowed:
         return jsonify({"error": "unknown"}), 400
     out, _ = sh(f"journalctl -u {allowed[name]} -n 100 --no-pager -o short")
@@ -832,7 +832,7 @@ def run_command():
         "find_ports":   "ls /dev/ttyUSB* /dev/ttyACM* 2>/dev/null || echo 'не найдено'",
         "rnstatus":     f"{_RNS_BIN}/rnstatus",
         "restart_rnsd": "sudo systemctl restart rnsd && sleep 2 && systemctl is-active rnsd",
-        "restart_lxmf": "sudo systemctl restart lxmf_bridge_mqtt && sleep 1 && systemctl is-active lxmf_bridge_mqtt",
+        "restart_lxmf": "sudo systemctl restart noema_lxmf_bridge && sleep 1 && systemctl is-active noema_lxmf_bridge",
         "restart_dash": "sudo systemctl restart dashboard",
         "free_mem":     "LC_ALL=C free -h",
         "disk":         "df -h /",
@@ -1217,7 +1217,7 @@ def reset_identity():
         import threading as _thr
         _thr.Thread(target=_recalc_nn, daemon=True).start()
         # Restart all services in background - dashboard last
-        _sp.Popen(f"sleep 1 && sudo systemctl restart i2pd rnsd lxmf_bridge_mqtt nomadnet && sleep 8 && {_HOME}/NOEMA-RNSGate-Lite/.venv/bin/python3 {_HOME}/NOEMA-RNSGate/recalc_nn_addr.py && sleep 2 && sudo systemctl restart dashboard", shell=True)
+        _sp.Popen(f"sleep 1 && sudo systemctl restart i2pd rnsd noema_lxmf_bridge nomadnet && sleep 8 && {_HOME}/NOEMA-RNSGate-Lite/.venv/bin/python3 {_HOME}/NOEMA-RNSGate/recalc_nn_addr.py && sleep 2 && sudo systemctl restart dashboard", shell=True)
         return jsonify({"ok": True})
     except Exception as e:
         return jsonify({"ok": False, "error": str(e)})

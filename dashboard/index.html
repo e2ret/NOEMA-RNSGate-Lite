@@ -444,7 +444,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
             <circle cx="350" cy="166" r="16" fill="none" stroke="#4ade9a" stroke-width="0.5" class="mg-ring" style="animation-duration:1.8s"/>
             <circle cx="350" cy="166" r="8" fill="#4ade9a"><animate attributeName="opacity" values="1;.6;1" dur="1.6s" repeatCount="indefinite"/></circle>
             <text x="350" y="189" font-family="Courier New" font-size="13" fill="#e8eaf6" font-weight="700" text-anchor="middle">NOEMA RNSGate</text>
-            <text x="350" y="204" font-family="Courier New" font-size="9.5" fill="#8b90c0" text-anchor="middle">lxmf_bridge_mqtt</text>
+            <text x="350" y="204" font-family="Courier New" font-size="9.5" fill="#8b90c0" text-anchor="middle">noema_lxmf_bridge</text>
             <text x="350" y="216" font-family="Courier New" font-size="9.5" fill="#4ade9a" text-anchor="middle" id="mg-hub-status">● active</text>
           </g>
 
@@ -706,7 +706,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
     <div class="panel" id="panel-logs">
       <div class="log-toolbar">
         <select id="log-unit" onchange="loadLogs()">
-          <option value="lxmf_bridge_mqtt">lxmf_bridge_mqtt</option>
+          <option value="noema_lxmf_bridge">noema_lxmf_bridge</option>
           <option value="rnsd">rnsd</option>
         </select>
         <button class="sys-btn" onclick="loadLogs()">↻</button>
@@ -995,7 +995,7 @@ async function svcAction(name,action){
 }
 
 async function restartAll(){
-  for(const s of ["rnsd","lxmf_bridge_mqtt"]){
+  for(const s of ["rnsd","noema_lxmf_bridge"]){
     await fetch(API+`/api/services/${s}/restart`,{method:"POST"});
   }
   toast("All services rerunningы");
@@ -1155,7 +1155,7 @@ async function updateTopology(){
   try{
     const sv=await fetch(API+"/api/services").then(r=>r.json());
     const rns=sv.find(s=>s.name==="rnsd");
-    const lxmf=sv.find(s=>s.name==="lxmf_bridge_mqtt");
+    const lxmf=sv.find(s=>s.name==="noema_lxmf_bridge");
     if(rns){
       const on=rns.status==="active";
       document.getElementById("mg-n-rns")?.classList.toggle("dim",!on);
@@ -1299,7 +1299,7 @@ async function saveConfig(){
   const d=await r.json();
   if(d.ok){
     toast("Saved");
-    const svcMap={"lxmf_bridge_mqtt":"lxmf_bridge_mqtt","nomadnet":"nomadnet","reticulum":"rnsd"};
+    const svcMap={"noema_lxmf_bridge":"noema_lxmf_bridge","nomadnet":"nomadnet","reticulum":"rnsd"};
     const svc=svcMap[curCfg];
     if(svc){
       await fetch(API+"/api/services/"+svc+"/restart",{method:"POST"});
