@@ -4,11 +4,7 @@ NOEMA LXMF Bridge — LXMFy + MQTT bridge for Home Assistant.
 Config: /etc/noema/bridge.cfg
 """
 
-import json
-import os
-import time
-import configparser
-import threading
+import json, os, time, re, configparser, threading
 import paho.mqtt.client as mqtt_client
 from lxmfy import LXMFBot
 
@@ -16,15 +12,14 @@ from lxmfy import LXMFBot
 
 CONFIG_PATH  = "/etc/noema/bridge.cfg"
 STORAGE_PATH = "/var/lib/noema/lxmfy"
+ADDRESS_FILE = "/var/lib/noema/lxmf_address"
 
 _cfg = configparser.ConfigParser()
 _cfg.read(CONFIG_PATH)
 
 def cfg(section, key, fallback=""):
-    try:
-        return _cfg[section][key].strip()
-    except KeyError:
-        return fallback
+    try: return _cfg[section][key].strip()
+    except KeyError: return fallback
 
 MQTT_HOST      = cfg("mqtt", "host",      "localhost")
 MQTT_PORT      = int(cfg("mqtt", "port",  "1883"))
@@ -39,6 +34,29 @@ TOPIC_POWER    = cfg("topics", "power",    "message/lxmf/power")
 TOPIC_RM_POWER = cfg("topics", "rm_power", "message/lxmf/rm_power")
 
 DISPLAY_NAME   = cfg("lxmf", "display_name", "LXMF Bridge")
+
+# ─── Intercept RNS stdout to capture address ─────────────────────────────────
+
+import sys
+
+class _Tee:
+    def __init__(self, stream):
+        self._s = stream
+    def write(self, s):
+        self._s.write(s)
+        m = re.search(r"LXMF Router ready to receive on: <([0-9a-f]{32})>", s)
+        if m:
+            try:
+                os.makedirs("/var/lib/noema", exist_ok=True)
+                with open(ADDRESS_FILE, "w") as f:
+                    f.write(m.group(1))
+                self._s.write(f"[NOEMA] Address saved: {m.group(1)}\n")
+            except Exception as e:
+                self._s.write(f"[NOEMA] Address save error: {e}\n")
+    def flush(self): self._s.flush()
+    def fileno(self): return self._s.fileno()
+
+sys.stderr = _Tee(sys.stderr)
 
 # ─── MQTT ────────────────────────────────────────────────────────────────────
 
@@ -101,7 +119,7 @@ def _publish_state():
 
 def _handle_mqtt_to_lxmf(payload):
     try:
-        data = json.loads(payload)
+        data    = json.loads(payload)
         dest    = data.get("destination", "").strip()
         content = data.get("content", "").strip()
         title   = data.get("title", "Reply").strip()
@@ -128,16 +146,6 @@ bot = LXMFBot(
 )
 _bot_ref = bot
 
-# Save address for dashboard
-try:
-    addr = bot.router.lxmf_destination.hexhash
-    os.makedirs("/var/lib/noema", exist_ok=True)
-    with open("/var/lib/noema/lxmf_address", "w") as f:
-        f.write(addr)
-    print(f"[NOEMA] Address: {addr}")
-except Exception as e:
-    print(f"[NOEMA] Could not save address: {e}")
-
 @bot.on_first_message()
 def welcome(sender, message):
     bot.send(sender,
@@ -153,11 +161,11 @@ def forward_to_mqtt(sender, message):
         content = message.content.decode("utf-8", errors="replace").strip()
         title   = message.title.decode("utf-8", errors="replace").strip() if message.title else ""
         _publish(TOPIC_RECEIVE, json.dumps({
-            "source":         sender,
-            "title":          title,
-            "content":        content,
-            "timestamp":      message.timestamp,
-            "date_time":      time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(message.timestamp)),
+            "source":          sender,
+            "title":           title,
+            "content":         content,
+            "timestamp":       message.timestamp,
+            "date_time":       time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(message.timestamp)),
             "signature_valid": 1 if message.signature_validated else 0,
         }))
     except Exception as e:
