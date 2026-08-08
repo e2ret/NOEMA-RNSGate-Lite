@@ -135,8 +135,9 @@ _bot_ref = bot
 # Save address for dashboard
 try:
     addr = list(bot.router.delivery_destinations.values())[0].hexhash
-    with open(ADDRESS_FILE, "w") as f:
-        f.write(addr)
+    fd = os.open(ADDRESS_FILE, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o666)
+    os.write(fd, addr.encode())
+    os.close(fd)
     print(f"[NOEMA] Address: {addr}")
 except Exception as e:
     print(f"[NOEMA] Could not save address: {e}")
