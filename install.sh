@@ -110,6 +110,8 @@ pip install \
     pytz \
     requests \
     geopy
+# Force reinstall rns to ensure rnsd binary is in venv
+pip install --force-reinstall rns -q
 
 echo "      Python dependencies installed."
 
