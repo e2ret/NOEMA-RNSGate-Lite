@@ -87,7 +87,7 @@ def mqtt_connect():
         elif topic == TOPIC_STATE:
             _handle_state(payload)
 
-    def on_disconnect(client, userdata, rc, props=None):
+    def on_disconnect(client, userdata, disconnect_flags, reason_code, props=None):
         global _mqtt_connected
         _mqtt_connected = False
         print("[MQTT] Disconnected, reconnecting...")
