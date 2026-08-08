@@ -15,8 +15,8 @@ from lxmfy import LXMFBot
 # ─── Config ──────────────────────────────────────────────────────────────────
 
 CONFIG_PATH  = "/etc/noema/bridge.cfg"
-STORAGE_PATH   = "/var/lib/noema/lxmfy"
-ADDRESS_FILE   = "/root/lxmf-tools/lxmf_address"
+STORAGE_PATH   = os.path.join(os.path.dirname(os.path.abspath(__file__)), "lxmfy_data")
+ADDRESS_FILE   = os.path.join(os.path.dirname(os.path.abspath(__file__)), "lxmf_address")
 
 _cfg = configparser.ConfigParser()
 _cfg.read(CONFIG_PATH)
@@ -113,7 +113,7 @@ def _handle_mqtt_to_lxmf(payload):
 
 # ─── Bot ─────────────────────────────────────────────────────────────────────
 
-CONFIG_DIR = "/var/lib/noema/lxmfy_config"
+CONFIG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "lxmfy_config")
 os.makedirs(STORAGE_PATH, exist_ok=True)
 os.makedirs(CONFIG_DIR, exist_ok=True)
 
