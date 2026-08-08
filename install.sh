@@ -168,6 +168,8 @@ mkdir -p "$LXMF_TOOLS_DIR"
 mkdir -p /etc/noema
 mkdir -p /var/lib/noema/lxmfy
 mkdir -p /var/lib/noema/lxmfy_config
+touch /var/lib/noema/lxmf_address
+chmod 666 /var/lib/noema/lxmf_address
 cp "$INSTALL_DIR/lxmf-tools/noema_lxmf_bridge.py" "$LXMF_TOOLS_DIR/noema_lxmf_bridge.py"
 
 if [ -f "/etc/noema/bridge.cfg" ]; then
@@ -240,7 +242,7 @@ install_service "rnsd" \
 install_service "noema_lxmf_bridge" \
     "NOEMA LXMF Bridge" \
     "$PYTHON $LXMF_TOOLS_DIR/noema_lxmf_bridge.py" \
-    "/var/lib/noema" \
+    "$LXMF_TOOLS_DIR" \
     "network.target rnsd.service"
 
 install_service "dashboard" \
@@ -391,7 +393,7 @@ echo "Getting LXMF Bridge address..."
 sleep 10
 LXMF_ADDR=$(journalctl -u noema_lxmf_bridge -n 100 --no-pager 2>/dev/null | grep -oE '[0-9a-f]{32}' | tail -1 || true)
 if [ -n "$LXMF_ADDR" ]; then
-    echo -n "$LXMF_ADDR" > /root/lxmf-tools/lxmf_address
+    echo -n "$LXMF_ADDR" > /var/lib/noema/lxmf_address
     echo "  LXMF Bridge address: $LXMF_ADDR"
 else
     echo "  [WARN] Could not get LXMF address, check dashboard after startup"
