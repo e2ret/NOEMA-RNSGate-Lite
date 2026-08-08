@@ -388,7 +388,8 @@ fi
 
 # --- Get LXMF Bridge address ---
 echo "Getting LXMF Bridge address..."
-sleep 5
+systemctl stop noema_lxmf_bridge 2>/dev/null || true
+sleep 2
 LXMF_ADDR=$("$PYTHON" -c "
 from lxmfy import LXMFBot
 import os
@@ -403,6 +404,7 @@ if [ -n "$LXMF_ADDR" ]; then
 else
     echo "  [WARN] Could not get LXMF address, check dashboard after startup"
 fi
+systemctl start noema_lxmf_bridge 2>/dev/null || true
 
 # --- Calculate Nomadnet node address ---
 echo "Calculating Nomadnet node address..."
