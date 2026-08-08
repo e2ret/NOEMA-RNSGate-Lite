@@ -109,21 +109,21 @@ nmtui
 |---------|-------------|
 | `rnsd` | Reticulum Network Stack |
 | `dashboard` | Web interface :8081 |
-| `lxmf_bridge_mqtt` | LXMF ↔ MQTT bridge |
+| `noema_lxmf_bridge` | LXMF ↔ MQTT bridge |
 | `i2pd` | I2P daemon |
 | `nomadnet` | Nomadnet Node |
 | `rbrowser` | Nomadnet Browser :5000 |
 
 Check status:
 ```bash
-systemctl status rnsd dashboard lxmf_bridge_mqtt i2pd nomadnet rbrowser
+systemctl status rnsd dashboard noema_lxmf_bridge i2pd nomadnet rbrowser
 ```
 
 ---
 
 ## MQTT Configuration
 
-`Dashboard → Configs → lxmf_bridge_mqtt`
+`Dashboard → Configs → noema_lxmf_bridge`
 
 ```ini
 [mqtt]
@@ -522,21 +522,21 @@ nmtui
 |--------|----------|
 | `rnsd` | Reticulum Network Stack |
 | `dashboard` | Веб-интерфейс :8081 |
-| `lxmf_bridge_mqtt` | Мост LXMF ↔ MQTT |
+| `noema_lxmf_bridge` | Мост LXMF ↔ MQTT |
 | `i2pd` | I2P демон |
 | `nomadnet` | Nomadnet Node |
 | `rbrowser` | Nomadnet Browser :5000 |
 
 Проверка:
 ```bash
-systemctl status rnsd dashboard lxmf_bridge_mqtt i2pd nomadnet rbrowser
+systemctl status rnsd dashboard noema_lxmf_bridge i2pd nomadnet rbrowser
 ```
 
 ---
 
 ## Настройка MQTT
 
-`Dashboard → Configs → lxmf_bridge_mqtt`
+`Dashboard → Configs → noema_lxmf_bridge`
 
 ```ini
 [mqtt]
