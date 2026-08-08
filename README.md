@@ -408,7 +408,6 @@ What is preserved:
 - [Flask](https://flask.palletsprojects.com/) — Pallets, BSD
 - [paho-mqtt](https://github.com/eclipse/paho.mqtt.python) — Eclipse, EPL/EDL
 - [rBrowser](https://github.com/fr33n0w/rBrowser) — fr33n0w, MIT
-- [lxmf-tools](https://github.com/SebastianObi/LXMF-Tools) — SebastianObi
 - [i2pd](https://github.com/PurpleI2P/i2pd) — PurpleI2P, BSD
 
 ---
@@ -819,7 +818,6 @@ RNSGate ──I2P──▶ RNSGate
 - [Flask](https://flask.palletsprojects.com/) — Pallets, BSD
 - [paho-mqtt](https://github.com/eclipse/paho.mqtt.python) — Eclipse, EPL/EDL
 - [rBrowser](https://github.com/fr33n0w/rBrowser) — fr33n0w, MIT
-- [lxmf-tools](https://github.com/SebastianObi/LXMF-Tools) — SebastianObi
 - [i2pd](https://github.com/PurpleI2P/i2pd) — PurpleI2P, BSD
 
 ---
@@ -827,7 +825,6 @@ RNSGate ──I2P──▶ RNSGate
 ## Благодарности
 
 - **Mark Qvist** — Reticulum, LXMF, Nomadnet
-- **SebastianObi** — lxmf-tools
 - **fr33n0w** — rBrowser
 - **PurpleI2P Team** — i2pd
 
