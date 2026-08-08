@@ -32,7 +32,7 @@ SCRIPTS_DIR = f"{_HOME}/NOEMA-RNSGate-Lite/scripts"
 NOMADNET_ADDR_FILE = f"{_HOME}/.nomadnetwork/storage/hashes"
 
 CONFIGS = {
-    "noema_lxmf_bridge": f"{_HOME}/lxmf-tools/config.cfg.owr",
+    "noema_lxmf_bridge": "/etc/noema/bridge.cfg",
     "reticulum": f"{_HOME}/.reticulum/config",
     "nomadnet": f"{_HOME}/.nomadnetwork/config",
 }
@@ -129,7 +129,7 @@ def lxmf_collector():
             client = mqtt.Client()
             cfg = {}
             try:
-                with open(f"{_HOME}/lxmf-tools/config.cfg.owr") as f:
+                with open("/etc/noema/bridge.cfg") as f:
                     for line in f:
                         if "=" in line and not line.strip().startswith("#"):
                             k,v = line.split("=",1)
@@ -331,7 +331,7 @@ def rnstatus():
 def mqtt_status():
     cfg = {}
     try:
-        with open(f"{_HOME}/lxmf-tools/config.cfg.owr") as f:
+        with open("/etc/noema/bridge.cfg") as f:
             for line in f:
                 if "=" in line and not line.strip().startswith("#"):
                     k,v = line.split("=",1)
@@ -418,7 +418,7 @@ def backup_download():
     buf = io.BytesIO()
     files = {
         "reticulum_config": f"{_HOME}/.reticulum/config",
-        "lxmf_config.cfg.owr": f"{_HOME}/lxmf-tools/config.cfg.owr",
+        "noema_bridge.cfg": "/etc/noema/bridge.cfg",
         "lxmf_identity": f"{_HOME}/lxmf-tools/identity",
         "monitored_nodes.json": f"{_HOME}/dashboard/monitored_nodes.json",
     }
@@ -441,7 +441,7 @@ def backup_restore():
     if not f: return jsonify({"error": "no file"}), 400
     restore_map = {
         "reticulum_config": f"{_HOME}/.reticulum/config",
-        "lxmf_config.cfg.owr": f"{_HOME}/lxmf-tools/config.cfg.owr",
+        "noema_bridge.cfg": "/etc/noema/bridge.cfg",
         "monitored_nodes.json": f"{_HOME}/dashboard/monitored_nodes.json",
     }
     try:
