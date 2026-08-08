@@ -96,7 +96,18 @@ fi
 
 # --- Python venv ---
 echo "[3/7] Setting up Python virtual environment..."
-python3 -m venv --system-site-packages "$INSTALL_DIR/.venv"
+
+# Ensure Python 3.11+ for lxmfy on Ubuntu 22.04
+PY_MINOR=$(python3 -c "import sys; print(sys.version_info.minor)")
+if [ "$PY_MINOR" -lt 11 ]; then
+    echo "      Python 3.${PY_MINOR} detected, installing Python 3.11..."
+    apt-get install -y python3.11 python3.11-venv python3.11-dev -q
+    PYTHON_BIN="python3.11"
+else
+    PYTHON_BIN="python3"
+fi
+
+$PYTHON_BIN -m venv --system-site-packages "$INSTALL_DIR/.venv"
 source "$INSTALL_DIR/.venv/bin/activate"
 
 pip install --upgrade pip -q
