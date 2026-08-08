@@ -103,6 +103,7 @@ pip install --upgrade pip -q
 pip install \
     rns \
     lxmf \
+    lxmfy \
     flask \
     paho-mqtt \
     nomadnet \
@@ -210,14 +211,7 @@ EOF
     echo "      Created lxmf-tools config."
 fi
 
-# Patch config.cfg after first run
-echo "      Initializing lxmf-tools config.cfg..."
-timeout 5 "$PYTHON" "$LXMF_TOOLS_DIR/noema_lxmf_bridge.py" 2>/dev/null || true
-if [ -f "$LXMF_TOOLS_DIR/config.cfg" ]; then
-    sed -i "s/^host = .*/host = $MQTT_HOST/" "$LXMF_TOOLS_DIR/config.cfg"
-    sed -i "s/^#\?password = .*/password = $MQTT_PASS/" "$LXMF_TOOLS_DIR/config.cfg"
-    echo "      config.cfg patched."
-fi
+
 
 # --- Serial port access for RNode ---
 if groups "$CURRENT_USER" | grep -qw dialout; then
