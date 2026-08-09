@@ -747,16 +747,17 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
 
       <!-- Reticulum form -->
       <div id="cfg-form-panel" style="display:none">
-        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+        <div style="display:flex;gap:6px;margin-bottom:14px;align-items:center;flex-wrap:wrap">
           <button class="sys-btn teal" onclick="loadRnsConfig()">↻ LOAD</button>
           <button class="sys-btn teal" onclick="saveRnsConfig()">SAVE & RESTART</button>
           <button class="sys-btn" onclick="showAddIfaceModal()">+ ADD INTERFACE</button>
+          <div id="rns-cfg-status" style="margin-left:8px;font-size:12px;color:var(--teal);display:none"></div>
         </div>
 
         <!-- [reticulum] section -->
         <div class="section-lbl">Reticulum</div>
         <div style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:12px;margin-bottom:16px">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">
             <div>
               <div style="font-size:11px;color:var(--mu);margin-bottom:3px">enable_transport</div>
               <select id="rns-main-transport" style="width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px">
@@ -787,12 +788,20 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
         </div>
 
         <!-- Interfaces -->
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <div class="section-lbl" style="margin:0">Interfaces</div>
+        <div class="section-lbl" style="margin-bottom:8px">Interfaces</div>
+        <div id="rns-cfg-ifaces" style="border:1px solid var(--bd);border-radius:8px;overflow:hidden;min-height:200px">
+          <div style="display:grid;grid-template-columns:200px 1fr" id="rns-ifaces-split">
+            <div id="rns-iface-list" style="border-right:1px solid var(--bd);overflow-y:auto"></div>
+            <div id="rns-iface-detail" style="padding:16px;overflow-y:auto"><div style="color:var(--mu);font-size:12px;margin-top:40px;text-align:center">Select an interface</div></div>
+          </div>
         </div>
-        <div id="rns-cfg-ifaces" style="display:flex;flex-direction:column;gap:10px"></div>
+        <style>
+          @media(max-width:600px){
+            #rns-ifaces-split{grid-template-columns:1fr!important;grid-template-rows:auto auto}
+            #rns-iface-list{border-right:none!important;border-bottom:1px solid var(--bd)}
+          }
+        </style>
 
-        <div id="rns-cfg-status" style="margin-top:12px;font-size:12px;color:var(--teal);display:none"></div>
       </div>
 
       <!-- Add Interface Modal -->
@@ -2632,36 +2641,60 @@ async function loadRnsConfig() {
   } catch(e){ alert('Error loading config: '+e); }
 }
 
+let _selectedIface = null;
+
 function renderIfacesList(ifaces) {
-  const el = document.getElementById('rns-cfg-ifaces');
-  if(!el) return;
-  el.innerHTML = (ifaces||[]).map((iface, idx) => {
+  const list = document.getElementById('rns-iface-list');
+  const detail = document.getElementById('rns-iface-detail');
+  if(!list) return;
+
+  list.innerHTML = (ifaces||[]).map((iface, idx) => {
     const type = (iface.params && iface.params.type) || 'Unknown';
     const color = type.includes('RNode') ? 'var(--teal)' : type.includes('I2P') ? 'var(--am)' : type.includes('TCP')||type.includes('Back') ? '#6c8ebf' : 'var(--mu)';
-    const fields = RNS_IFACE_FIELDS[type] || Object.keys(iface.params||{}).filter(k=>k!=='type').map(k=>({k,label:k,type:'text',default:''}));
-    const fieldRows = fields.map(f => renderIfaceField(idx, f, iface.params && iface.params[f.k])).join('');
-    return `<div style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;overflow:hidden" id="iface-block-${idx}">
-      <div onclick="toggleIface(${idx})" style="display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;user-select:none">
-        <span id="iface-arrow-${idx}" style="color:var(--mu);font-size:12px">▶</span>
-        <span style="font-size:13px;font-weight:600;color:${color};flex:1">[[ ${esc(iface.name)} ]]</span>
-        <span style="font-size:11px;color:var(--mu);background:var(--bg);padding:2px 8px;border-radius:4px">${esc(type)}</span>
-        <button class="sys-btn rd" style="padding:2px 10px;font-size:11px" onclick="event.stopPropagation();deleteRnsIface(${idx})">DELETE</button>
-      </div>
-      <div id="iface-body-${idx}" style="display:none;padding:0 14px 14px">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          ${fieldRows}
-        </div>
-      </div>
+    const deleted = _deletedIfaces && _deletedIfaces.has(idx);
+    return `<div id="iface-list-item-${idx}" onclick="selectIface(${idx})"
+      style="padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--bd);user-select:none;${deleted?'opacity:0.3;pointer-events:none;':''}"
+      onmouseenter="this.style.background='var(--s2)'" onmouseleave="this.style.background=(_selectedIface===${idx}?'var(--s2)':'')">
+      <div style="font-size:12px;font-weight:600;color:${color}">[[ ${esc(iface.name)} ]]</div>
+      <div style="font-size:10px;color:var(--mu);margin-top:2px">${esc(type)}</div>
     </div>`;
   }).join('');
+
+  // restore selection
+  if(_selectedIface !== null && ifaces && ifaces[_selectedIface]) {
+    selectIface(_selectedIface);
+  } else if(ifaces && ifaces.length > 0) {
+    selectIface(0);
+  } else {
+    detail.innerHTML = '<div style="color:var(--mu);font-size:12px;margin-top:40px;text-align:center">No interfaces</div>';
+  }
 }
 
-function toggleIface(idx) {
-  const body = document.getElementById('iface-body-'+idx);
-  const arrow = document.getElementById('iface-arrow-'+idx);
-  const open = body.style.display !== 'none';
-  body.style.display = open ? 'none' : '';
-  arrow.textContent = open ? '▶' : '▼';
+function selectIface(idx) {
+  _selectedIface = idx;
+  // highlight
+  document.querySelectorAll('[id^="iface-list-item-"]').forEach(el => el.style.background = '');
+  const item = document.getElementById('iface-list-item-'+idx);
+  if(item) item.style.background = 'var(--s2)';
+
+  const iface = _rnsCfgData && _rnsCfgData.interfaces && _rnsCfgData.interfaces[idx];
+  const detail = document.getElementById('rns-iface-detail');
+  if(!iface || !detail) return;
+
+  const type = (iface.params && iface.params.type) || 'Unknown';
+  const color = type.includes('RNode') ? 'var(--teal)' : type.includes('I2P') ? 'var(--am)' : type.includes('TCP')||type.includes('Back') ? '#6c8ebf' : 'var(--mu)';
+  const fields = RNS_IFACE_FIELDS[type] || Object.keys(iface.params||{}).filter(k=>k!=='type').map(k=>({k,label:k,type:'text',default:''}));
+  const fieldRows = fields.map(f => renderIfaceField(idx, f, iface.params && iface.params[f.k])).join('');
+
+  detail.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="font-size:13px;font-weight:600;color:${color}">[[ ${esc(iface.name)} ]]</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:11px;color:var(--mu);background:var(--bg);padding:2px 8px;border-radius:4px">${esc(type)}</span>
+        <button class="sys-btn rd" style="padding:2px 10px;font-size:11px" onclick="deleteRnsIface(${idx})">DELETE</button>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${fieldRows}</div>`;
 }
 
 function collectRnsConfig() {
@@ -2694,8 +2727,8 @@ function collectRnsConfig() {
 
 function deleteRnsIface(idx) {
   _deletedIfaces.add(idx);
-  const el = document.getElementById('iface-block-'+idx);
-  if(el){ el.style.opacity='0.3'; el.style.pointerEvents='none'; }
+  _selectedIface = null;
+  renderIfacesList(_rnsCfgData.interfaces);
 }
 
 function showAddIfaceModal() {
