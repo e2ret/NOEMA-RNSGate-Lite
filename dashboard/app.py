@@ -419,42 +419,107 @@ def chat_history_clear():
 
 @app.route("/api/backup/download")
 def backup_download():
-    import zipfile, io, time as _t
+    import zipfile, io, time as _t, glob as _g
     buf = io.BytesIO()
-    files = {
-        "reticulum_config": f"{_HOME}/.reticulum/config",
-        "noema_bridge.cfg": "/etc/noema/bridge.cfg",
-        "lxmf_identity": f"{_HOME}/lxmf-tools/identity",
-        "monitored_nodes.json": f"{_HOME}/dashboard/monitored_nodes.json",
+
+    single_files = {
+        "configs/reticulum.cfg":       f"{_HOME}/.reticulum/config",
+        "configs/noema_bridge.cfg":    "/etc/noema/bridge.cfg",
+        "configs/nomadnet.cfg":        f"{_HOME}/.nomadnetwork/config",
+        "identity/lxmf_identity":      f"{_HOME}/lxmf-tools/identity",
+        "identity/reticulum_identity": f"{_HOME}/.reticulum/storage/identity",
+        "identity/i2p_keys":           "/var/lib/i2pd/router.keys",
+        "data/monitored_nodes.json":   f"{_HOME}/dashboard/monitored_nodes.json",
+        "data/nomadnet_hashes":        NOMADNET_ADDR_FILE,
     }
+
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
-        for name, path in files.items():
+        for arcname, path in single_files.items():
             try:
-                zf.write(path, name)
+                zf.write(path, arcname)
             except: pass
+
+        for p in _g.glob(f"{NOMADNET_PAGES_DIR}/*.mu"):
+            try: zf.write(p, f"pages/{os.path.basename(p)}")
+            except: pass
+
+        for p in _g.glob(f"{SCRIPTS_DIR}/*.py") + _g.glob(f"{SCRIPTS_DIR}/*.sh"):
+            try: zf.write(p, f"scripts/{os.path.basename(p)}")
+            except: pass
+
+        for p in _g.glob("/etc/i2pd/tunnels.conf") + _g.glob("/etc/i2pd/tunnels.d/*.conf"):
+            try: zf.write(p, f"configs/i2p/{os.path.basename(p)}")
+            except: pass
+
+        rns_dest = f"{_HOME}/.reticulum/storage/destinations"
+        for p in _g.glob(f"{rns_dest}/*"):
+            try:
+                if os.path.isfile(p):
+                    zf.write(p, f"identity/rns_destinations/{os.path.basename(p)}")
+            except: pass
+
     buf.seek(0)
     from flask import send_file
     ts = _t.strftime("%Y%m%d_%H%M%S")
     return send_file(buf, mimetype="application/zip",
                      as_attachment=True,
-                     download_name=f"meshgate_backup_{ts}.zip")
+                     download_name=f"noema_backup_{ts}.zip")
 
 @app.route("/api/backup/restore", methods=["POST"])
 def backup_restore():
     import zipfile, io
     f = request.files.get("file")
     if not f: return jsonify({"error": "no file"}), 400
-    restore_map = {
-        "reticulum_config": f"{_HOME}/.reticulum/config",
-        "noema_bridge.cfg": "/etc/noema/bridge.cfg",
-        "monitored_nodes.json": f"{_HOME}/dashboard/monitored_nodes.json",
+
+    single_restore = {
+        "configs/reticulum.cfg":       f"{_HOME}/.reticulum/config",
+        "configs/noema_bridge.cfg":    "/etc/noema/bridge.cfg",
+        "configs/nomadnet.cfg":        f"{_HOME}/.nomadnetwork/config",
+        "identity/lxmf_identity":      f"{_HOME}/lxmf-tools/identity",
+        "identity/reticulum_identity": f"{_HOME}/.reticulum/storage/identity",
+        "data/monitored_nodes.json":   f"{_HOME}/dashboard/monitored_nodes.json",
+        "data/nomadnet_hashes":        NOMADNET_ADDR_FILE,
+        # legacy keys from old backups
+        "reticulum_config":            f"{_HOME}/.reticulum/config",
+        "noema_bridge.cfg":            "/etc/noema/bridge.cfg",
+        "monitored_nodes.json":        f"{_HOME}/dashboard/monitored_nodes.json",
     }
+
     try:
         with zipfile.ZipFile(io.BytesIO(f.read())) as zf:
-            for name, path in restore_map.items():
-                if name in zf.namelist():
+            names = zf.namelist()
+
+            # Single files
+            for arcname, path in single_restore.items():
+                if arcname in names:
                     os.makedirs(os.path.dirname(path), exist_ok=True)
-                    open(path, "wb").write(zf.read(name))
+                    open(path, "wb").write(zf.read(arcname))
+
+            # Pages
+            os.makedirs(NOMADNET_PAGES_DIR, exist_ok=True)
+            for n in names:
+                if n.startswith("pages/") and n.endswith(".mu"):
+                    fname = os.path.basename(n)
+                    if fname:
+                        open(os.path.join(NOMADNET_PAGES_DIR, fname), "wb").write(zf.read(n))
+
+            # Scripts
+            os.makedirs(SCRIPTS_DIR, exist_ok=True)
+            for n in names:
+                if n.startswith("scripts/") and (n.endswith(".py") or n.endswith(".sh")):
+                    fname = os.path.basename(n)
+                    if fname:
+                        open(os.path.join(SCRIPTS_DIR, fname), "wb").write(zf.read(n))
+
+            # RNS destinations
+            rns_dest = f"{_HOME}/.reticulum/storage/destinations"
+            os.makedirs(rns_dest, exist_ok=True)
+            for n in names:
+                if n.startswith("identity/rns_destinations/"):
+                    fname = os.path.basename(n)
+                    if fname:
+                        open(os.path.join(rns_dest, fname), "wb").write(zf.read(n))
+
         return jsonify({"ok": True})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -1200,86 +1265,6 @@ def rns_update():
         return jsonify({"ok": False, "error": "not allowed"})
     out, rc = sh(f"{_RNS_BIN}/pip install --upgrade {pkg} 2>&1")
     return jsonify({"ok": rc==0, "output": out})
-
-
-@app.route("/api/rns_config_parsed")
-def rns_config_parsed():
-    import re, configparser
-    cfg_path = os.path.expanduser("~/.reticulum/config")
-    try:
-        raw = open(cfg_path).read()
-    except:
-        return jsonify({"error": "config not found"})
-
-    result = {"reticulum": {}, "interfaces": []}
-
-    # Parse [reticulum] section
-    rns_match = re.search(r'^\[reticulum\](.*?)(?=^\[|\Z)', raw, re.M | re.S)
-    if rns_match:
-        for line in rns_match.group(1).splitlines():
-            m = re.match(r'\s*(\w+)\s*=\s*(.+)', line)
-            if m:
-                result["reticulum"][m.group(1).strip()] = m.group(2).strip()
-
-    # Parse [[interfaces]]
-    iface_blocks = re.findall(r'  \[\[(.+?)\]\](.*?)(?=  \[\[|\Z)', raw, re.S)
-    for name, body in iface_blocks:
-        iface = {"name": name.strip(), "params": {}}
-        for line in body.splitlines():
-            m = re.match(r'\s+(\w+)\s*=\s*(.+)', line)
-            if m:
-                iface["params"][m.group(1).strip()] = m.group(2).strip()
-        result["interfaces"].append(iface)
-
-    return jsonify(result)
-
-@app.route("/api/rns_config_save", methods=["POST"])
-def rns_config_save():
-    import re
-    data = request.json or {}
-    cfg_path = os.path.expanduser("~/.reticulum/config")
-    try:
-        rns_section = data.get("reticulum", {})
-        interfaces = data.get("interfaces", [])
-
-        lines = ["[reticulum]"]
-        for k, v in rns_section.items():
-            lines.append(f"  {k} = {v}")
-        lines.append("")
-        lines.append("[interfaces]")
-        for iface in interfaces:
-            lines.append(f"  [[{iface['name']}]]")
-            for k, v in iface.get("params", {}).items():
-                lines.append(f"    {k} = {v}")
-            lines.append("")
-
-        # Backup
-        import shutil, time as _t
-        shutil.copy2(cfg_path, cfg_path + f".bak.{int(_t.time())}")
-
-        open(cfg_path, "w").write("\n".join(lines))
-        return jsonify({"ok": True})
-    except Exception as e:
-        return jsonify({"ok": False, "error": str(e)})
-
-@app.route("/api/rns_iface_delete", methods=["POST"])
-def rns_iface_delete():
-    name = (request.json or {}).get("name", "")
-    if not name:
-        return jsonify({"ok": False, "error": "no name"})
-    import re
-    cfg_path = os.path.expanduser("~/.reticulum/config")
-    try:
-        raw = open(cfg_path).read()
-        # Remove interface block
-        pattern = rf'  \[\[{re.escape(name)}\]\][^\[]*'
-        new_cfg = re.sub(pattern, '', raw)
-        import shutil, time as _t
-        shutil.copy2(cfg_path, cfg_path + f".bak.{int(_t.time())}")
-        open(cfg_path, "w").write(new_cfg)
-        return jsonify({"ok": True})
-    except Exception as e:
-        return jsonify({"ok": False, "error": str(e)})
 
 @app.route("/api/reset_identity", methods=["POST"])
 def reset_identity():
