@@ -958,10 +958,11 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
     <div style="font-size:15px;font-weight:700;color:var(--tx);margin-bottom:8px">⬇ Download backup</div>
     <div style="font-size:12px;color:var(--mu);margin-bottom:20px;line-height:1.8">
       Will be saved:<br>
-      • ~/.reticulum/config<br>
-      • ~/lxmf-tools/config.cfg.owr<br>
-      • ~/lxmf-tools/identity<br>
-      • monitored_nodes.json
+      • configs: reticulum, noema_bridge, nomadnet, i2p tunnels<br>
+      • identity: lxmf, reticulum, i2p keys, rns destinations<br>
+      • pages: all .mu files<br>
+      • scripts: all .py and .sh<br>
+      • data: monitored_nodes, nomadnet hashes
     </div>
     <div style="display:flex;gap:10px;justify-content:flex-end">
       <button class="sys-btn" onclick="closeModal('backup-modal')">Cancel</button>
