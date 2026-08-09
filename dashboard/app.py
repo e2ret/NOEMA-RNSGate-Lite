@@ -1201,6 +1201,86 @@ def rns_update():
     out, rc = sh(f"{_RNS_BIN}/pip install --upgrade {pkg} 2>&1")
     return jsonify({"ok": rc==0, "output": out})
 
+
+@app.route("/api/rns_config_parsed")
+def rns_config_parsed():
+    import re, configparser
+    cfg_path = os.path.expanduser("~/.reticulum/config")
+    try:
+        raw = open(cfg_path).read()
+    except:
+        return jsonify({"error": "config not found"})
+
+    result = {"reticulum": {}, "interfaces": []}
+
+    # Parse [reticulum] section
+    rns_match = re.search(r'^\[reticulum\](.*?)(?=^\[|\Z)', raw, re.M | re.S)
+    if rns_match:
+        for line in rns_match.group(1).splitlines():
+            m = re.match(r'\s*(\w+)\s*=\s*(.+)', line)
+            if m:
+                result["reticulum"][m.group(1).strip()] = m.group(2).strip()
+
+    # Parse [[interfaces]]
+    iface_blocks = re.findall(r'  \[\[(.+?)\]\](.*?)(?=  \[\[|\Z)', raw, re.S)
+    for name, body in iface_blocks:
+        iface = {"name": name.strip(), "params": {}}
+        for line in body.splitlines():
+            m = re.match(r'\s+(\w+)\s*=\s*(.+)', line)
+            if m:
+                iface["params"][m.group(1).strip()] = m.group(2).strip()
+        result["interfaces"].append(iface)
+
+    return jsonify(result)
+
+@app.route("/api/rns_config_save", methods=["POST"])
+def rns_config_save():
+    import re
+    data = request.json or {}
+    cfg_path = os.path.expanduser("~/.reticulum/config")
+    try:
+        rns_section = data.get("reticulum", {})
+        interfaces = data.get("interfaces", [])
+
+        lines = ["[reticulum]"]
+        for k, v in rns_section.items():
+            lines.append(f"  {k} = {v}")
+        lines.append("")
+        lines.append("[interfaces]")
+        for iface in interfaces:
+            lines.append(f"  [[{iface['name']}]]")
+            for k, v in iface.get("params", {}).items():
+                lines.append(f"    {k} = {v}")
+            lines.append("")
+
+        # Backup
+        import shutil, time as _t
+        shutil.copy2(cfg_path, cfg_path + f".bak.{int(_t.time())}")
+
+        open(cfg_path, "w").write("\n".join(lines))
+        return jsonify({"ok": True})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)})
+
+@app.route("/api/rns_iface_delete", methods=["POST"])
+def rns_iface_delete():
+    name = (request.json or {}).get("name", "")
+    if not name:
+        return jsonify({"ok": False, "error": "no name"})
+    import re
+    cfg_path = os.path.expanduser("~/.reticulum/config")
+    try:
+        raw = open(cfg_path).read()
+        # Remove interface block
+        pattern = rf'  \[\[{re.escape(name)}\]\][^\[]*'
+        new_cfg = re.sub(pattern, '', raw)
+        import shutil, time as _t
+        shutil.copy2(cfg_path, cfg_path + f".bak.{int(_t.time())}")
+        open(cfg_path, "w").write(new_cfg)
+        return jsonify({"ok": True})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)})
+
 @app.route("/api/reset_identity", methods=["POST"])
 def reset_identity():
     import shutil, time as _t, subprocess as _sp

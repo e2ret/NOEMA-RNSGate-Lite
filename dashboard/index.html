@@ -133,31 +133,25 @@ body{
   background:rgba(11,18,32,.6);
   backdrop-filter:blur(16px);
   border-bottom:1px solid var(--bd);
-  padding:0 12px;
+  padding:0 16px;
   display:flex;
-  flex-wrap:nowrap;
-  overflow-x:auto;
+  flex-wrap:wrap;
+  overflow-x:hidden;
   overflow-y:hidden;
   scrollbar-width:none;
   gap:4px;
   align-items:center;
-  justify-content:flex-start;
+  justify-content:center;
   min-height:52px;
   flex-shrink:0;
-  position:relative;
-  -webkit-overflow-scrolling:touch
+  position:relative
 }
 .sidebar::-webkit-scrollbar{display:none}
 .nav-sep{width:1px;height:20px;background:var(--bd);margin:0 6px;flex-shrink:0}
-.sidebar-wrap{position:relative;z-index:0}
-.sidebar-wrap::after{
-  content:"";position:absolute;top:0;right:0;bottom:0;width:26px;z-index:1;
-  background:linear-gradient(to left,rgba(10,15,26,.95),transparent);
-  pointer-events:none;opacity:0;transition:opacity .2s
-}
-.sidebar-wrap.scrollable::after{opacity:1}
 @media(max-width:768px){
-  .sidebar{justify-content:flex-start;flex-wrap:nowrap;overflow-x:auto;padding:6px 8px 6px 8px;gap:6px;min-height:56px}
+  .sidebar{justify-content:space-around;flex-wrap:nowrap;overflow-x:hidden;padding:0;gap:0;min-height:50px}
+  .nav-item{flex:1;justify-content:center;padding:6px 2px;gap:0;min-width:0;font-size:9px;flex-direction:column;align-items:center}
+  .nav-item span{display:block;margin-top:2px;letter-spacing:.03em;overflow:hidden;text-overflow:ellipsis;max-width:100%;text-align:center}
   .nav-sep{display:none}
   .topbar{padding:8px 12px}
   .logo b{font-size:13px}
@@ -180,52 +174,31 @@ body{
 
 .nav-item{
   display:flex;align-items:center;gap:8px;
-  padding:7px 14px;
+  padding:7px 16px;
   cursor:pointer;color:var(--mu);
   transition:color .18s var(--ease),background-color .18s var(--ease),border-color .18s var(--ease);
   border-radius:10px;
   border:1px solid transparent;
-  font-size:13px;font-weight:500;
+  font-size:15px;font-weight:500;
   white-space:nowrap;flex-shrink:0;
-  text-transform:uppercase;letter-spacing:.04em
+  text-transform:uppercase;letter-spacing:.06em
 }
-.nav-item svg{flex-shrink:0;opacity:.7;transition:opacity .18s var(--ease);width:16px;height:16px}
+.nav-item svg{flex-shrink:0;opacity:.7;transition:opacity .18s var(--ease)}
 .nav-item:hover{color:var(--tx);background:rgba(255,255,255,.05)}
 .nav-item:hover svg{opacity:1}
 .nav-item.active{
-  color:#fff;
-  background:rgba(45,212,191,.15);
-  border-color:rgba(45,212,191,.3);
-  font-weight:600
+  color:var(--teal);
+  background:linear-gradient(135deg,rgba(20,184,166,.18),rgba(20,184,166,.08));
+  border-color:rgba(20,184,166,.55);
+  font-weight:600;
+  backdrop-filter:blur(12px);
+  box-shadow:0 1px 0 rgba(20,184,166,.15) inset,0 4px 16px rgba(20,184,166,.1)
 }
 .nav-item.active svg{opacity:1;color:var(--teal)}
 @media(max-width:768px){
-  .nav-item{
-    flex:0 0 auto;
-    flex-direction:column;
-    justify-content:center;
-    align-items:center;
-    padding:8px 12px;
-    gap:4px;
-    min-width:58px;
-    font-size:9px;
-    letter-spacing:.02em;
-    border-radius:10px
-  }
-  .nav-item svg{width:20px;height:20px;opacity:.9}
-  .nav-item span{
-    display:block;
-    line-height:1.15;
-    max-width:70px;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    text-align:center;
-    font-size:9px
-  }
-  .nav-item.active{background:rgba(45,212,191,.22);border-color:rgba(45,212,191,.45)}
-}
-@media(min-width:769px){
-  .sidebar{justify-content:center;flex-wrap:wrap;overflow-x:hidden;padding-right:12px}
+  .nav-item svg{width:14px;height:14px}
+  .nav-item{flex:1 1 0;justify-content:center;padding:6px 4px;font-size:10px;gap:3px;min-width:0}
+  .nav-item span{display:none}
 }
 
 .sys-btn{
@@ -245,8 +218,8 @@ body{
   color:var(--tx);
 }
 .sys-btn:hover{background:rgba(255,255,255,.1);transform:translateY(-1px)}
-.sys-btn:active{transform:translateY(0)}
-.sys-btn.teal{color:var(--teal);}
+.sys-btn:active{transform:translateY(1px);background:rgba(20,184,166,.12);border-color:rgba(20,184,166,.4);box-shadow:0 1px 0 rgba(20,184,166,.2) inset}
+.sys-btn.teal{color:var(--teal);background:rgba(20,184,166,.12);border-color:rgba(20,184,166,.28);}
 .sys-btn.am{color:var(--am);}
 .sys-btn.rd{color:var(--rd);}
 .main{overflow-y:auto;padding:20px 20px;background:transparent;display:flex;flex-direction:column;flex:1;min-height:0}
@@ -303,8 +276,7 @@ select{
 .cfg-tabs::-webkit-scrollbar{display:none}
 .ctab{font-size:15px;padding:7px 16px;cursor:pointer;color:var(--mu);border-radius:10px;border:1px solid transparent;font-weight:500;text-transform:uppercase;letter-spacing:.06em;transition:.15s;white-space:nowrap;flex-shrink:0}
 .ctab:hover{color:var(--tx);background:rgba(255,255,255,.05)}
-.ctab.active{color:#fff;background:rgba(20,184,166,.15);border-color:rgba(20,184,166,.3);font-weight:600}
-.ctab.active{color:var(--teal);border-bottom-color:var(--teal);font-weight:600}
+.ctab.active{color:var(--teal);background:linear-gradient(135deg,rgba(20,184,166,.18),rgba(20,184,166,.08));border-color:rgba(20,184,166,.55);font-weight:600;backdrop-filter:blur(12px);box-shadow:0 1px 0 rgba(20,184,166,.15) inset,0 4px 16px rgba(20,184,166,.1)}
 .ctab:hover:not(.active){color:var(--tx)}
 .cfg-path{font-size:11px;color:var(--mu);margin-bottom:8px;font-family:var(--mono)}
 
@@ -382,8 +354,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
   <div class="mc"><div class="lb">LXMF received</div><div class="vl b" id="m-lxmf-recv">0</div></div>
 </div>
 <div class="body">
-  <div class="sidebar-wrap">
-  <div class="sidebar" id="sidebar">
+  <div class="sidebar">
     <div class="nav-item active" onclick="nav('services',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span>Services</span></div>
     <div class="nav-item"       onclick="nav('configs',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="4" x2="5" y2="20"/><circle cx="5" cy="10" r="2.2"/><line x1="12" y1="4" x2="12" y2="20"/><circle cx="12" cy="16" r="2.2"/><line x1="19" y1="4" x2="19" y2="20"/><circle cx="19" cy="7" r="2.2"/></svg><span>Configs</span></div>
     <div class="nav-item"       onclick="nav('addresses',this);loadAddressesPanel();"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M16 12v1.5a2.5 2.5 0 0 0 5 0V12a9 9 0 1 0-4 7.5"/></svg><span>Addresses</span></div>
@@ -397,20 +368,6 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
     <div class="nav-item"       onclick="nav('logs',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9l3 3-3 3"/><line x1="12" y1="15" x2="17" y2="15"/></svg><span>Logs</span></div>
     <div class="nav-item"       onclick="nav('system',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/><rect x="10" y="10" width="4" height="4"/><line x1="9" y1="2" x2="9" y2="6"/><line x1="15" y1="2" x2="15" y2="6"/><line x1="9" y1="18" x2="9" y2="22"/><line x1="15" y1="18" x2="15" y2="22"/><line x1="2" y1="9" x2="6" y2="9"/><line x1="2" y1="15" x2="6" y2="15"/><line x1="18" y1="9" x2="22" y2="9"/><line x1="18" y1="15" x2="22" y2="15"/></svg><span>System</span></div>
   </div>
-  </div>
-  <script>
-    (function(){
-      const wrap=document.querySelector('.sidebar-wrap');
-      const sb=document.getElementById('sidebar');
-      function upd(){
-        const canScroll = sb.scrollWidth - sb.clientWidth - sb.scrollLeft > 4;
-        wrap.classList.toggle('scrollable', canScroll);
-      }
-      sb.addEventListener('scroll', upd, {passive:true});
-      window.addEventListener('resize', upd);
-      upd();
-    })();
-  </script>
   <div class="main">
 
     <!-- SERVICES -->
@@ -773,11 +730,98 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
 
     <!-- CONFIGS -->
     <div class="panel" id="panel-configs">
-      <div class="cfg-tabs" id="cfg-tabs"></div>
-      <div class="cfg-path" id="cfg-path"></div>
-      <textarea id="cfg-area" spellcheck="false"></textarea>
-      <div class="brow">
-        <button class="sys-btn teal" onclick="saveConfig()">Save</button>
+      <div style="display:flex;gap:6px;margin-bottom:10px;border-bottom:1px solid var(--bd);padding-bottom:8px">
+        <button class="sys-btn teal" id="cfg-mode-text" onclick="cfgMode('text')">TEXT</button>
+        <button class="sys-btn" id="cfg-mode-form" onclick="cfgMode('form')">RETICULUM FORM</button>
+      </div>
+
+      <!-- Text editor -->
+      <div id="cfg-text-panel">
+        <div class="cfg-tabs" id="cfg-tabs"></div>
+        <div class="cfg-path" id="cfg-path"></div>
+        <textarea id="cfg-area" spellcheck="false"></textarea>
+        <div class="brow">
+          <button class="sys-btn teal" onclick="saveConfig()">Save</button>
+        </div>
+      </div>
+
+      <!-- Reticulum form -->
+      <div id="cfg-form-panel" style="display:none">
+        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+          <button class="sys-btn teal" onclick="loadRnsConfig()">↻ LOAD</button>
+          <button class="sys-btn teal" onclick="saveRnsConfig()">SAVE & RESTART</button>
+          <button class="sys-btn" onclick="showAddIfaceModal()">+ ADD INTERFACE</button>
+        </div>
+
+        <!-- [reticulum] section -->
+        <div class="section-lbl">Reticulum</div>
+        <div style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:12px;margin-bottom:16px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div>
+              <div style="font-size:11px;color:var(--mu);margin-bottom:3px">enable_transport</div>
+              <select id="rns-main-transport" style="width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px">
+                <option value="Yes">Yes</option><option value="No">No</option>
+              </select>
+            </div>
+            <div>
+              <div style="font-size:11px;color:var(--mu);margin-bottom:3px">share_instance</div>
+              <select id="rns-main-share" style="width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px">
+                <option value="Yes">Yes</option><option value="No">No</option>
+              </select>
+            </div>
+            <div>
+              <div style="font-size:11px;color:var(--mu);margin-bottom:3px">shared_instance_port</div>
+              <input id="rns-main-siport" value="37428" style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px">
+            </div>
+            <div>
+              <div style="font-size:11px;color:var(--mu);margin-bottom:3px">instance_control_port</div>
+              <input id="rns-main-icport" value="37429" style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px">
+            </div>
+            <div>
+              <div style="font-size:11px;color:var(--mu);margin-bottom:3px">panic_on_interface_error</div>
+              <select id="rns-main-panic" style="width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px">
+                <option value="No">No</option><option value="Yes">Yes</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interfaces -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div class="section-lbl" style="margin:0">Interfaces</div>
+        </div>
+        <div id="rns-cfg-ifaces" style="display:flex;flex-direction:column;gap:10px"></div>
+
+        <div id="rns-cfg-status" style="margin-top:12px;font-size:12px;color:var(--teal);display:none"></div>
+      </div>
+
+      <!-- Add Interface Modal -->
+      <div id="add-iface-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center">
+        <div style="background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:20px;width:90%;max-width:400px">
+          <div style="font-size:14px;font-weight:600;margin-bottom:16px">Add Interface</div>
+          <div style="margin-bottom:12px">
+            <div style="font-size:11px;color:var(--mu);margin-bottom:4px">Interface Name</div>
+            <input id="new-iface-name" placeholder="My Interface" style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:6px 10px">
+          </div>
+          <div style="margin-bottom:16px">
+            <div style="font-size:11px;color:var(--mu);margin-bottom:4px">Type</div>
+            <select id="new-iface-type" onchange="updateNewIfaceHint()" style="width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:6px 10px">
+              <option value="AutoInterface">AutoInterface — local LAN/WiFi discovery</option>
+              <option value="TCPClientInterface">TCPClientInterface — connect to TCP server</option>
+              <option value="TCPServerInterface">TCPServerInterface — listen for connections</option>
+              <option value="BackboneInterface">BackboneInterface — high-performance TCP</option>
+              <option value="RNodeInterface">RNodeInterface — LoRa radio</option>
+              <option value="I2PInterface">I2PInterface — I2P anonymous network</option>
+              <option value="UDPInterface">UDPInterface — UDP broadcast</option>
+              <option value="SerialInterface">SerialInterface — serial port</option>
+            </select>
+          </div>
+          <div id="new-iface-hint" style="font-size:11px;color:var(--mu);margin-bottom:16px;padding:8px;background:var(--bg);border-radius:5px"></div>
+          <div style="display:flex;gap:8px">
+            <button class="sys-btn teal" onclick="confirmAddIface()">ADD</button>
+            <button class="sys-btn" onclick="hideAddIfaceModal()">CANCEL</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -2437,6 +2481,266 @@ fetch(API+"/api/chat/contacts").then(r=>r.json()).then(async d=>{
   window.addEventListener('resize',()=>{resize();init();});
   resize();init();draw();
 })();
+
+// CONFIGS MODE
+function cfgMode(mode) {
+  document.getElementById('cfg-text-panel').style.display = mode==='text' ? '' : 'none';
+  document.getElementById('cfg-form-panel').style.display = mode==='form' ? '' : 'none';
+  document.getElementById('cfg-mode-text').className = 'sys-btn' + (mode==='text' ? ' teal' : '');
+  document.getElementById('cfg-mode-form').className = 'sys-btn' + (mode==='form' ? ' teal' : '');
+  if(mode==='form') loadRnsConfig();
+}
+
+// RNODE CONFIG
+
+function rNodeTab(tab) {
+  document.getElementById('rnode-tab-status-panel').style.display = tab==='status' ? '' : 'none';
+  document.getElementById('rnode-tab-config-panel').style.display = tab==='config' ? '' : 'none';
+  document.getElementById('rnode-tab-status').className = 'sys-btn' + (tab==='status' ? ' teal' : '');
+  document.getElementById('rnode-tab-config').className = 'sys-btn' + (tab==='config' ? ' teal' : '');
+  if(tab==='config') loadRnsConfig();
+}
+
+// RNS CONFIG FORM
+let _rnsCfgData = null;
+const _deletedIfaces = new Set();
+
+// Interface field definitions from official docs
+const RNS_IFACE_FIELDS = {
+  AutoInterface: [
+    {k:'enabled', label:'Enabled', type:'select', opts:['yes','no'], default:'yes'},
+    {k:'mode', label:'Mode', type:'select', opts:['full','gateway','access_point','roaming','boundary','internal'], default:'full', hint:'full=default, access_point=radio AP'},
+    {k:'group_id', label:'Group ID', type:'text', default:'', hint:'Isolate network segments on same LAN'},
+    {k:'devices', label:'Devices (optional)', type:'text', default:'', hint:'e.g. wlan0,eth0'},
+    {k:'ignored_devices', label:'Ignored Devices', type:'text', default:''},
+  ],
+  TCPClientInterface: [
+    {k:'enabled', label:'Enabled', type:'select', opts:['yes','no'], default:'yes'},
+    {k:'target_host', label:'Target Host', type:'text', default:'', hint:'IP or hostname'},
+    {k:'target_port', label:'Target Port', type:'text', default:'4242'},
+    {k:'mode', label:'Mode', type:'select', opts:['full','gateway','access_point','roaming','boundary','internal'], default:'full'},
+    {k:'network_name', label:'Network Name (IFAC)', type:'text', default:''},
+    {k:'passphrase', label:'Passphrase (IFAC)', type:'text', default:''},
+  ],
+  TCPServerInterface: [
+    {k:'enabled', label:'Enabled', type:'select', opts:['yes','no'], default:'yes'},
+    {k:'listen_ip', label:'Listen IP', type:'text', default:'0.0.0.0'},
+    {k:'listen_port', label:'Listen Port', type:'text', default:'4242'},
+    {k:'mode', label:'Mode', type:'select', opts:['full','gateway','access_point','roaming','boundary','internal'], default:'full'},
+    {k:'network_name', label:'Network Name (IFAC)', type:'text', default:''},
+    {k:'passphrase', label:'Passphrase (IFAC)', type:'text', default:''},
+  ],
+  BackboneInterface: [
+    {k:'enabled', label:'Enabled', type:'select', opts:['yes','no'], default:'yes'},
+    {k:'listen_on', label:'Listen IP', type:'text', default:'0.0.0.0', hint:'For listener'},
+    {k:'port', label:'Port', type:'text', default:'4242'},
+    {k:'remote', label:'Remote Host', type:'text', default:'', hint:'For client connection'},
+    {k:'target_port', label:'Remote Port', type:'text', default:'4242'},
+    {k:'mode', label:'Mode', type:'select', opts:['full','gateway','access_point','roaming','boundary','internal'], default:'gateway'},
+  ],
+  RNodeInterface: [
+    {k:'enabled', label:'Enabled', type:'select', opts:['yes','no'], default:'yes'},
+    {k:'port', label:'Port', type:'text', default:'/dev/ttyUSB0', hint:'e.g. /dev/ttyUSB0 or tcp://10.0.0.1'},
+    {k:'frequency', label:'Frequency (Hz)', type:'text', default:'869525000', hint:'e.g. 868000000 for 868 MHz'},
+    {k:'bandwidth', label:'Bandwidth (Hz)', type:'select', opts:['7800','10400','15600','20800','31250','41700','62500','125000','250000','500000'], default:'125000'},
+    {k:'txpower', label:'TX Power (dBm)', type:'text', default:'17', hint:'Max depends on hardware, e.g. 7-22 dBm'},
+    {k:'spreadingfactor', label:'Spreading Factor', type:'select', opts:['7','8','9','10','11','12'], default:'9', hint:'7=fastest, 12=longest range'},
+    {k:'codingrate', label:'Coding Rate', type:'select', opts:['5','6','7','8'], default:'5', hint:'5=fastest, 8=longest range'},
+    {k:'mode', label:'Mode', type:'select', opts:['full','access_point','gateway','boundary'], default:'full'},
+    {k:'id_callsign', label:'ID Callsign', type:'text', default:'', hint:'Optional station ID'},
+    {k:'id_interval', label:'ID Interval (s)', type:'text', default:'600'},
+    {k:'flow_control', label:'Flow Control', type:'select', opts:['False','True'], default:'False'},
+    {k:'airtime_limit_long', label:'Airtime Limit Long (%)', type:'text', default:'', hint:'e.g. 1.5 for EU 868MHz compliance'},
+    {k:'airtime_limit_short', label:'Airtime Limit Short (%)', type:'text', default:'', hint:'e.g. 33'},
+    {k:'network_name', label:'Network Name (IFAC)', type:'text', default:''},
+    {k:'passphrase', label:'Passphrase (IFAC)', type:'text', default:''},
+  ],
+  I2PInterface: [
+    {k:'enabled', label:'Enabled', type:'select', opts:['yes','no'], default:'yes'},
+    {k:'connectable', label:'Connectable', type:'select', opts:['yes','no'], default:'yes', hint:'Accept incoming I2P connections'},
+    {k:'peers', label:'Peers (b32 addresses)', type:'text', default:'', hint:'Comma-separated .b32.i2p addresses'},
+    {k:'mode', label:'Mode', type:'select', opts:['full','gateway','boundary'], default:'full'},
+    {k:'network_name', label:'Network Name (IFAC)', type:'text', default:''},
+    {k:'passphrase', label:'Passphrase (IFAC)', type:'text', default:''},
+    {k:'ifac_size', label:'IFAC Size (bits)', type:'text', default:'', hint:'Default auto, 8-512 bits'},
+  ],
+  UDPInterface: [
+    {k:'enabled', label:'Enabled', type:'select', opts:['yes','no'], default:'yes'},
+    {k:'listen_ip', label:'Listen IP', type:'text', default:'0.0.0.0'},
+    {k:'listen_port', label:'Listen Port', type:'text', default:'4242'},
+    {k:'forward_ip', label:'Forward IP', type:'text', default:'255.255.255.255'},
+    {k:'forward_port', label:'Forward Port', type:'text', default:'4242'},
+  ],
+  SerialInterface: [
+    {k:'enabled', label:'Enabled', type:'select', opts:['yes','no'], default:'yes'},
+    {k:'port', label:'Serial Port', type:'text', default:'/dev/ttyUSB0'},
+    {k:'speed', label:'Baud Rate', type:'select', opts:['9600','19200','38400','57600','115200','230400'], default:'115200'},
+    {k:'databits', label:'Data Bits', type:'select', opts:['8','7'], default:'8'},
+    {k:'parity', label:'Parity', type:'select', opts:['none','even','odd'], default:'none'},
+    {k:'stopbits', label:'Stop Bits', type:'select', opts:['1','2'], default:'1'},
+  ],
+};
+
+const IFACE_HINTS = {
+  AutoInterface: 'Zero-config local LAN/WiFi. Works without any IP infrastructure.',
+  TCPClientInterface: 'Connect to a remote TCP server. Use for public nodes like testnet.',
+  TCPServerInterface: 'Listen for incoming TCP connections from other peers.',
+  BackboneInterface: 'High-performance TCP, preferred on Linux. Compatible with TCP interfaces.',
+  RNodeInterface: 'LoRa radio via RNode device. Serial USB or WiFi TCP connection.',
+  I2PInterface: 'Anonymous I2P network. Requires i2pd running on system.',
+  UDPInterface: 'UDP broadcast. AutoInterface is preferred for local networks.',
+  SerialInterface: 'Direct serial port or transparent serial devices.',
+};
+
+function inpStyle() {
+  return 'width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px';
+}
+
+function renderIfaceField(idx, fieldDef, val) {
+  const v = val !== undefined ? val : fieldDef.default;
+  const hint = fieldDef.hint ? `<div style="font-size:10px;color:var(--mu);margin-top:2px">${fieldDef.hint}</div>` : '';
+  if (fieldDef.type === 'select') {
+    const opts = fieldDef.opts.map(o => `<option value="${o}" ${v===o?'selected':''}>${o}</option>`).join('');
+    return `<div>
+      <div style="font-size:11px;color:var(--mu);margin-bottom:3px">${fieldDef.label}</div>
+      <select data-iface="${idx}" data-key="${fieldDef.k}" style="${inpStyle()}">
+        ${opts}
+      </select>${hint}
+    </div>`;
+  }
+  return `<div>
+    <div style="font-size:11px;color:var(--mu);margin-bottom:3px">${fieldDef.label}</div>
+    <input data-iface="${idx}" data-key="${fieldDef.k}" value="${esc(v)}" placeholder="${fieldDef.default||''}" style="${inpStyle()}">${hint}
+  </div>`;
+}
+
+async function loadRnsConfig() {
+  try {
+    const d = await fetch(API+'/api/rns_config_parsed').then(r=>r.json());
+    if(d.error){ alert(d.error); return; }
+    _rnsCfgData = d;
+    _deletedIfaces.clear();
+    // Fill [reticulum] fields
+    const rns = d.reticulum || {};
+    const setVal = (id, key) => { const el = document.getElementById(id); if(el && rns[key]) el.value = rns[key]; };
+    setVal('rns-main-transport', 'enable_transport');
+    setVal('rns-main-share', 'share_instance');
+    setVal('rns-main-siport', 'shared_instance_port');
+    setVal('rns-main-icport', 'instance_control_port');
+    setVal('rns-main-panic', 'panic_on_interface_error');
+    renderIfacesList(d.interfaces);
+  } catch(e){ alert('Error loading config: '+e); }
+}
+
+function renderIfacesList(ifaces) {
+  const el = document.getElementById('rns-cfg-ifaces');
+  if(!el) return;
+  el.innerHTML = (ifaces||[]).map((iface, idx) => {
+    const type = (iface.params && iface.params.type) || 'Unknown';
+    const color = type.includes('RNode') ? 'var(--teal)' : type.includes('I2P') ? 'var(--am)' : type.includes('TCP')||type.includes('Back') ? '#6c8ebf' : 'var(--mu)';
+    const fields = RNS_IFACE_FIELDS[type] || Object.keys(iface.params||{}).filter(k=>k!=='type').map(k=>({k,label:k,type:'text',default:''}));
+    const fieldRows = fields.map(f => renderIfaceField(idx, f, iface.params && iface.params[f.k])).join('');
+    return `<div style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;overflow:hidden" id="iface-block-${idx}">
+      <div onclick="toggleIface(${idx})" style="display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;user-select:none">
+        <span id="iface-arrow-${idx}" style="color:var(--mu);font-size:12px">▶</span>
+        <span style="font-size:13px;font-weight:600;color:${color};flex:1">[[ ${esc(iface.name)} ]]</span>
+        <span style="font-size:11px;color:var(--mu);background:var(--bg);padding:2px 8px;border-radius:4px">${esc(type)}</span>
+        <button class="sys-btn rd" style="padding:2px 10px;font-size:11px" onclick="event.stopPropagation();deleteRnsIface(${idx})">DELETE</button>
+      </div>
+      <div id="iface-body-${idx}" style="display:none;padding:0 14px 14px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          ${fieldRows}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleIface(idx) {
+  const body = document.getElementById('iface-body-'+idx);
+  const arrow = document.getElementById('iface-arrow-'+idx);
+  const open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : '';
+  arrow.textContent = open ? '▶' : '▼';
+}
+
+function collectRnsConfig() {
+  const rns = {
+    enable_transport: document.getElementById('rns-main-transport').value,
+    share_instance: document.getElementById('rns-main-share').value,
+    shared_instance_port: document.getElementById('rns-main-siport').value,
+    instance_control_port: document.getElementById('rns-main-icport').value,
+    panic_on_interface_error: document.getElementById('rns-main-panic').value,
+  };
+
+  const ifaceMap = {};
+  document.querySelectorAll('[data-iface]').forEach(el => {
+    const idx = el.dataset.iface;
+    if(!ifaceMap[idx]) ifaceMap[idx] = {};
+    const v = el.value.trim();
+    if(v) ifaceMap[idx][el.dataset.key] = v;
+  });
+
+  const interfaces = (_rnsCfgData.interfaces || [])
+    .filter((_, idx) => !_deletedIfaces.has(idx))
+    .map((iface, origIdx) => {
+      const actualIdx = [...Array(_rnsCfgData.interfaces.length).keys()]
+        .filter(i => !_deletedIfaces.has(i))[origIdx] ?? origIdx;
+      return {name: iface.name, params: {type: iface.params.type, ...(ifaceMap[actualIdx] || {})}};
+    });
+
+  return { reticulum: rns, interfaces };
+}
+
+function deleteRnsIface(idx) {
+  _deletedIfaces.add(idx);
+  const el = document.getElementById('iface-block-'+idx);
+  if(el){ el.style.opacity='0.3'; el.style.pointerEvents='none'; }
+}
+
+function showAddIfaceModal() {
+  const m = document.getElementById('add-iface-modal');
+  m.style.display='flex';
+  updateNewIfaceHint();
+}
+function hideAddIfaceModal() {
+  document.getElementById('add-iface-modal').style.display='none';
+}
+function updateNewIfaceHint() {
+  const type = document.getElementById('new-iface-type').value;
+  document.getElementById('new-iface-hint').textContent = IFACE_HINTS[type] || '';
+}
+function confirmAddIface() {
+  const name = document.getElementById('new-iface-name').value.trim();
+  const type = document.getElementById('new-iface-type').value;
+  if(!name){ alert('Enter interface name'); return; }
+  const fields = RNS_IFACE_FIELDS[type] || [];
+  const params = {type};
+  fields.forEach(f => { if(f.default) params[f.k] = f.default; });
+  if(!_rnsCfgData) _rnsCfgData = {reticulum:{}, interfaces:[]};
+  _rnsCfgData.interfaces.push({name, params});
+  renderIfacesList(_rnsCfgData.interfaces);
+  hideAddIfaceModal();
+  document.getElementById('new-iface-name').value = '';
+}
+
+async function saveRnsConfig() {
+  const cfg = collectRnsConfig();
+  const st = document.getElementById('rns-cfg-status');
+  st.style.display='block'; st.style.color='var(--teal)'; st.textContent='Saving...';
+  try {
+    const r = await fetch(API+'/api/rns_config_save', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(cfg)});
+    const d = await r.json();
+    if(d.ok) {
+      st.textContent = 'Saved! Restarting rnsd...';
+      await fetch(API+'/api/svc', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name:'rnsd', action:'restart'})}).catch(()=>{});
+      setTimeout(()=>{ st.textContent='Done! Reload page to see effect.'; }, 3000);
+    } else {
+      st.style.color='var(--rd)'; st.textContent='Error: '+d.error;
+    }
+  } catch(e){ st.style.color='var(--rd)'; st.textContent='Error: '+e; }
+}
+
 </script>
 </body>
 </html>
