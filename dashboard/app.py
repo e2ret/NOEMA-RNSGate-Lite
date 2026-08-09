@@ -1149,14 +1149,52 @@ def version(): return jsonify({"version": __version__})
 @app.route("/api/rns_update_check")
 def rns_update_check():
     import urllib.request, json as _json
+    def get_ver(mod):
+        v,_ = sh(f"{_RNS_BIN}/python3 -c 'import {mod}; print({mod}.__version__)' 2>/dev/null")
+        return (v or "").strip() or "—"
+    def get_pypi(pkg):
+        try:
+            with urllib.request.urlopen(f"https://pypi.org/pypi/{pkg}/json", timeout=5) as r:
+                return _json.loads(r.read())["info"]["version"]
+        except: return "—"
     try:
-        cur,_ = sh(f"{_RNS_BIN}/python3 -c 'import RNS; print(RNS.__version__)' 2>/dev/null")
-        cur = (cur or "").strip()
-        with urllib.request.urlopen("https://pypi.org/pypi/rns/json", timeout=5) as r:
-            latest = _json.loads(r.read())["info"]["version"]
-        return jsonify({"current": cur, "latest": latest, "update_available": cur != latest})
+        py_ver,_ = sh(f"{_RNS_BIN}/python3 --version 2>&1")
+        rns_cur   = get_ver("RNS")
+        lxmf_cur  = get_ver("LXMF")
+        lxmfy_cur = get_ver("lxmfy")
+        nomad_ver,_ = sh(f"{_RNS_BIN}/python3 -c 'from nomadnet._version import __version__; print(__version__)' 2>/dev/null")
+        nomad_cur = (nomad_ver or "").strip() or "\u2014"
+        flask_cur = get_ver("flask")
+        mqtt_ver,_ = sh(f"{_RNS_BIN}/python3 -c 'import paho.mqtt; print(paho.mqtt.__version__)' 2>/dev/null")
+        mqtt_cur  = (mqtt_ver or "").strip() or "—"
+        rns_lat   = get_pypi("rns")
+        lxmf_lat  = get_pypi("lxmf")
+        lxmfy_lat = get_pypi("lxmfy")
+        nomad_lat = get_pypi("nomadnet")
+        mqtt_lat  = get_pypi("paho-mqtt")
+        return jsonify({
+            "current": rns_cur, "latest": rns_lat, "update_available": rns_cur != rns_lat,
+            "python": py_ver.replace("Python ","").strip(),
+            "components": [
+                {"name": "RNS",       "pkg": "rns",       "installed": rns_cur,   "latest": rns_lat},
+                {"name": "LXMF",      "pkg": "lxmf",      "installed": lxmf_cur,  "latest": lxmf_lat},
+                {"name": "lxmfy",     "pkg": "lxmfy",     "installed": lxmfy_cur, "latest": lxmfy_lat},
+                {"name": "nomadnet",  "pkg": "nomadnet",  "installed": nomad_cur, "latest": nomad_lat},
+                {"name": "paho-mqtt", "pkg": "paho-mqtt", "installed": mqtt_cur,  "latest": mqtt_lat},
+                {"name": "Flask",     "pkg": "flask",     "installed": flask_cur,  "latest": "—"},
+            ]
+        })
     except Exception as e:
         return jsonify({"error": str(e)})
+
+@app.route("/api/rns_update", methods=["POST"])
+def rns_update():
+    pkg = (request.json or {}).get("package", "rns")
+    allowed = ["rns","lxmf","lxmfy","nomadnet","paho-mqtt","flask","waitress"]
+    if pkg not in allowed:
+        return jsonify({"ok": False, "error": "not allowed"})
+    out, rc = sh(f"{_RNS_BIN}/pip install --upgrade {pkg} 2>&1")
+    return jsonify({"ok": rc==0, "output": out})
 
 @app.route("/api/reset_identity", methods=["POST"])
 def reset_identity():
