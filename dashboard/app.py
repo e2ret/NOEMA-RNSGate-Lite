@@ -1216,6 +1216,74 @@ def script_cron_set(name):
 
 
 def version(): return jsonify({"version": __version__})
+@app.route("/api/rns_config_parsed")
+def rns_config_parsed():
+    import configparser, re
+    path = f"{_HOME}/.reticulum/config"
+    try:
+        text = open(path).read()
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+    # Parse [reticulum] section
+    rns = {}
+    rns_match = re.search(r'^\[reticulum\](.*?)^(?=\[|\Z)', text, re.MULTILINE | re.DOTALL)
+    if rns_match:
+        for line in rns_match.group(1).splitlines():
+            line = line.strip()
+            if '=' in line and not line.startswith('#'):
+                k, v = line.split('=', 1)
+                rns[k.strip()] = v.strip()
+
+    # Parse [[Interface]] sections
+    interfaces = []
+    for m in re.finditer(r'^\s*\[\[([^\]]+)\]\](.*?)(?=^\s*\[\[|\Z)', text, re.MULTILINE | re.DOTALL):
+        name = m.group(1).strip()
+        params = {}
+        for line in m.group(2).splitlines():
+            line = line.strip()
+            if '=' in line and not line.startswith('#'):
+                k, v = line.split('=', 1)
+                params[k.strip()] = v.strip()
+        interfaces.append({"name": name, "params": params})
+
+    return jsonify({"reticulum": rns, "interfaces": interfaces})
+
+
+@app.route("/api/rns_config_save", methods=["POST"])
+def rns_config_save():
+    import re
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "no data"}), 400
+    path = f"{_HOME}/.reticulum/config"
+    try:
+        # Build new config text
+        rns = data.get("reticulum", {})
+        interfaces = data.get("interfaces", [])
+
+        lines = ["[reticulum]\n"]
+        for k, v in rns.items():
+            lines.append(f"  {k} = {v}\n")
+        lines.append("\n")
+
+        for iface in interfaces:
+            name = iface.get("name", "Interface")
+            params = iface.get("params", {})
+            lines.append(f"[[{name}]]\n")
+            for k, v in params.items():
+                lines.append(f"  {k} = {v}\n")
+            lines.append("\n")
+
+        # Backup
+        import shutil, time as _t
+        shutil.copy2(path, path + ".bak." + _t.strftime("%Y%m%d_%H%M%S"))
+        open(path, "w").write("".join(lines))
+        return jsonify({"ok": True})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 @app.route("/api/rns_update_check")
 def rns_update_check():
     import urllib.request, json as _json

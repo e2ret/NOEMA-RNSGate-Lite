@@ -122,7 +122,8 @@ body{
 }
 .mc::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--teal),transparent);opacity:.5}
 .mc:hover{transform:translateY(-2px);border-color:rgba(45,212,191,.28);box-shadow:var(--shadow-lg)}
-.mc .lb{color:var(--mu);font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;font-weight:600;margin-bottom:8px;font-family:var(--mono)}
+.mc-inner{display:flex;align-items:baseline;gap:6px;margin-bottom:6px}
+.mc .lb{color:var(--mu);font-size:10px;text-transform:uppercase;letter-spacing:.12em;font-weight:600;margin-bottom:0;font-family:var(--mono);flex:1}
 .mc .vl{font-size:27px;font-weight:700;line-height:1;font-family:var(--mono);letter-spacing:-.01em}
 
 .g{color:var(--gr)}.a{color:var(--am)}.r{color:var(--rd)}.b{color:var(--bl)}
@@ -345,13 +346,13 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
   </div>
 </div>
 <div class="metrics">
-  <div class="mc"><div class="lb">CPU</div><div class="vl a skel" id="m-cpu">—</div><div class="pb"><div class="pbf a" id="pb-cpu" style="width:0%"></div></div></div>
-  <div class="mc"><div class="lb">RAM</div><div class="vl skel" id="m-ram">—</div><div class="pb"><div class="pbf" id="pb-ram" style="width:0%"></div></div></div>
-  <div class="mc"><div class="lb">Disk</div><div class="vl skel" id="m-disk">—</div><div class="pb"><div class="pbf" id="pb-disk" style="width:0%"></div></div></div>
-  <div class="mc"><div class="lb">Temp.</div><div class="vl a skel" id="m-temp">—</div></div>
-  <div class="mc"><div class="lb">MQTT broker</div><div class="vl skel" id="m-mqtt-status">—</div></div>
-  <div class="mc"><div class="lb">LXMF sent</div><div class="vl g" id="m-lxmf-sent">0</div></div>
-  <div class="mc"><div class="lb">LXMF received</div><div class="vl b" id="m-lxmf-recv">0</div></div>
+  <div class="mc"><div class="mc-inner"><div class="lb">CPU</div><div class="vl a skel" id="m-cpu">—</div></div><div class="pb"><div class="pbf a" id="pb-cpu" style="width:0%"></div></div></div>
+  <div class="mc"><div class="mc-inner"><div class="lb">RAM</div><div class="vl skel" id="m-ram">—</div></div><div class="pb"><div class="pbf" id="pb-ram" style="width:0%"></div></div></div>
+  <div class="mc"><div class="mc-inner"><div class="lb">Disk</div><div class="vl skel" id="m-disk">—</div></div><div class="pb"><div class="pbf" id="pb-disk" style="width:0%"></div></div></div>
+  <div class="mc"><div class="mc-inner"><div class="lb">Temp.</div><div class="vl a skel" id="m-temp">—</div></div><div class="pb"><div class="pbf a" id="pb-temp" style="width:0%"></div></div></div>
+  <div class="mc"><div class="mc-inner"><div class="lb">MQTT broker</div><div class="vl skel" id="m-mqtt-status">—</div></div><div class="pb"><div class="pbf" id="pb-mqtt" style="width:0%"></div></div></div>
+  <div class="mc"><div class="mc-inner"><div class="lb">LXMF sent</div><div class="vl g" id="m-lxmf-sent">0</div></div><div class="pb"><div class="pbf g" id="pb-lxmf-sent" style="width:0%"></div></div></div>
+  <div class="mc"><div class="mc-inner"><div class="lb">LXMF received</div><div class="vl b" id="m-lxmf-recv">0</div></div><div class="pb"><div class="pbf b" id="pb-lxmf-recv" style="width:0%"></div></div></div>
 </div>
 <div class="body">
   <div class="sidebar">
@@ -1073,6 +1074,8 @@ async function loadSystem(){
   document.getElementById("m-disk").textContent=disk+"%";
   document.getElementById("pb-disk").style.width=disk+"%";
   document.getElementById("m-temp").textContent=d.temp+"°C";
+  const tempPct = Math.min(Math.max((d.temp||0)/100*100, 0), 100);
+  const pbTemp = document.getElementById("pb-temp"); if(pbTemp) pbTemp.style.width=tempPct+"%";
   const _si=document.getElementById("sys-info"); if(_si) _si.innerHTML=
     `IP: ${esc(d.ip)}<br>Uptime: ${esc(d.uptime)}<br>RNS: ${esc(d.rns_version)}<br>Python: ${esc(d.py_version)}<br>CPU: ${cpu}%<br>RAM: ${d.ram_used}/${d.ram_total} MB<br>Disk: ${d.disk_used}/${d.disk_total} MB`;
   // home sys
@@ -1087,6 +1090,8 @@ async function checkMqttStatus(){
     const el=document.getElementById("m-mqtt-status");
     el.textContent=d.status==="ok"?"OK":"Error";
     el.className="vl "+(d.status==="ok"?"g":"r");
+    const pbMqtt=document.getElementById("pb-mqtt");
+    if(pbMqtt){pbMqtt.style.width=d.status==="ok"?"100%":"0%";pbMqtt.className="pbf "+(d.status==="ok"?"g":"r");}
   }catch(e){}
 }
 
@@ -1251,6 +1256,9 @@ async function loadLxmf(){
   const s=await fetch(API+"/api/lxmf/stats").then(r=>r.json());
   document.getElementById("m-lxmf-sent").textContent=s.count?.sent||0;
   document.getElementById("m-lxmf-recv").textContent=s.count?.recv||0;
+  const sent=s.count?.sent||0, recv=s.count?.recv||0, maxLxmf=Math.max(sent,recv,10);
+  const pbSent=document.getElementById("pb-lxmf-sent"); if(pbSent) pbSent.style.width=Math.min(sent/maxLxmf*100,100)+"%";
+  const pbRecv=document.getElementById("pb-lxmf-recv"); if(pbRecv) pbRecv.style.width=Math.min(recv/maxLxmf*100,100)+"%";
   // last msg
   if(lxmfMsgs.length>0){
     const last=lxmfMsgs[lxmfMsgs.length-1];
