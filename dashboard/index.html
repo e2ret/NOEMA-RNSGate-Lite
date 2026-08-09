@@ -208,6 +208,7 @@ body{
   text-transform:uppercase;
   white-space:nowrap;
   line-height:1;
+  color:var(--tx);
 }
 .sys-btn:hover{background:rgba(255,255,255,.1);transform:translateY(-1px)}
 .sys-btn:active{transform:translateY(0)}
@@ -704,12 +705,19 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
 
     <!-- LOGS -->
     <div class="panel" id="panel-logs">
-      <div class="log-toolbar">
-        <select id="log-unit" onchange="loadLogs()">
+      <div class="log-toolbar" style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+        <select id="log-unit" onchange="loadLogs()" style="background:var(--s2);border:1px solid var(--bd);border-radius:6px;color:var(--tx);padding:4px 8px;font-family:var(--fn);font-size:12px">
           <option value="noema_lxmf_bridge">noema_lxmf_bridge</option>
           <option value="rnsd">rnsd</option>
+          <option value="nomadnet">nomadnet</option>
+          <option value="dashboard">dashboard</option>
+          <option value="rbrowser">rbrowser</option>
         </select>
-        <button class="sys-btn" onclick="loadLogs()">↻</button>
+        <button class="sys-btn" onclick="loadLogs()">↻ Refresh</button>
+        <label style="font-size:11px;color:var(--mu);display:flex;align-items:center;gap:4px">
+          <input type="checkbox" id="log-auto" onchange="toggleLogAuto()"> Auto
+        </label>
+        <button class="sys-btn rd" onclick="clearLogView()">Clear view</button>
       </div>
       <div class="log-box" id="log-box"></div>
     </div>
@@ -800,20 +808,31 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
         <div id="cmd-output" style="font-family:var(--fn);font-size:11px;color:var(--teal);background:var(--bg);border-radius:6px;padding:8px 10px;min-height:32px;white-space:pre-wrap;display:none"></div>
       </div>
 
-      <div class="section-lbl">RNS Version</div>
-      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:12px 14px;margin-bottom:12px">
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-          <div>
-            <div style="font-size:12px;color:var(--mu);margin-bottom:2px">Installed</div>
-            <div id="rns-cur-ver" style="font-family:var(--fn);font-size:13px;color:var(--tx)">—</div>
-          </div>
-          <div>
-            <div style="font-size:12px;color:var(--mu);margin-bottom:2px">Latest (PyPI)</div>
-            <div id="rns-latest-ver" style="font-family:var(--fn);font-size:13px;color:var(--tx)">—</div>
-          </div>
-          <button class="sys-btn teal" id="rns-update-btn" onclick="rnsUpdate()" style="display:none">UPDATE RNS</button>
-        </div>
-        <div id="rns-update-status" style="font-family:var(--fn);font-size:11px;color:var(--teal);margin-top:8px;display:none"></div>
+      <div class="section-lbl">Versions</div>
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:14px;margin-bottom:12px">
+        <table style="width:100%;border-collapse:collapse;font-family:var(--fn);font-size:12px">
+          <thead>
+            <tr style="border-bottom:1px solid var(--bd)">
+              <th style="text-align:left;color:var(--mu);font-weight:400;padding:4px 8px 8px 0">Component</th>
+              <th style="text-align:left;color:var(--mu);font-weight:400;padding:4px 8px 8px">Installed</th>
+              <th style="text-align:left;color:var(--mu);font-weight:400;padding:4px 8px 8px">Latest</th>
+              <th style="text-align:right;color:var(--mu);font-weight:400;padding:4px 0 8px 8px"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="color:var(--mu);padding:6px 8px 6px 0">Python</td>
+              <td id="ver-python" style="color:var(--tx);padding:6px 8px">—</td>
+              <td style="color:var(--mu);padding:6px 8px">—</td>
+              <td></td>
+            </tr>
+          </tbody>
+          <tbody id="ver-table"></tbody>
+        </table>
+        <div id="rns-update-status" style="font-size:11px;color:var(--teal);margin-top:8px;display:none"></div>
+        <span id="rns-cur-ver" style="display:none"></span>
+        <span id="rns-latest-ver" style="display:none"></span>
+        <button id="rns-update-btn" style="display:none" onclick="rnsUpdate()"></button>
       </div>
 
       <div class="section-lbl">System</div>
@@ -1037,15 +1056,37 @@ async function checkRnsVersion(){
     if(d.error) return;
     document.getElementById("rns-cur-ver").textContent = d.current || "—";
     document.getElementById("rns-latest-ver").textContent = d.latest || "—";
-    const btn = document.getElementById("rns-update-btn");
-    if(d.update_available){
-      btn.style.display = "block";
-      document.getElementById("rns-latest-ver").style.color = "var(--teal)";
-    } else {
-      btn.style.display = "none";
-      document.getElementById("rns-latest-ver").style.color = "var(--gr)";
+    if(d.python) document.getElementById("ver-python").textContent = d.python;
+    const tbl = document.getElementById("ver-table");
+    if(tbl && d.components){
+      tbl.innerHTML = d.components.map(c => {
+        const notInstalled = !c.installed || c.installed === "—";
+        const upd = c.latest && c.latest !== "—" && !notInstalled && c.installed !== c.latest;
+        const instColor = notInstalled ? "var(--rd)" : "var(--tx)";
+        const latColor  = upd ? "var(--am)" : c.latest === "—" ? "var(--mu)" : "var(--gr)";
+        const btnLabel = notInstalled ? "INSTALL" : "UPDATE";
+        const showBtn = notInstalled && c.latest && c.latest !== "—" || upd;
+        const btn = showBtn ? `<button class="sys-btn teal" style="padding:2px 10px;font-size:11px" onclick="updatePkg('${c.pkg||c.name.toLowerCase()}')">${btnLabel}</button>` : "";
+        return `<tr>
+          <td style="color:var(--mu);padding:6px 8px 6px 0">${c.name}</td>
+          <td style="color:${instColor};padding:6px 8px">${c.installed}</td>
+          <td style="color:${latColor};padding:6px 8px">${c.latest||"—"}</td>
+          <td style="text-align:right;padding:6px 0 6px 8px">${btn}</td>
+        </tr>`;
+      }).join("");
     }
   }catch(e){}
+}
+async function updatePkg(pkg){
+  const st = document.getElementById("rns-update-status");
+  st.style.display="block"; st.textContent="Updating "+pkg+"...";
+  try{
+    const r = await fetch(API+"/api/rns_update",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({package:pkg})});
+    const d = await r.json();
+    st.style.color = d.ok ? "var(--teal)" : "var(--rd)";
+    st.textContent = d.ok ? pkg+" updated!" : "Error: "+(d.error||"");
+    if(d.ok) setTimeout(checkRnsVersion, 2000);
+  }catch(e){ st.style.color="var(--rd)"; st.textContent="Error: "+e; }
 }
 async function rnsUpdate(){
   const st = document.getElementById("rns-update-status");
@@ -1265,13 +1306,24 @@ async function loadRns(){
 }
 
 // Logs
+let _logAutoTimer = null;
 async function loadLogs(){
   const unit=document.getElementById("log-unit").value;
-  const r=await fetch(API+"/api/logs/"+unit);
-  const lines=await r.json();
-  const box=document.getElementById("log-box");
-  box.innerHTML=lines.map(l=>`<div class="ll ${l.l}">${esc(l.t)}</div>`).join("");
-  box.scrollTop=box.scrollHeight;
+  try{
+    const r=await fetch(API+"/api/logs/"+unit);
+    const lines=await r.json();
+    const box=document.getElementById("log-box");
+    box.innerHTML=lines.map(l=>`<div class="ll ${l.l}">${esc(l.t)}</div>`).join("");
+    box.scrollTop=box.scrollHeight;
+  }catch(e){}
+}
+function clearLogView(){
+  document.getElementById("log-box").innerHTML="";
+}
+function toggleLogAuto(){
+  const on=document.getElementById("log-auto").checked;
+  if(on){ _logAutoTimer=setInterval(loadLogs,3000); }
+  else{ clearInterval(_logAutoTimer); _logAutoTimer=null; }
 }
 
 // Configs

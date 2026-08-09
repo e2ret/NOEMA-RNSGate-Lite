@@ -32,7 +32,7 @@ SCRIPTS_DIR = f"{_HOME}/NOEMA-RNSGate-Lite/scripts"
 NOMADNET_ADDR_FILE = f"{_HOME}/.nomadnetwork/storage/hashes"
 
 CONFIGS = {
-    "noema_lxmf_bridge": "/etc/noema/bridge.cfg",
+    "LXMF Bridge": "/etc/noema/bridge.cfg",
     "reticulum": f"{_HOME}/.reticulum/config",
     "nomadnet": f"{_HOME}/.nomadnetwork/config",
 }
@@ -375,15 +375,20 @@ def save_config(name):
 
 @app.route("/api/logs/<name>")
 def get_log(name):
-    allowed = {"rnsd": "rnsd", "noema_lxmf_bridge": "noema_lxmf_bridge"}
+    import re as _re
+    allowed = {"rnsd": "rnsd", "noema_lxmf_bridge": "noema_lxmf_bridge",
+               "nomadnet": "nomadnet", "dashboard": "dashboard", "rbrowser": "rbrowser"}
     if name not in allowed:
         return jsonify({"error": "unknown"}), 400
-    out, _ = sh(f"journalctl -u {allowed[name]} -n 100 --no-pager -o short")
+    out, _ = sh(f"journalctl -u {allowed[name]} -n 200 --no-pager -o cat")
     lines = []
     for line in out.splitlines():
+        line = line.strip()
+        if not line: continue
         ll = line.lower()
-        if any(w in ll for w in ("error","fail","crit")): lvl="err"
-        elif "warn" in ll: lvl="warn"
+        if any(w in ll for w in ("error","fail","crit","exception","traceback")): lvl="err"
+        elif any(w in ll for w in ("warn","warning")): lvl="warn"
+        elif any(w in ll for w in ("info","notice","started","connected","address")): lvl="info"
         else: lvl="ok"
         lines.append({"t": line, "l": lvl})
     return jsonify(lines)
