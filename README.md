@@ -183,6 +183,25 @@ password = password
 ```
 
 ---
+## Reticulum Config Editor
+
+`Dashboard → Configs → Reticulum`
+
+The Configs tab has two modes:
+
+- **TEXT** — raw config file editor
+- **RETICULUM FORM** — visual form editor for Reticulum config
+
+In RETICULUM FORM mode:
+- Main parameters (enable_transport, share_instance, ports) are edited via dropdowns and fields
+- **INTERFACES** section shows all interfaces as collapsible cards in a two-column grid (single column on mobile)
+- Each card expands to show all interface parameters
+- **+ ADD INTERFACE** — add a new interface with type selection
+- **DELETE** — mark interface for removal (removed on Save)
+- Click **Save** to write the config and restart rnsd
+
+---
+
 ## LoRa / RNode Configuration
 
 `Dashboard → Configs → Reticulum`
@@ -367,11 +386,42 @@ No mobile internet needed on the smartphone.
 
 ---
 
+## Versions
+
+`Dashboard → System → Versions`
+
+Table showing installed vs latest PyPI versions for all key components: RNS, LXMF, lxmfy, Nomadnet, and Python.
+
+- **Green** — up to date
+- **Orange** — update available
+- **Red** — not installed
+
+Buttons appear automatically:
+- **UPDATE** — update the component via pip without SSH
+- **INSTALL** — install a missing component
+
+---
+
+## Logs
+
+`Dashboard → Logs`
+
+Service log viewer with the following controls:
+
+| Control | Description |
+|---------|-------------|
+| Service selector | Switch between: noema_lxmf_bridge, rnsd, nomadnet, dashboard, rbrowser |
+| ↻ Refresh | Manual refresh |
+| Auto | Auto-refresh (checkbox) |
+| Clear view | Clear the log display (does not delete journal entries) |
+
+---
+
 ## RNS Version Check
 
-`Dashboard → System → RNS Version`
+`Dashboard → System → Versions`
 
-Shows installed vs latest PyPI version. If an update is available, the **Update RNS** button appears — click to update without SSH.
+Shows installed vs latest PyPI version. If an update is available, the **Update** button appears — click to update without SSH.
 
 ---
 
@@ -624,6 +674,25 @@ password = password
 ```
 
 ---
+## Редактор конфига Reticulum
+
+`Dashboard → Configs → Reticulum`
+
+Вкладка Configs имеет два режима:
+
+- **TEXT** — редактор сырого файла конфига
+- **RETICULUM FORM** — визуальный редактор конфига Reticulum
+
+В режиме RETICULUM FORM:
+- Основные параметры (enable_transport, share_instance, порты) редактируются через поля и выпадающие списки
+- Секция **INTERFACES** показывает все интерфейсы как сворачиваемые карточки в двухколоночной сетке (одна колонка на мобильном)
+- Каждая карточка разворачивается и показывает все параметры интерфейса
+- **+ ADD INTERFACE** — добавить новый интерфейс с выбором типа
+- **DELETE** — пометить интерфейс на удаление (удаляется при сохранении)
+- Кнопка **Save** записывает конфиг и перезапускает rnsd
+
+---
+
 ## Настройка LoRa / RNode
 
 `Dashboard → Configs → Reticulum`
@@ -806,11 +875,42 @@ RNSGate ──I2P──▶ RNSGate
 
 ---
 
+## Версии компонентов
+
+`Dashboard → System → Versions`
+
+Таблица с установленными и актуальными версиями на PyPI: RNS, LXMF, lxmfy, Nomadnet, Python.
+
+- **Зелёный** — актуально
+- **Оранжевый** — есть обновление
+- **Красный** — не установлен
+
+Кнопки появляются автоматически:
+- **UPDATE** — обновить компонент через pip без SSH
+- **INSTALL** — установить отсутствующий компонент
+
+---
+
+## Журналы (Logs)
+
+`Dashboard → Logs`
+
+Просмотр журналов сервисов:
+
+| Элемент | Описание |
+|---------|----------|
+| Выбор сервиса | noema_lxmf_bridge, rnsd, nomadnet, dashboard, rbrowser |
+| ↻ Refresh | Ручное обновление |
+| Auto | Автообновление (чекбокс) |
+| Clear view | Очистить отображение (журнал не удаляется) |
+
+---
+
 ## Проверка версии RNS
 
-`Dashboard → System → RNS Version`
+`Dashboard → System → Versions`
 
-Показывает установленную и актуальную версию с PyPI. При наличии обновления появляется кнопка **Update RNS** — обновление без SSH.
+Показывает установленную и актуальную версию. При наличии обновления появляется кнопка **Update** — обновление без SSH.
 
 ---
 
