@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru" style="background:#0b1220">
+<html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
 <title>NOEMA RNSGate Lite</title>
 <link rel="icon" href="logo.png" type="image/png">
 <style>
@@ -14,30 +15,33 @@
 @font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:100 900;font-display:swap;src:url('fonts/jbmono-cyrillic-ext.woff2') format('woff2');unicode-range:U+0460-052F,U+1C80-1C8A,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F}
 
 :root{
-  --bg:#0a0f1a;
-  --s1:rgba(18,25,41,.55);
-  --s2:rgba(30,40,58,.6);
-  --s3:rgba(51,65,85,.9);
-  --bd:rgba(148,163,184,.12);
-  --bd-hi:rgba(148,163,184,.22);
-  --tx:#f8fafc;
-  --mu:#8b96ab;
-  --gr:#14b8a6;
-  --am:#f59e0b;
-  --rd:#ef4444;
-  --bl:#3b82f6;
-  --teal:#2dd4bf;
-  --purple:#8b5cf6;
+  color-scheme:dark;
+  --bg:#07090c;
+  --s1:rgba(15,20,27,.62);
+  --s2:rgba(19,25,33,.75);
+  --s3:rgba(29,37,48,.92);
+  --bd:rgba(150,168,184,.16);
+  --bd-hi:rgba(45,217,232,.35);
+  --tx:#eaf1f3;
+  --mu:#7f93a3;
+  --gr:#3ddc84;
+  --am:#f5a623;
+  --rd:#ff5c5c;
+  --bl:#5aa9e6;
+  --teal:#2dd8ec;
+  --purple:#c99bf5;
   --fn:'Inter',system-ui,sans-serif;
-  --mono:'JetBrains Mono',monospace;
-  --shadow:0 10px 30px rgba(0,0,0,.28),0 1px 0 rgba(255,255,255,.03);
-  --shadow-lg:0 20px 50px rgba(0,0,0,.4),0 1px 0 rgba(255,255,255,.03);
-  --radius:16px;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --shadow:0 10px 24px rgba(0,0,0,.4);
+  --shadow-lg:0 16px 36px rgba(0,0,0,.5);
+  --glow:0 0 18px rgba(45,217,232,.28);
+  --radius:2px;
   --ease:cubic-bezier(.4,0,.2,1)
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden}
+html{background:var(--bg)}
 
 body{
   background:transparent;
@@ -51,45 +55,45 @@ body{
 
 ::-webkit-scrollbar{width:8px;height:8px}
 ::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:rgba(148,163,184,.18);border-radius:8px}
-::-webkit-scrollbar-thumb:hover{background:rgba(148,163,184,.32)}
+::-webkit-scrollbar-thumb{background:rgba(140,160,148,.22);border-radius:2px}
+::-webkit-scrollbar-thumb:hover{background:rgba(140,160,148,.38)}
 
-:focus-visible{outline:2px solid var(--teal);outline-offset:2px;border-radius:6px}
+:focus-visible{outline:1.5px solid var(--teal);outline-offset:-1.5px}
 
 .skel{
   display:inline-block;min-width:3em;height:1em;vertical-align:-0.15em;
-  color:transparent!important;border-radius:5px;
-  background:linear-gradient(90deg,rgba(148,163,184,.09) 25%,rgba(148,163,184,.2) 37%,rgba(148,163,184,.09) 63%);
+  color:transparent!important;border-radius:2px;
+  background:linear-gradient(90deg,rgba(140,160,148,.1) 25%,rgba(140,160,148,.22) 37%,rgba(140,160,148,.1) 63%);
   background-size:400% 100%;
   animation:skel-shimmer 1.6s ease-in-out infinite
 }
 @keyframes skel-shimmer{0%{background-position:100% 50%}100%{background-position:0 50%}}
 @media(prefers-reduced-motion:reduce){.skel{animation:none;opacity:.5}}
 
-.shell{display:grid;grid-template-rows:auto auto 1fr;height:100vh}
+.shell{display:grid;grid-template-rows:auto auto auto 1fr;height:100vh}
 
 .topbar{
   display:flex;align-items:center;justify-content:space-between;
-  padding:16px 24px;
-  background:linear-gradient(180deg,rgba(20,184,166,.05),transparent);
+  padding:9px 24px;
+  background:var(--bg);
   border-bottom:1px solid var(--bd);
   flex-wrap:wrap;gap:8px
 }
 
-.logo{font-size:16px;font-weight:700;color:var(--teal);letter-spacing:.01em;font-family:var(--fn)}
-.logo b{color:var(--tx)}
+.logo{font-size:15px;font-weight:800;color:var(--teal);letter-spacing:.06em;font-family:var(--mono);text-transform:uppercase}
+.logo b{color:var(--tx);font-weight:800}
 
 .pill{
-  display:flex;align-items:center;gap:6px;
-  padding:6px 14px;border-radius:10px;
+  display:flex;align-items:center;gap:7px;
+  padding:7px 14px;border-radius:var(--radius);
   border:1px solid var(--bd);
-  background:rgba(31,41,55,.6);
-  backdrop-filter:blur(10px);
-  color:var(--tx);font-size:12px;cursor:pointer;
+  background:var(--s2);
+  color:var(--tx);font-size:11px;cursor:pointer;
+  letter-spacing:.06em;
   font-family:var(--mono);
-  transition:all .2s
+  transition:border-color .2s,background .2s
 }
-.pill:hover{border-color:rgba(20,184,166,.3);background:rgba(31,41,55,.9)}
+.pill:hover{border-color:var(--bd-hi);background:var(--s3)}
 
 .dot{position:relative;display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--gr);flex-shrink:0}
 .dot::after{
@@ -102,45 +106,40 @@ body{
 
 .metrics{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(110px,1fr));
-  gap:10px;padding:14px 24px;
-  background:rgba(10,15,26,.35);
-  backdrop-filter:blur(16px);
+  grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+  gap:0;padding:0 24px;
+  background:var(--s2);
   border-bottom:1px solid var(--bd)
 }
 
 .mc{
   position:relative;
-  background:var(--s1);
-  backdrop-filter:blur(20px);
-  border:1px solid var(--bd);
-  border-radius:18px;
-  padding:16px;
-  transition:transform .25s var(--ease),border-color .25s var(--ease),box-shadow .25s var(--ease);
-  box-shadow:var(--shadow);
+  background:transparent;
+  border-right:1px solid var(--bd);
+  padding:9px 16px;
   overflow:hidden
 }
-.mc::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--teal),transparent);opacity:.5}
-.mc:hover{transform:translateY(-2px);border-color:rgba(45,212,191,.28);box-shadow:var(--shadow-lg)}
-.mc-inner{display:flex;align-items:baseline;gap:6px;margin-bottom:6px}
-.mc .lb{color:var(--mu);font-size:10px;text-transform:uppercase;letter-spacing:.12em;font-weight:600;margin-bottom:0;font-family:var(--mono);flex:1}
-.mc .vl{font-size:27px;font-weight:700;line-height:1;font-family:var(--mono);letter-spacing:-.01em}
+.mc:last-child{border-right:none}
+.mc::before{content:none}
+.mc:hover{background:rgba(45,217,232,.05)}
+.mc-inner{display:flex;align-items:baseline;gap:6px;margin-bottom:8px}
+.mc .lb{color:var(--mu);font-size:10px;text-transform:uppercase;letter-spacing:.14em;font-weight:600;margin-bottom:0;font-family:var(--mono);flex:1}
+.mc .vl{font-size:22px;font-weight:700;line-height:1;font-family:var(--mono);letter-spacing:-.01em;font-variant-numeric:tabular-nums}
 
 .g{color:var(--gr)}.a{color:var(--am)}.r{color:var(--rd)}.b{color:var(--bl)}
 
 .body{display:flex;flex-direction:column;overflow:hidden;height:100%}
 
 .sidebar{
-  background:rgba(11,18,32,.6);
-  backdrop-filter:blur(16px);
+  background:var(--bg);
   border-bottom:1px solid var(--bd);
-  padding:0 16px;
+  padding:10px 16px;
   display:flex;
   flex-wrap:wrap;
   overflow-x:hidden;
   overflow-y:hidden;
   scrollbar-width:none;
-  gap:4px;
+  gap:6px;
   align-items:center;
   justify-content:center;
   min-height:52px;
@@ -148,7 +147,7 @@ body{
   position:relative
 }
 .sidebar::-webkit-scrollbar{display:none}
-.nav-sep{width:1px;height:20px;background:var(--bd);margin:0 6px;flex-shrink:0}
+.nav-sep{display:none}
 @media(max-width:768px){
   .sidebar{justify-content:space-around;flex-wrap:nowrap;overflow-x:hidden;padding:0;gap:0;min-height:50px}
   .nav-item{flex:1;justify-content:center;padding:6px 2px;gap:0;min-width:0;font-size:9px;flex-direction:column;align-items:center}
@@ -175,77 +174,77 @@ body{
 
 .nav-item{
   display:flex;align-items:center;gap:8px;
-  padding:7px 16px;
+  padding:8px 14px;
   cursor:pointer;color:var(--mu);
-  transition:color .18s var(--ease),background-color .18s var(--ease),border-color .18s var(--ease);
-  border-radius:10px;
-  border:1px solid transparent;
-  font-size:15px;font-weight:500;
+  transition:color .15s var(--ease),background-color .15s var(--ease),border-color .15s var(--ease);
+  border-radius:var(--radius);
+  border:1px solid var(--bd);
+  background:var(--s2);
+  font-size:12px;font-weight:600;font-family:var(--mono);
   white-space:nowrap;flex-shrink:0;
-  text-transform:uppercase;letter-spacing:.06em
+  text-transform:uppercase;letter-spacing:.1em
 }
 .nav-item svg{flex-shrink:0;opacity:.7;transition:opacity .18s var(--ease)}
-.nav-item:hover{color:var(--tx);background:rgba(255,255,255,.05)}
+.nav-item:hover{color:var(--tx);border-color:var(--mu)}
 .nav-item:hover svg{opacity:1}
 .nav-item.active{
-  color:var(--teal);
-  background:linear-gradient(135deg,rgba(20,184,166,.18),rgba(20,184,166,.08));
-  border-color:rgba(20,184,166,.55);
-  font-weight:600;
-  backdrop-filter:blur(12px);
-  box-shadow:0 1px 0 rgba(20,184,166,.15) inset,0 4px 16px rgba(20,184,166,.1)
+  color:#0b0f0c;
+  background:var(--teal);
+  border-color:var(--teal);
+  font-weight:700;
+  box-shadow:var(--glow)
 }
-.nav-item.active svg{opacity:1;color:var(--teal)}
+.nav-item.active svg{opacity:1;color:#0b0f0c}
 @media(max-width:768px){
   .nav-item svg{width:14px;height:14px}
-  .nav-item{flex:1 1 0;justify-content:center;padding:6px 4px;font-size:10px;gap:3px;min-width:0}
+  .nav-item{flex:1 1 0;justify-content:center;padding:6px 4px;font-size:9px;gap:3px;min-width:0}
   .nav-item span{display:none}
 }
 
 .sys-btn{
   display:inline-flex;align-items:center;gap:6px;
-  padding:7px 16px;
+  padding:8px 15px;
   cursor:pointer;
-  transition:transform .15s var(--ease),background-color .15s var(--ease),border-color .15s var(--ease);
-  border-radius:10px;
-  border:1px solid rgba(255,255,255,.08);
-  background:rgba(255,255,255,.06);
-  font-size:15px;font-weight:500;
-  font-family:var(--fn);
-  letter-spacing:.06em;
+  transition:background-color .15s var(--ease),border-color .15s var(--ease);
+  border-radius:var(--radius);
+  border:1px solid var(--bd);
+  background:var(--s2);
+  font-size:11px;font-weight:600;
+  font-family:var(--mono);
+  letter-spacing:.08em;
   text-transform:uppercase;
   white-space:nowrap;
   line-height:1;
   color:var(--tx);
 }
-.sys-btn:hover{background:rgba(255,255,255,.1);transform:translateY(-1px)}
-.sys-btn:active{transform:translateY(1px);background:rgba(20,184,166,.12);border-color:rgba(20,184,166,.4);box-shadow:0 1px 0 rgba(20,184,166,.2) inset}
-.sys-btn.teal{color:var(--teal);background:rgba(20,184,166,.12);border-color:rgba(20,184,166,.28);}
-.sys-btn.am{color:var(--am);}
-.sys-btn.rd{color:var(--rd);}
+.sys-btn:hover{background:var(--s3);border-color:var(--bd-hi)}
+.sys-btn:active{background:rgba(45,217,232,.14);border-color:var(--teal)}
+.sys-btn.teal{color:var(--teal);background:rgba(45,217,232,.08);border-color:rgba(45,217,232,.3);}
+.sys-btn.am{color:var(--am);border-color:rgba(245,166,35,.3)}
+.sys-btn.rd{color:var(--rd);border-color:rgba(255,92,92,.3)}
 .main{overflow-y:auto;padding:20px 20px;background:transparent;display:flex;flex-direction:column;flex:1;min-height:0}
 .panel{display:none}
-.panel.active{display:flex;flex-direction:column;flex:1;min-height:0;animation:panel-in .22s var(--ease)}
-@keyframes panel-in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.panel.active{display:flex;flex-direction:column;flex:1;min-height:0;animation:panel-in .18s var(--ease)}
+@keyframes panel-in{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
 
 .btn{
   font-size:12px;padding:8px 16px;
-  border-radius:10px;
+  border-radius:var(--radius);
   border:1px solid var(--bd);
-  background:rgba(31,41,55,.8);
+  background:var(--s2);
   cursor:pointer;color:var(--tx);
-  font-family:var(--fn);font-weight:500;
-  transition:all .2s
+  font-family:var(--mono);font-weight:600;letter-spacing:.04em;
+  transition:background-color .15s,border-color .15s
 }
-.btn:hover{transform:translateY(-1px);background:var(--s3);border-color:rgba(148,163,184,.25)}
-.btn.ok{background:rgba(20,184,166,.15);color:var(--gr);border-color:rgba(20,184,166,.25)}
-.btn.ok:hover{background:rgba(20,184,166,.25)}
-.btn.wr{background:rgba(245,158,11,.12);color:var(--am);border-color:rgba(245,158,11,.25)}
-.btn.wr:hover{background:rgba(245,158,11,.22)}
-.btn.er{background:rgba(239,68,68,.12);color:var(--rd);border-color:rgba(239,68,68,.25)}
-.btn.er:hover{background:rgba(239,68,68,.22)}
-.btn.pr{background:var(--teal);color:#fff;border:none;font-weight:600;box-shadow:0 4px 14px rgba(20,184,166,.35)}
-.btn.pr:hover{filter:brightness(1.1);box-shadow:0 6px 20px rgba(20,184,166,.45)}
+.btn:hover{background:var(--s3);border-color:var(--bd-hi)}
+.btn.ok{background:rgba(61,220,132,.1);color:var(--gr);border-color:rgba(61,220,132,.3)}
+.btn.ok:hover{background:rgba(61,220,132,.18)}
+.btn.wr{background:rgba(245,166,35,.1);color:var(--am);border-color:rgba(245,166,35,.3)}
+.btn.wr:hover{background:rgba(245,166,35,.18)}
+.btn.er{background:rgba(255,92,92,.1);color:var(--rd);border-color:rgba(255,92,92,.3)}
+.btn.er:hover{background:rgba(255,92,92,.18)}
+.btn.pr{background:var(--teal);color:#0b0f0c;border:1px solid var(--teal);font-weight:700;box-shadow:var(--glow)}
+.btn.pr:hover{filter:brightness(1.08)}
 
 .brow{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
 
@@ -253,13 +252,13 @@ body{
 .svc:last-child{border-bottom:none}
 .svc-n{font-size:14px;font-weight:600;font-family:var(--mono);color:var(--tx)}
 
-.badge{font-size:15px;padding:7px 16px;border-radius:10px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;line-height:1;display:inline-flex;align-items:center}
-.badge.active{background:rgba(20,184,166,.15);color:var(--gr);border:1px solid rgba(20,184,166,.25)}
-.badge.inactive,.badge.failed{background:rgba(239,68,68,.15);color:var(--rd);border:1px solid rgba(239,68,68,.25)}
+.badge{font-size:10px;padding:5px 12px;border-radius:var(--radius);font-weight:700;letter-spacing:.1em;text-transform:uppercase;line-height:1;display:inline-flex;align-items:center;background:transparent}
+.badge.active{color:var(--gr);border:1px solid var(--gr)}
+.badge.inactive,.badge.failed{color:var(--rd);border:1px solid var(--rd)}
 
 .log-toolbar{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
 .log-box{
-  background:var(--s1);backdrop-filter:blur(20px);
+  background:var(--s1);
   border:1px solid var(--bd);border-radius:var(--radius);
   padding:14px 16px;flex:1;min-height:0;overflow-y:auto;
   line-height:1.8;font-size:12px;font-family:var(--mono);
@@ -268,16 +267,16 @@ body{
 .ll{color:var(--tx)}.ll.err{color:var(--rd)}.ll.warn{color:var(--am)}.ll.ok{color:var(--gr)}
 
 select{
-  font-family:var(--fn);font-size:13px;padding:6px 12px;
+  font-family:var(--mono);font-size:12px;padding:7px 12px;
   background:var(--s2);border:1px solid var(--bd);
-  border-radius:10px;color:var(--tx)
+  border-radius:var(--radius);color:var(--tx)
 }
 
 .cfg-tabs{display:flex;gap:4px;margin-bottom:12px;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none}
 .cfg-tabs::-webkit-scrollbar{display:none}
-.ctab{font-size:15px;padding:7px 16px;cursor:pointer;color:var(--mu);border-radius:10px;border:1px solid transparent;font-weight:500;text-transform:uppercase;letter-spacing:.06em;transition:.15s;white-space:nowrap;flex-shrink:0}
-.ctab:hover{color:var(--tx);background:rgba(255,255,255,.05)}
-.ctab.active{color:var(--teal);background:linear-gradient(135deg,rgba(20,184,166,.18),rgba(20,184,166,.08));border-color:rgba(20,184,166,.55);font-weight:600;backdrop-filter:blur(12px);box-shadow:0 1px 0 rgba(20,184,166,.15) inset,0 4px 16px rgba(20,184,166,.1)}
+.ctab{font-size:12px;padding:8px 15px;cursor:pointer;color:var(--mu);border-radius:var(--radius);border:1px solid var(--bd);background:var(--s2);font-weight:600;font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;transition:.15s;white-space:nowrap;flex-shrink:0}
+.ctab:hover{color:var(--tx);border-color:var(--mu)}
+.ctab.active{color:#0b0f0c;background:var(--teal);border-color:var(--teal);font-weight:700;box-shadow:var(--glow)}
 .ctab:hover:not(.active){color:var(--tx)}
 .cfg-path{font-size:11px;color:var(--mu);margin-bottom:8px;font-family:var(--mono)}
 
@@ -286,38 +285,38 @@ textarea{
   border-radius:var(--radius);padding:14px 16px;
   color:var(--tx);font-family:var(--mono);font-size:12px;
   line-height:1.7;resize:vertical;flex:1;min-height:200px;
-  backdrop-filter:blur(20px)
 }
-textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(20,184,166,.1)}
+textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 1px var(--teal)}
 
-.pb{height:4px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;margin-top:8px}
-.pbf{height:100%;border-radius:4px;background:var(--gr);transition:width .4s}
+.pb{position:relative;height:9px;background:var(--line,var(--bd));border:1px solid var(--bd);overflow:hidden;margin-top:8px}
+.pb::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background-image:repeating-linear-gradient(90deg,var(--s2) 0 2px,transparent 2px 11px)}
+.pbf{position:relative;z-index:1;height:100%;background:var(--gr);transition:width .4s}
 .pbf.a{background:var(--am)}.pbf.r{background:var(--rd)}
 
 .toast{
   position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
-  background:var(--teal);color:#fff;
-  font-size:12px;font-weight:600;padding:10px 24px;
-  border-radius:12px;opacity:0;transition:opacity .2s;
-  pointer-events:none;z-index:9999;
-  box-shadow:0 8px 24px rgba(20,184,166,.35)
+  background:var(--teal);color:#0b0f0c;
+  font-size:12px;font-weight:700;padding:10px 22px;
+  border-radius:var(--radius);opacity:0;transition:opacity .2s;
+  pointer-events:none;z-index:9999;font-family:var(--mono);letter-spacing:.03em;
+  box-shadow:var(--shadow-lg)
 }
 .toast.show{opacity:1}
 
 .lxmf-toolbar{display:flex;align-items:center;gap:8px;margin-bottom:12px}
 .lxmf-box{
-  background:var(--s1);backdrop-filter:blur(20px);
+  background:var(--s1);
   border:1px solid var(--bd);border-radius:var(--radius);
   padding:14px 16px;flex:1;min-height:0;overflow-y:auto;
   line-height:1.8;font-size:13px;box-shadow:var(--shadow)
 }
-.lm{padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.lm{padding:6px 0;border-bottom:1px solid var(--bd)}
 .lm:last-child{border-bottom:none}
 .lm .ts{color:var(--mu);margin-right:8px;font-family:var(--mono)}
 
 .section-lbl{
-  font-size:10px;letter-spacing:.12em;text-transform:uppercase;
-  color:var(--teal);margin-bottom:14px;font-weight:700
+  font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--teal);margin-bottom:14px;font-weight:700;font-family:var(--mono)
 }
 
 #qr-modal{
@@ -327,6 +326,11 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
 }
 
 @keyframes rmap-ring{0%{transform:scale(1);opacity:.7}100%{transform:scale(2.8);opacity:0}}
+
+.hero{position:relative;border-bottom:1px solid var(--bd);background:var(--bg)}
+.mesh-canvas{display:block;width:100%;height:108px}
+.mesh-caption{position:absolute;top:6px;left:24px;font-size:9px;letter-spacing:.18em;color:var(--mu);font-family:var(--mono);text-transform:uppercase;pointer-events:none}
+@media(max-width:768px){.mesh-canvas{height:64px}.mesh-caption{display:none}}
 </style>
 </head>
 <body>
@@ -334,16 +338,22 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
 <div class="shell">
 <div class="topbar">
   <div>
-    <div class="logo" style="display:flex;align-items:center;gap:10px"><img src="logo.png" style="height:36px;width:36px;object-fit:contain;border-radius:6px"><b>NOEMA RNSGate <span style="color:var(--teal)">Lite</span></b></div>
-    <div class="skel" style="font-size:11px;color:var(--mu);margin-top:2px" id="uptime-lbl">—</div>
-    <div class="skel" style="font-size:11px;color:var(--mu);margin-top:1px" id="rns-ver-lbl">—</div>
-    <div class="skel" style="font-size:11px;color:var(--mu);margin-top:1px" id="clock-lbl">—</div>
+    <div class="logo" style="display:flex;align-items:center;gap:10px"><img src="logo.png" style="height:28px;width:28px;object-fit:contain;border-radius:2px;border:1px solid var(--bd)"><b>NOEMA <span style="color:var(--teal)">RNSGATE</span> · LITE</b></div>
+    <div style="display:flex;flex-wrap:wrap;gap:2px 10px;margin-top:4px">
+      <div class="skel" style="font-size:10px;color:var(--mu);font-family:var(--mono)" id="uptime-lbl">—</div>
+      <div class="skel" style="font-size:10px;color:var(--mu);font-family:var(--mono)" id="rns-ver-lbl">—</div>
+      <div class="skel" style="font-size:10px;color:var(--mu);font-family:var(--mono)" id="clock-lbl">—</div>
+    </div>
   </div>
   <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
     <div style="display:flex;gap:6px;align-items:center">
       <div class="pill" style="display:inline-flex"><div class="dot" id="dot"></div><span class="skel" id="ip-lbl">—</span></div>
     </div>
   </div>
+</div>
+<div class="hero">
+  <canvas id="mesh-canvas" class="mesh-canvas"></canvas>
+  <div class="mesh-caption">Mesh topology — live</div>
 </div>
 <div class="metrics">
   <div class="mc"><div class="mc-inner"><div class="lb">CPU</div><div class="vl a skel" id="m-cpu">—</div></div><div class="pb"><div class="pbf a" id="pb-cpu" style="width:0%"></div></div></div>
@@ -381,7 +391,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
       </div>
       </div>
       <div style="display:none">
-      <div style="margin-bottom:16px;background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:10px;box-shadow:var(--shadow)">
+      <div style="margin-bottom:16px;background:var(--s1);border:1px solid var(--bd);border-radius:2px;padding:10px;box-shadow:var(--shadow)">
         <style>
           @keyframes mg-flow { to { stroke-dashoffset: -24; } }
           @keyframes mg-ring { 0%,100%{r:10;opacity:.6} 50%{r:14;opacity:0} }
@@ -509,7 +519,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
             <div class="section-lbl" style="margin-bottom:8px">Public Nodes</div>
             <div id="home-nodes" style="font-size:12px;line-height:1.9">—</div>
           </div>
-          <div style="background:var(--s1);border:1px solid var(--bd);border-radius:8px;padding:10px 14px;box-shadow:var(--shadow)">
+          <div style="background:var(--s1);border:1px solid var(--bd);border-radius:2px;padding:10px 14px;box-shadow:var(--shadow)">
             <div class="section-lbl" style="margin-bottom:8px">RNS interfaces</div>
             <div id="home-rns" style="font-size:12px;line-height:1.9">—</div>
           </div>
@@ -521,14 +531,14 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
     <!-- MONITOR -->
     <div class="panel" id="panel-monitor">
       <div class="two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;flex:1;min-height:0">
-        <div style="display:flex;flex-direction:column;background:var(--s1);border:1px solid var(--bd);border-radius:8px;overflow:hidden">
+        <div style="display:flex;flex-direction:column;background:var(--s1);border:1px solid var(--bd);border-radius:2px;overflow:hidden">
           <div style="padding:8px 12px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between">
             <div class="section-lbl" style="margin:0">LXMF Messages</div>
             <button class="sys-btn" onclick="clearLxmf()">CLEAR</button>
           </div>
           <div class="lxmf-box" id="lxmf-box" style="flex:1;height:auto;border-radius:0;border:none"></div>
         </div>
-        <div style="display:flex;flex-direction:column;background:var(--s1);border:1px solid var(--bd);border-radius:8px;overflow:hidden">
+        <div style="display:flex;flex-direction:column;background:var(--s1);border:1px solid var(--bd);border-radius:2px;overflow:hidden">
           <div style="padding:8px 12px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between">
             <div class="section-lbl" style="margin:0">RNS interfaces</div>
             <button class="sys-btn teal" onclick="loadRns()">REFRESH</button>
@@ -546,7 +556,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
       </div>
 
       <!-- Status -->
-      <div id="i2p-status-block" style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:12px 14px;margin-bottom:12px">
+      <div id="i2p-status-block" style="background:var(--s2);border:1px solid var(--bd);border-radius:2px;padding:12px 14px;margin-bottom:12px">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
           <div id="i2p-dot" class="dot" style="width:10px;height:10px;background:var(--mu)"></div>
           <div style="font-size:13px;font-weight:700;color:var(--tx)">i2pd daemon</div>
@@ -569,11 +579,11 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
 
       <!-- Reticulum integration -->
       <div class="section-lbl" style="margin-bottom:8px">Reticulum Interface</div>
-      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:12px 14px;margin-bottom:12px">
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:2px;padding:12px 14px;margin-bottom:12px">
         <div style="font-size:11px;color:var(--mu);margin-bottom:8px">Add I2P interface to Reticulum config pointing to a remote node:</div>
         <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
-          <input id="i2p-peer-addr" placeholder="xxxxx.b32.i2p" style="flex:1;min-width:200px;background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:6px 10px;color:var(--tx);font-size:12px;font-family:var(--fn)">
-          <input id="i2p-peer-name" placeholder="Interface name" value="I2P-Node" style="width:120px;background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:6px 10px;color:var(--tx);font-size:12px">
+          <input id="i2p-peer-addr" placeholder="xxxxx.b32.i2p" style="flex:1;min-width:200px;background:var(--bg);border:1px solid var(--bd);border-radius:2px;padding:6px 10px;color:var(--tx);font-size:12px;font-family:var(--fn)">
+          <input id="i2p-peer-name" placeholder="Interface name" value="I2P-Node" style="width:120px;background:var(--bg);border:1px solid var(--bd);border-radius:2px;padding:6px 10px;color:var(--tx);font-size:12px">
           <button class="sys-btn teal" onclick="i2pAddInterface()">ADD TO CONFIG</button>
         </div>
         <div id="i2p-rns-status" style="font-size:11px;color:var(--mu)"></div>
@@ -581,14 +591,14 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
 
       <!-- Setup tunnel -->
       <div class="section-lbl" style="margin-bottom:8px">Local Tunnel Setup</div>
-      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:12px 14px;margin-bottom:12px">
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:2px;padding:12px 14px;margin-bottom:12px">
         <div style="font-size:11px;color:var(--mu);margin-bottom:8px">Create incoming I2P tunnel for this MeshGate (so others can connect anonymously):</div>
         <button class="sys-btn teal" onclick="i2pAction('setup_tunnel')">SETUP I2P TUNNEL</button>
         <div id="i2p-tunnel-result" style="margin-top:8px;font-size:11px;color:var(--teal);font-family:var(--fn)"></div>
       </div>
 
       <!-- Output -->
-      <div id="i2p-output" style="font-family:var(--fn);font-size:11px;color:var(--teal);background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:8px 10px;min-height:32px;white-space:pre-wrap;display:none"></div>
+      <div id="i2p-output" style="font-family:var(--fn);font-size:11px;color:var(--teal);background:var(--bg);border:1px solid var(--bd);border-radius:2px;padding:8px 10px;min-height:32px;white-space:pre-wrap;display:none"></div>
     </div>
 
     <!-- NOMADNET -->
@@ -620,7 +630,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
         <div id="nn-file-label" style="font-size:11px;color:var(--mu);flex-shrink:0">—</div>
 
         <!-- Editor -->
-        <textarea id="nn-editor" style="flex:1;min-height:0;width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:10px;color:var(--tx);font-family:var(--fn);font-size:12px;resize:none;box-sizing:border-box" spellcheck="false"></textarea>
+        <textarea id="nn-editor" style="flex:1;min-height:0;width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:2px;padding:10px;color:var(--tx);font-family:var(--fn);font-size:12px;resize:none;box-sizing:border-box" spellcheck="false"></textarea>
 
         <!-- Action buttons -->
         <div style="display:flex;gap:8px;align-items:center;flex-shrink:0;flex-wrap:wrap">
@@ -632,10 +642,10 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
         </div>
 
         <!-- Cron block (scripts only) -->
-        <div id="nn-cron-block" style="display:none;background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:10px 14px;flex-shrink:0">
+        <div id="nn-cron-block" style="display:none;background:var(--s2);border:1px solid var(--bd);border-radius:2px;padding:10px 14px;flex-shrink:0">
           <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
             <span style="font-size:13px;color:var(--mu);text-transform:uppercase;letter-spacing:.06em">Schedule</span>
-            <select id="nn-cron-select" style="font-family:var(--fn);font-size:13px;padding:5px 10px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);cursor:pointer">
+            <select id="nn-cron-select" style="font-family:var(--fn);font-size:13px;padding:5px 10px;border-radius:2px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);cursor:pointer">
               <option value="">— disabled —</option>
               <option value="*/5 * * * *">Every 5 min</option>
               <option value="*/15 * * * *">Every 15 min</option>
@@ -649,7 +659,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
           </div>
         </div>
 
-        <div id="nn-output" style="font-family:var(--fn);font-size:11px;color:var(--teal);background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:8px 10px;white-space:pre-wrap;display:none;flex-shrink:0"></div>
+        <div id="nn-output" style="font-family:var(--fn);font-size:11px;color:var(--teal);background:var(--bg);border:1px solid var(--bd);border-radius:2px;padding:8px 10px;white-space:pre-wrap;display:none;flex-shrink:0"></div>
       </div>
     </div>
 
@@ -659,7 +669,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
       <div class="two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
 
       <!-- LXMF Bridge -->
-      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:14px 16px">
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:2px;padding:14px 16px">
         <div style="font-size:11px;color:var(--mu);margin-bottom:4px">🔹 LXMF Bridge</div>
         <div style="font-size:10px;color:var(--mu);margin-bottom:6px">For receiving commands from Reticulum to MQTT / Home Assistant. Add to Sideband as a contact.</div>
         <div id="ap-lxmf-bridge" style="font-family:var(--fn);font-size:12px;color:var(--teal);word-break:break-all;margin-bottom:8px">—</div>
@@ -669,7 +679,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
 
 
       <!-- I2P -->
-      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:14px 16px">
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:2px;padding:14px 16px">
         <div style="font-size:11px;color:var(--mu);margin-bottom:4px">🔹 I2P Address (b32)</div>
         <div style="font-size:10px;color:var(--mu);margin-bottom:6px">Anonymous connection without public IP. Share with another gateway.</div>
         <div id="ap-i2p" style="font-family:var(--fn);font-size:12px;color:var(--teal);word-break:break-all;margin-bottom:8px">—</div>
@@ -677,7 +687,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
       </div>
 
       <!-- Nomadnet Node -->
-      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:14px 16px">
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:2px;padding:14px 16px">
         <div style="font-size:11px;color:var(--mu);margin-bottom:4px">🌐 Nomadnet Node</div>
         <div style="font-size:10px;color:var(--mu);margin-bottom:6px">Gateway info page in the Reticulum network.</div>
         <div id="ap-nn-node" style="font-family:var(--fn);font-size:12px;color:var(--teal);word-break:break-all;margin-bottom:8px">—</div>
@@ -685,7 +695,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
       </div>
 
       <!-- Nomadnet Chat -->
-      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:14px 16px">
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:2px;padding:14px 16px">
         <div style="font-size:11px;color:var(--mu);margin-bottom:4px">💬 Nomadnet Chat</div>
         <div style="font-size:10px;color:var(--mu);margin-bottom:6px">IRC-style chat in the Nomadnet network. Open in Nomadnet browser.</div>
         <div id="ap-nn-chat" style="font-family:var(--fn);font-size:12px;color:var(--teal);word-break:break-all;margin-bottom:8px">—</div>
@@ -702,7 +712,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
         <a id="rbrowser-link" href="#" target="_blank" class="sys-btn teal" style="text-decoration:none">OPEN RBROWSER</a>
         <span style="font-size:11px;color:var(--mu)">rBrowser · порт 5000</span>
       </div>
-      <iframe id="rbrowser-frame" style="width:100%;height:calc(100vh - 200px);border:none;border-radius:8px;flex:1"></iframe>
+      <iframe id="rbrowser-frame" style="width:100%;height:calc(100vh - 200px);border:none;border-radius:2px;flex:1"></iframe>
       <script>
         var _rbHost = "http://"+window.location.hostname+":5000";
         document.getElementById("rbrowser-frame").src = _rbHost;
@@ -713,7 +723,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
     <!-- LOGS -->
     <div class="panel" id="panel-logs">
       <div class="log-toolbar" style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-        <select id="log-unit" onchange="loadLogs()" style="background:var(--s2);border:1px solid var(--bd);border-radius:6px;color:var(--tx);padding:4px 8px;font-family:var(--fn);font-size:12px">
+        <select id="log-unit" onchange="loadLogs()" style="background:var(--s2);border:1px solid var(--bd);border-radius:2px;color:var(--tx);padding:4px 8px;font-family:var(--fn);font-size:12px">
           <option value="noema_lxmf_bridge">noema_lxmf_bridge</option>
           <option value="rnsd">rnsd</option>
           <option value="nomadnet">nomadnet</option>
@@ -757,31 +767,31 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
 
         <!-- [reticulum] section -->
         <div class="section-lbl">Reticulum</div>
-        <div style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:12px;margin-bottom:16px">
+        <div style="background:var(--s2);border:1px solid var(--bd);border-radius:2px;padding:12px;margin-bottom:16px">
           <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">
             <div>
               <div style="font-size:11px;color:var(--mu);margin-bottom:3px">enable_transport</div>
-              <select id="rns-main-transport" style="width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px">
+              <select id="rns-main-transport" style="width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:2px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px">
                 <option value="Yes">Yes</option><option value="No">No</option>
               </select>
             </div>
             <div>
               <div style="font-size:11px;color:var(--mu);margin-bottom:3px">share_instance</div>
-              <select id="rns-main-share" style="width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px">
+              <select id="rns-main-share" style="width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:2px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px">
                 <option value="Yes">Yes</option><option value="No">No</option>
               </select>
             </div>
             <div>
               <div style="font-size:11px;color:var(--mu);margin-bottom:3px">shared_instance_port</div>
-              <input id="rns-main-siport" value="37428" style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px">
+              <input id="rns-main-siport" value="37428" style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--bd);border-radius:2px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px">
             </div>
             <div>
               <div style="font-size:11px;color:var(--mu);margin-bottom:3px">instance_control_port</div>
-              <input id="rns-main-icport" value="37429" style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px">
+              <input id="rns-main-icport" value="37429" style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--bd);border-radius:2px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px">
             </div>
             <div>
               <div style="font-size:11px;color:var(--mu);margin-bottom:3px">panic_on_interface_error</div>
-              <select id="rns-main-panic" style="width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px">
+              <select id="rns-main-panic" style="width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:2px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px">
                 <option value="No">No</option><option value="Yes">Yes</option>
               </select>
             </div>
@@ -790,7 +800,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
 
         <!-- Interfaces -->
         <div class="section-lbl" style="margin-bottom:8px">Interfaces</div>
-        <div id="rns-cfg-ifaces" style="border:1px solid var(--bd);border-radius:8px;overflow:hidden;min-height:200px">
+        <div id="rns-cfg-ifaces" style="border:1px solid var(--bd);border-radius:2px;overflow:hidden;min-height:200px">
           <div style="display:grid;grid-template-columns:200px 1fr" id="rns-ifaces-split">
             <div id="rns-iface-list" style="border-right:1px solid var(--bd);overflow-y:auto"></div>
             <div id="rns-iface-detail" style="padding:16px;overflow-y:auto"><div style="color:var(--mu);font-size:12px;margin-top:40px;text-align:center">Select an interface</div></div>
@@ -807,15 +817,15 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
 
       <!-- Add Interface Modal -->
       <div id="add-iface-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center">
-        <div style="background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:20px;width:90%;max-width:400px">
+        <div style="background:var(--s1);border:1px solid var(--bd);border-radius:2px;padding:20px;width:90%;max-width:400px">
           <div style="font-size:14px;font-weight:600;margin-bottom:16px">Add Interface</div>
           <div style="margin-bottom:12px">
             <div style="font-size:11px;color:var(--mu);margin-bottom:4px">Interface Name</div>
-            <input id="new-iface-name" placeholder="My Interface" style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:6px 10px">
+            <input id="new-iface-name" placeholder="My Interface" style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--bd);border-radius:2px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:6px 10px">
           </div>
           <div style="margin-bottom:16px">
             <div style="font-size:11px;color:var(--mu);margin-bottom:4px">Type</div>
-            <select id="new-iface-type" onchange="updateNewIfaceHint()" style="width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:6px 10px">
+            <select id="new-iface-type" onchange="updateNewIfaceHint()" style="width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:2px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:6px 10px">
               <option value="AutoInterface">AutoInterface — local LAN/WiFi discovery</option>
               <option value="TCPClientInterface">TCPClientInterface — connect to TCP server</option>
               <option value="TCPServerInterface">TCPServerInterface — listen for connections</option>
@@ -826,7 +836,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
               <option value="SerialInterface">SerialInterface — serial port</option>
             </select>
           </div>
-          <div id="new-iface-hint" style="font-size:11px;color:var(--mu);margin-bottom:16px;padding:8px;background:var(--bg);border-radius:5px"></div>
+          <div id="new-iface-hint" style="font-size:11px;color:var(--mu);margin-bottom:16px;padding:8px;background:var(--bg);border-radius:2px"></div>
           <div style="display:flex;gap:8px">
             <button class="sys-btn teal" onclick="confirmAddIface()">ADD</button>
             <button class="sys-btn" onclick="hideAddIfaceModal()">CANCEL</button>
@@ -844,11 +854,11 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
       <div id="rnode-status" style="margin-bottom:12px"></div>
       <div id="rnode-metrics" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:16px"></div>
       <div class="two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
-        <div style="background:var(--s1);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;min-width:0;overflow:hidden">
+        <div style="background:var(--s1);border:1px solid var(--bd);border-radius:2px;padding:10px 12px;min-width:0;overflow:hidden">
           <div class="section-lbl" style="margin-bottom:8px">Airtime % (15s)</div>
           <div style="position:relative;height:160px"><canvas id="rnode-chart-airtime"></canvas></div>
         </div>
-        <div style="background:var(--s1);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;min-width:0;overflow:hidden">
+        <div style="background:var(--s1);border:1px solid var(--bd);border-radius:2px;padding:10px 12px;min-width:0;overflow:hidden">
           <div class="section-lbl" style="margin-bottom:8px">Noise dBm</div>
           <div style="position:relative;height:160px"><canvas id="rnode-chart-noise"></canvas></div>
         </div>
@@ -869,12 +879,12 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
           </div>
         </div>
         <div id="nodes-monitor-list"></div>
-        <div id="add-node-form" style="display:none;margin-top:10px;padding:10px;background:var(--s1);border:1px solid var(--bd);border-radius:6px">
+        <div id="add-node-form" style="display:none;margin-top:10px;padding:10px;background:var(--s1);border:1px solid var(--bd);border-radius:2px">
           <div style="font-size:12px;font-weight:700;margin-bottom:8px">New node</div>
           <div style="display:flex;gap:6px;flex-wrap:wrap">
-            <input id="new-node-name" placeholder="Name" style="flex:1;min-width:80px;font-family:var(--fn);font-size:12px;padding:5px 8px;border:1px solid var(--bd);border-radius:5px;background:var(--bg);color:var(--tx)">
-            <input id="new-node-host" placeholder="host" style="flex:2;min-width:120px;font-family:var(--fn);font-size:12px;padding:5px 8px;border:1px solid var(--bd);border-radius:5px;background:var(--bg);color:var(--tx)">
-            <input id="new-node-port" placeholder="port" value="4242" style="width:60px;font-family:var(--fn);font-size:12px;padding:5px 8px;border:1px solid var(--bd);border-radius:5px;background:var(--bg);color:var(--tx)">
+            <input id="new-node-name" placeholder="Name" style="flex:1;min-width:80px;font-family:var(--fn);font-size:12px;padding:5px 8px;border:1px solid var(--bd);border-radius:2px;background:var(--bg);color:var(--tx)">
+            <input id="new-node-host" placeholder="host" style="flex:2;min-width:120px;font-family:var(--fn);font-size:12px;padding:5px 8px;border:1px solid var(--bd);border-radius:2px;background:var(--bg);color:var(--tx)">
+            <input id="new-node-port" placeholder="port" value="4242" style="width:60px;font-family:var(--fn);font-size:12px;padding:5px 8px;border:1px solid var(--bd);border-radius:2px;background:var(--bg);color:var(--tx)">
             <button class="sys-btn teal" onclick="addNode()">Add</button>
             <button class="sys-btn" onclick="hideAddNode()">Cancel</button>
           </div>
@@ -882,7 +892,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
         <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--bd)">
           <div class="section-lbl">rnprobe</div>
           <div style="display:flex;gap:6px;margin-bottom:8px">
-            <input id="probe-addr" placeholder="LXMF address" style="flex:1;font-family:var(--fn);font-size:12px;padding:5px 8px;border:1px solid var(--bd);border-radius:5px;background:var(--s1);color:var(--tx)">
+            <input id="probe-addr" placeholder="LXMF address" style="flex:1;font-family:var(--fn);font-size:12px;padding:5px 8px;border:1px solid var(--bd);border-radius:2px;background:var(--s1);color:var(--tx)">
             <button class="sys-btn teal" onclick="doProbe()">▶ probe</button>
           </div>
           <div id="probe-result" style="font-size:12px;font-family:var(--fn);color:var(--mu);white-space:pre-wrap"></div>
@@ -899,7 +909,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
       </div>
 
       <div class="section-lbl">Quick Commands</div>
-      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:10px 14px;margin-bottom:12px">
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:2px;padding:10px 14px;margin-bottom:12px">
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
           <button class="sys-btn" onclick="runCmd('find_ports')">Ports</button>
           <button class="sys-btn" onclick="runCmd('rnstatus')">RNStatus</button>
@@ -909,11 +919,11 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
           <button class="sys-btn" onclick="runCmd('uptime')">Uptime</button>
           <button class="sys-btn rd" onclick="runCmd('log_cleanup')">🗑 Clean Logs</button>
         </div>
-        <div id="cmd-output" style="font-family:var(--fn);font-size:11px;color:var(--teal);background:var(--bg);border-radius:6px;padding:8px 10px;min-height:32px;white-space:pre-wrap;display:none"></div>
+        <div id="cmd-output" style="font-family:var(--fn);font-size:11px;color:var(--teal);background:var(--bg);border-radius:2px;padding:8px 10px;min-height:32px;white-space:pre-wrap;display:none"></div>
       </div>
 
       <div class="section-lbl">Versions</div>
-      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:14px;margin-bottom:12px">
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:2px;padding:14px;margin-bottom:12px">
         <table style="width:100%;border-collapse:collapse;font-family:var(--fn);font-size:12px">
           <thead>
             <tr style="border-bottom:1px solid var(--bd)">
@@ -956,7 +966,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
 
 <!-- Backup Modal -->
 <div id="backup-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center">
-  <div style="background:var(--s1);border:1px solid var(--bd);border-radius:16px;padding:28px 32px;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.5)">
+  <div style="background:var(--s1);border:1px solid var(--bd);border-radius:3px;padding:28px 32px;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.5)">
     <div style="font-size:15px;font-weight:700;color:var(--tx);margin-bottom:8px">⬇ Download backup</div>
     <div style="font-size:12px;color:var(--mu);margin-bottom:20px;line-height:1.8">
       Will be saved:<br>
@@ -975,7 +985,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
 
 <!-- Restore Modal -->
 <div id="restore-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center">
-  <div style="background:var(--s1);border:1px solid var(--bd);border-radius:16px;padding:28px 32px;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.5)">
+  <div style="background:var(--s1);border:1px solid var(--bd);border-radius:3px;padding:28px 32px;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.5)">
     <div style="font-size:15px;font-weight:700;color:var(--tx);margin-bottom:8px">↑ Restore from backup</div>
     <div style="font-size:12px;color:var(--mu);margin-bottom:16px;line-height:1.8">Select ZIP-file backupа:</div>
     <input type="file" id="restore-file" accept=".zip" style="font-size:12px;color:var(--tx);margin-bottom:16px;width:100%">
@@ -988,7 +998,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
 
 <!-- Reboot Modal -->
 <div id="reset-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:1000;align-items:center;justify-content:center">
-  <div style="background:var(--s2);border:1px solid var(--rd);border-radius:12px;padding:24px;max-width:420px;text-align:center">
+  <div style="background:var(--s2);border:1px solid var(--rd);border-radius:2px;padding:24px;max-width:420px;text-align:center">
     <div style="font-size:16px;font-weight:700;color:var(--rd);margin-bottom:12px">⚠ Reset Identity</div>
     <div style="font-size:13px;color:var(--mu);margin-bottom:20px">Reset: LXMF adress, I2P tonnel, Reticulum identity, chat history.<br><br></div>
     <div style="display:flex;gap:8px;justify-content:center">
@@ -999,7 +1009,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
   </div>
 </div>
 <div id="reboot-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center">
-  <div style="background:var(--s1);border:1px solid var(--bd);border-radius:16px;padding:28px 32px;max-width:380px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.5)">
+  <div style="background:var(--s1);border:1px solid var(--bd);border-radius:3px;padding:28px 32px;max-width:380px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.5)">
     <div style="font-size:15px;font-weight:700;color:var(--rd);margin-bottom:8px">⏻ Rebooting</div>
     <div style="font-size:12px;color:var(--mu);margin-bottom:20px">Server will reboot. All services will temporarily stop.</div>
     <div style="display:flex;gap:10px;justify-content:flex-end">
@@ -1010,7 +1020,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(2
 </div>
 <!-- QR Modal -->
 <div id="qr-modal" onclick="this.style.display='none'">
-  <div id="qr-box" style="background:#fff;padding:20px;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.3)"></div>
+  <div id="qr-box" style="background:#fff;padding:20px;border-radius:2px;box-shadow:0 20px 60px rgba(0,0,0,.3)"></div>
   <div style="color:#fff;font-size:12px;font-family:var(--fn)" id="qr-addr"></div>
 </div>
 <script>
@@ -1100,6 +1110,7 @@ async function checkMqttStatus(){
 async function loadServices(){
   const r=await fetch(API+"/api/services");
   const data=await r.json();
+  if(window.meshSetStatus) data.forEach(s=>window.meshSetStatus(s.name,s.status==="active"));
   const el=document.getElementById("svc-list");
   el.innerHTML=data.map(s=>`
     <div class="svc">
@@ -1550,7 +1561,7 @@ function showQR(){
   const modal=document.getElementById("qr-modal");
   modal.style.display="flex";
   document.getElementById("qr-addr").textContent=addr;
-  document.getElementById("qr-box").innerHTML=`<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}" style="width:200px;height:200px;border-radius:6px">`;
+  document.getElementById("qr-box").innerHTML=`<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}" style="width:200px;height:200px;border-radius:2px">`;
 }
 
 // Addresses
@@ -1618,7 +1629,7 @@ function renderChatContacts(){
   }
   el.innerHTML = chatContacts.map((c,i) => {
     const unread = _contactUnread[c.addr] || 0;
-    const badge = unread > 0 ? `<span style="background:#f87171;color:#fff;border-radius:10px;padding:1px 5px;font-size:9px;margin-left:4px">${unread}</span>` : '';
+    const badge = unread > 0 ? `<span style="background:#f87171;color:#fff;border-radius:2px;padding:1px 5px;font-size:9px;margin-left:4px">${unread}</span>` : '';
     return `<div onclick="openChat('${c.addr}','${esc(c.name||'')}')" style="padding:9px 12px;cursor:pointer;border-bottom:1px solid var(--bd);border-left:2px solid ${chatCurrentAddr===c.addr?'var(--teal)':'transparent'};background:${chatCurrentAddr===c.addr?'var(--s3)':'transparent'}">
       <div style="display:flex;align-items:center;justify-content:space-between">
         <div style="font-size:12px;font-weight:700;color:${unread>0?'var(--tx)':'var(--tx)'}">${esc(c.name||c.addr.slice(0,8))}</div>
@@ -1652,7 +1663,7 @@ function renderChatMsgs(msgs){
     if(m.file_id){
       const isImg = m.file_mime && m.file_mime.startsWith("image/");
       if(isImg){
-        body = `<img src="/api/chat/files/${m.file_id}/preview" style="max-width:220px;max-height:180px;border-radius:8px;display:block;cursor:pointer;margin-bottom:4px" onclick="window.open('/api/chat/files/${m.file_id}/preview')">`;
+        body = `<img src="/api/chat/files/${m.file_id}/preview" style="max-width:220px;max-height:180px;border-radius:2px;display:block;cursor:pointer;margin-bottom:4px" onclick="window.open('/api/chat/files/${m.file_id}/preview')">`;
       } else {
         body = `<a href="/api/chat/files/${m.file_id}" style="color:var(--teal);font-size:12px;text-decoration:none;display:block;margin-bottom:4px">📎 ${esc(m.file_name||'file')} ${m.file_size?'('+Math.round(m.file_size/1024)+' КБ)':''}</a>`;
       }
@@ -1661,7 +1672,7 @@ function renderChatMsgs(msgs){
       body = `<div style="font-size:12px;color:var(--tx)">${esc(m.text)}</div>`;
     }
     return `<div style="display:flex;justify-content:${isOut?'flex-end':'flex-start'}">
-      <div style="background:${isOut?'var(--s2)':'var(--s1)'};border:1px solid ${isOut?'var(--bd)':'var(--teal)'};border-radius:${isOut?'10px 10px 2px 10px':'10px 10px 10px 2px'};padding:7px 12px;max-width:75%">
+      <div style="background:${isOut?'var(--s2)':'var(--s1)'};border:1px solid ${isOut?'var(--bd)':'var(--teal)'};border-radius:${isOut?'2px 2px 0 2px':'2px 2px 2px 0'};padding:7px 12px;max-width:75%">
         ${body}
         <div style="font-size:10px;color:var(--mu);margin-top:3px;text-align:${isOut?'right':'left'}">${time}${isOut?' ✓':''}</div>
       </div>
@@ -1830,15 +1841,15 @@ async function loadSystemFiles(){
       const time = new Date(f.ts*1000).toLocaleString("ru",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"});
       return `<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--bd)">
         <div style="display:flex;align-items:center;gap:8px;min-width:0">
-          ${isImg?`<img src="/api/chat/files/${f.id}/preview" style="width:32px;height:32px;object-fit:cover;border-radius:4px;flex-shrink:0">`:'<div style="width:32px;height:32px;background:var(--bg);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">📎</div>'}
+          ${isImg?`<img src="/api/chat/files/${f.id}/preview" style="width:32px;height:32px;object-fit:cover;border-radius:2px;flex-shrink:0">`:'<div style="width:32px;height:32px;background:var(--bg);border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">📎</div>'}
           <div style="min-width:0">
             <div style="color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px">${esc(f.name)}</div>
             <div style="color:var(--mu);font-size:10px">${size} · ${time}</div>
           </div>
         </div>
         <div style="display:flex;gap:4px;flex-shrink:0">
-          <a href="/api/chat/files/${f.id}" style="color:var(--teal);text-decoration:none;font-size:11px;padding:2px 6px;border:1px solid var(--teal);border-radius:4px">↓</a>
-          <button onclick="deleteFile('${f.id}')" style="background:transparent;border:1px solid var(--rd);color:var(--rd);border-radius:4px;padding:2px 6px;font-size:11px;cursor:pointer;font-family:var(--fn)">✕</button>
+          <a href="/api/chat/files/${f.id}" style="color:var(--teal);text-decoration:none;font-size:11px;padding:2px 6px;border:1px solid var(--teal);border-radius:2px">↓</a>
+          <button onclick="deleteFile('${f.id}')" style="background:transparent;border:1px solid var(--rd);color:var(--rd);border-radius:2px;padding:2px 6px;font-size:11px;cursor:pointer;font-family:var(--fn)">✕</button>
         </div>
       </div>`;
     }).join("");
@@ -1897,7 +1908,7 @@ async function loadRmapNodes(){
         const l=document.createElementNS("http://www.w3.org/2000/svg","line");
         l.setAttribute("x1","50%");l.setAttribute("y1","50%");
         l.setAttribute("x2",p.x+"%");l.setAttribute("y2",p.y+"%");
-        l.setAttribute("stroke",isOn?"#2dd4bf":"#555");
+        l.setAttribute("stroke",isOn?"#3ddc84":"#4a5750");
         l.setAttribute("stroke-width","1");
         l.setAttribute("stroke-dasharray",isOn?"5 5":"3 8");
         l.setAttribute("opacity",isOn?"0.4":"0.2");
@@ -1910,7 +1921,7 @@ async function loadRmapNodes(){
         :"width:11px;height:11px;background:#333;border:2px solid #555";
       const ring=isOn&&!isMe?'<div style="position:absolute;inset:-5px;border-radius:50%;border:1px solid #4ade9a50;animation:rmap-ring 2.5s ease-out infinite"></div>':'';
       m.innerHTML='<div style="border-radius:50%;'+ds+'">'+ring+'</div>'
-        +'<div style="position:absolute;top:18px;left:50%;transform:translateX(-50%);background:var(--bg);border:1px solid var(--bd);border-radius:5px;padding:1px 7px;font-size:10px;white-space:nowrap;font-family:var(--fn);color:'+(isOn?'var(--tx)':'var(--mu)')+'">'+esc(n.name)+'</div>';
+        +'<div style="position:absolute;top:18px;left:50%;transform:translateX(-50%);background:var(--bg);border:1px solid var(--bd);border-radius:2px;padding:1px 7px;font-size:10px;white-space:nowrap;font-family:var(--fn);color:'+(isOn?'var(--tx)':'var(--mu)')+'">'+esc(n.name)+'</div>';
       m.onclick=()=>{
         clearTimeout(_rmapT);
         const pop=document.getElementById("rmap-popup");
@@ -2032,7 +2043,7 @@ function selectRnode(idx){
   ].filter(Boolean);
 
   if(metricsEl) metricsEl.innerHTML = metrics.map(m=>`
-    <div style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:8px 10px">
+    <div style="background:var(--s2);border:1px solid var(--bd);border-radius:2px;padding:8px 10px">
       <div style="font-size:14px;margin-bottom:3px">${m.icon}</div>
       <div style="font-size:9px;color:var(--mu);letter-spacing:.07em;text-transform:uppercase;margin-bottom:2px">${esc(m.label)}</div>
       <div style="font-size:12px;font-weight:700;color:var(--teal)">${esc(m.value)}</div>
@@ -2076,8 +2087,8 @@ async function loadRnodeCharts(rnodeName){
     });
 
     rnodeChartAirtime = new Chart(ctxA, {
-      ...chartOpts("#2dd4bf"),
-      data:{labels, datasets:[{data:airtime,borderColor:"#2dd4bf",backgroundColor:"#2dd4bf20",borderWidth:1.5,pointRadius:0,fill:true,tension:.3}]}
+      ...chartOpts("#2dd8ec"),
+      data:{labels, datasets:[{data:airtime,borderColor:"#2dd8ec",backgroundColor:"#2dd8ec20",borderWidth:1.5,pointRadius:0,fill:true,tension:.3}]}
     });
     rnodeChartNoise = new Chart(ctxN, {
       ...chartOpts("#a78bfa"),
@@ -2103,7 +2114,7 @@ async function loadTrafficCharts(){
       const safeId = "tc-"+name.replace(/[^a-z0-9]/gi,"_");
       if(!document.getElementById(safeId)){
         const div = document.createElement("div");
-        div.style.cssText = "background:var(--s1);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;min-width:0;overflow:hidden";
+        div.style.cssText = "background:var(--s1);border:1px solid var(--bd);border-radius:2px;padding:10px 12px;min-width:0;overflow:hidden";
         const shortName = name.replace(/.*\[/,"").replace(/\].*/,"");
         div.innerHTML = `<div class="section-lbl" style="margin-bottom:4px;font-size:10px">${esc(shortName)}</div><div style="position:relative;height:80px"><canvas id="${safeId}"></canvas></div>`;
         container.appendChild(div);
@@ -2128,7 +2139,7 @@ async function loadTrafficCharts(){
       return dt.getHours()+":"+String(dt.getMinutes()).padStart(2,"0")+":"+String(dt.getSeconds()).padStart(2,"0");
     });
 
-    const colors = ["#2dd4bf","#a78bfa","#f0a92e","#4ade9a","#f87171","#60a5fa","#fb923c","#e879f9"];
+    const colors = ["#2dd8ec","#a78bfa","#f0a92e","#4ade9a","#f87171","#60a5fa","#fb923c","#e879f9"];
 
     ifaceNames.forEach((name,ci) => {
       const safeId = "tc-"+name.replace(/[^a-z0-9]/gi,"_");
@@ -2486,19 +2497,120 @@ fetch(API+"/api/chat/contacts").then(r=>r.json()).then(async d=>{
   const cv=document.getElementById('bg-canvas'),ctx=cv.getContext('2d');
   let W,H,N;
   function resize(){W=cv.width=innerWidth;H=cv.height=innerHeight;}
-  function init(){N=[];for(let i=0;i<Math.floor(W*H/16000);i++)N.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35,r:Math.random()*1.5+.5,p:Math.random()*6.28});}
+  function init(){N=[];for(let i=0;i<Math.floor(W*H/18000);i++)N.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:Math.random()*1.3+.5,p:Math.random()*6.28});}
   function draw(){
     ctx.clearRect(0,0,W,H);
     N.forEach(n=>{n.x+=n.vx;n.y+=n.vy;n.p+=.02;if(n.x<0||n.x>W)n.vx*=-1;if(n.y<0||n.y>H)n.vy*=-1;});
     for(let i=0;i<N.length;i++)for(let j=i+1;j<N.length;j++){
       const dx=N[i].x-N[j].x,dy=N[i].y-N[j].y,d=Math.sqrt(dx*dx+dy*dy);
-      if(d<160){ctx.beginPath();ctx.strokeStyle=`rgba(20,184,166,${(1-d/160)*.2})`;ctx.lineWidth=.8;ctx.moveTo(N[i].x,N[i].y);ctx.lineTo(N[j].x,N[j].y);ctx.stroke();}
+      if(d<150){ctx.beginPath();ctx.strokeStyle=`rgba(45,217,232,${(1-d/150)*.1})`;ctx.lineWidth=.8;ctx.moveTo(N[i].x,N[i].y);ctx.lineTo(N[j].x,N[j].y);ctx.stroke();}
     }
-    N.forEach(n=>{const a=(Math.sin(n.p)*.5+.5)*.6+.2;ctx.beginPath();ctx.arc(n.x,n.y,n.r,0,6.28);ctx.fillStyle=`rgba(20,184,166,${a})`;ctx.fill();});
+    N.forEach(n=>{const a=(Math.sin(n.p)*.5+.5)*.4+.12;ctx.beginPath();ctx.arc(n.x,n.y,n.r,0,6.28);ctx.fillStyle=`rgba(45,217,232,${a})`;ctx.fill();});
     requestAnimationFrame(draw);
   }
-  window.addEventListener('resize',()=>{resize();init();});
+  window.addEventListener('resize',()=>{resize();init();draw();});
   resize();init();draw();
+})();
+
+// ---- Mesh topology hero canvas ----
+(function(){
+  const canvas=document.getElementById('mesh-canvas');
+  if(!canvas) return;
+  const ctx=canvas.getContext('2d');
+  let W,H,dpr=Math.max(1,window.devicePixelRatio||1);
+
+  const nodes=[
+    {id:'gw',   label:'GW',       x:0.5,  y:0.5,  r:11, core:true, status:'on'},
+    {id:'rnsd', label:'RETICULUM',x:0.10, y:0.42, r:7,  status:'unknown', svc:'rnsd'},
+    {id:'lxmf', label:'LXMF',     x:0.90, y:0.42, r:7,  status:'unknown', svc:'noema_lxmf_bridge'},
+    {id:'i2p',  label:'I2P',      x:0.88, y:0.88, r:7,  status:'unknown', svc:'i2pd'},
+    {id:'nomad',label:'NOMADNET', x:0.12, y:0.88, r:7,  status:'unknown', svc:'nomadnet'},
+    {id:'rb',   label:'RBROWSER', x:0.5,  y:0.10, r:6,  status:'unknown', svc:'rbrowser'}
+  ];
+  const edges=[['gw','rnsd'],['gw','lxmf'],['gw','i2p'],['gw','nomad'],['gw','rb']];
+  let pulses=[], spawnTimer=0;
+
+  function statusColor(s){
+    if(s==='on') return getComputedStyle(document.documentElement).getPropertyValue('--gr').trim();
+    if(s==='off') return getComputedStyle(document.documentElement).getPropertyValue('--rd').trim();
+    return getComputedStyle(document.documentElement).getPropertyValue('--mu').trim();
+  }
+
+  function resize(){
+    const rect=canvas.getBoundingClientRect();
+    W=rect.width; H=rect.height;
+    canvas.width=W*dpr; canvas.height=H*dpr;
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  window.addEventListener('resize',()=>{resize();draw();});
+  resize();
+
+  function px(n){return {x:n.x*W,y:n.y*H};}
+  function find(id){for(const n of nodes) if(n.id===id) return n;}
+
+  function spawnPulse(){
+    const e=edges[Math.floor(Math.random()*edges.length)];
+    const fwd=Math.random()>0.5;
+    pulses.push({from:fwd?e[0]:e[1],to:fwd?e[1]:e[0],t:0,speed:0.007+Math.random()*0.006});
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    const line=getComputedStyle(document.documentElement).getPropertyValue('--bd').trim();
+    const amber=getComputedStyle(document.documentElement).getPropertyValue('--teal').trim();
+    const gw=px(find('gw'));
+
+    ctx.save();
+    ctx.strokeStyle=line; ctx.globalAlpha=.6; ctx.setLineDash([2,4]);
+    [0.35,0.62].forEach(f=>{ctx.beginPath();ctx.arc(gw.x,gw.y,f*Math.min(W,H),0,Math.PI*2);ctx.stroke();});
+    ctx.restore();
+
+    edges.forEach(e=>{
+      const a=px(find(e[0])),b=px(find(e[1]));
+      ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);
+      ctx.strokeStyle=line;ctx.lineWidth=1;ctx.stroke();
+    });
+
+    pulses.forEach(p=>{
+      const a=px(find(p.from)),b=px(find(p.to));
+      const x=a.x+(b.x-a.x)*p.t, y=a.y+(b.y-a.y)*p.t;
+      ctx.beginPath();ctx.arc(x,y,2.4,0,Math.PI*2);
+      ctx.fillStyle=amber;ctx.shadowColor=amber;ctx.shadowBlur=7;ctx.fill();ctx.shadowBlur=0;
+    });
+
+    nodes.forEach(n=>{
+      const p=px(n);
+      const col=n.core?amber:statusColor(n.status);
+      ctx.beginPath();ctx.arc(p.x,p.y,n.r,0,Math.PI*2);
+      ctx.fillStyle=n.core?amber:'rgba(0,0,0,0)';
+      if(n.core){ctx.shadowColor=amber;ctx.shadowBlur=7;ctx.fill();ctx.shadowBlur=0;}
+      ctx.lineWidth=n.core?0:1.5;
+      if(!n.core){ctx.strokeStyle=col;ctx.stroke();}
+      ctx.fillStyle=n.core?'#0b0f0c':col;
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.font=(n.core?'700 9px ':'700 8px ')+"'JetBrains Mono',monospace";
+      if(n.core) ctx.fillText(n.label,p.x,p.y);
+      else if(H>=80){
+        if(n.y>0.5) ctx.fillText(n.label,p.x,p.y-n.r-8);
+        else ctx.fillText(n.label,p.x,p.y+n.r+10);
+      }
+    });
+  }
+
+  function frame(){
+    spawnTimer++;
+    if(spawnTimer>32){spawnTimer=0; if(pulses.length<6) spawnPulse();}
+    pulses.forEach(p=>p.t+=p.speed);
+    pulses=pulses.filter(p=>p.t<1);
+    draw();
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  window.meshSetStatus=function(svcName,active){
+    const n=nodes.find(n=>n.svc===svcName);
+    if(n) n.status=active?'on':'off';
+  };
 })();
 
 // CONFIGS MODE
@@ -2612,7 +2724,7 @@ const IFACE_HINTS = {
 };
 
 function inpStyle() {
-  return 'width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px';
+  return 'width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--bd);border-radius:2px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px';
 }
 
 function renderIfaceField(idx, fieldDef, val) {
@@ -2700,7 +2812,7 @@ function selectIface(idx) {
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
       <div style="font-size:13px;font-weight:600;color:${color}">[[ ${esc(iface.name)} ]]</div>
       <div style="display:flex;align-items:center;gap:8px">
-        <span style="font-size:11px;color:var(--mu);background:var(--bg);padding:2px 8px;border-radius:4px">${esc(type)}</span>
+        <span style="font-size:11px;color:var(--mu);background:var(--bg);padding:2px 8px;border-radius:2px">${esc(type)}</span>
         <button class="sys-btn rd" style="padding:2px 10px;font-size:11px" onclick="deleteRnsIface(${idx})">DELETE</button>
       </div>
     </div>
