@@ -60,8 +60,9 @@ _cpu_th.Thread(target=_cpu_monitor,daemon=True).start()
 traffic_history = deque(maxlen=60)
 
 def sh(cmd):
-    r = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=15)
-    return r.stdout.strip(), r.returncode
+    r = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=60)
+    out = (r.stdout + r.stderr).strip()
+    return out, r.returncode
 
 # RNode history for graphs
 from collections import deque as _dq
@@ -899,15 +900,29 @@ def chat_files_settings():
 @app.route("/api/run", methods=["POST"])
 def run_command():
     allowed = {
-        "find_ports":   "ls /dev/ttyUSB* /dev/ttyACM* 2>/dev/null || echo 'не найдено'",
-        "rnstatus":     f"{_RNS_BIN}/rnstatus",
-        "restart_rnsd": "sudo systemctl restart rnsd && sleep 2 && systemctl is-active rnsd",
-        "restart_lxmf": "sudo systemctl restart noema_lxmf_bridge && sleep 1 && systemctl is-active noema_lxmf_bridge",
-        "restart_dash": "sudo systemctl restart dashboard",
-        "free_mem":     "LC_ALL=C free -h",
-        "disk":         "df -h /",
-        "uptime":       "uptime",
-        "rns_update":   f"{_RNS_BIN}/pip install --upgrade rns && echo OK",
+        "find_ports":      "ls /dev/ttyUSB* /dev/ttyACM* 2>/dev/null || echo 'не найдено'",
+        "rnstatus":        f"{_RNS_BIN}/rnstatus",
+        "restart_rnsd":    "sudo systemctl restart rnsd && sleep 2 && systemctl is-active rnsd",
+        "restart_lxmf":    "sudo systemctl restart noema_lxmf_bridge && sleep 1 && systemctl is-active noema_lxmf_bridge",
+        "restart_dash":    "sudo systemctl restart dashboard",
+        "free_mem":        "LC_ALL=C free -h",
+        "disk":            "df -h /",
+        "uptime":          "uptime",
+        "rns_update":      f"{_RNS_BIN}/pip install --upgrade rns && echo OK",
+        "log_cleanup":     (
+            "journalctl --vacuum-size=50M 2>&1 && "
+            "rm -rf /var/log/i2pd/* && "
+            "truncate -s 0 /var/log/syslog 2>/dev/null; "
+            "truncate -s 0 /var/log/kern.log 2>/dev/null; "
+            "truncate -s 0 /var/log/dmesg 2>/dev/null; "
+            "apt clean -y 2>/dev/null; "
+            "mkdir -p /etc/systemd/journald.conf.d && "
+            "printf '[Journal]\\nSystemMaxUse=100M\\n' > /etc/systemd/journald.conf.d/size.conf && "
+            "systemctl restart systemd-journald && "
+            "mkdir -p /etc/logrotate.d && "
+            "printf '/var/log/i2pd/*.log {\\n  daily\\n  rotate 3\\n  compress\\n  missingok\\n  notifempty\\n  size 20M\\n  copytruncate\\n}\\n' > /etc/logrotate.d/i2pd && "
+            "df -h /"
+        ),
     }
     cmd_id = (request.json or {}).get("cmd", "")
     if cmd_id not in allowed:
