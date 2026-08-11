@@ -135,6 +135,13 @@ $PYTHON_BIN -m venv --system-site-packages "$INSTALL_DIR/.venv"
 source "$INSTALL_DIR/.venv/bin/activate"
 
 pip install --upgrade pip -q
+
+# On ARM without Rust compiler cbor2>=6 fails — install pure-python fallback first
+if ! pip install cbor2 -q 2>/dev/null; then
+    echo "      [INFO] cbor2 build failed (no Rust), installing pure-python fallback..."
+    pip install "cbor2<5.5" -q || true
+fi
+
 pip install \
     rns \
     lxmf \
