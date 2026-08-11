@@ -80,13 +80,35 @@ if [ -f "$I2PD_DEB" ]; then
         echo "      [WARN] i2pd service not available, skipping."
     fi
 else
-    echo "      [INFO] Bundled i2pd not found, adding official repo..."
-    wget -q -O - https://repo.i2pd.xyz/.help/add_repo | sudo bash -s - 2>/dev/null || true
-    sudo apt-get update -qq 2>/dev/null || true
-    sudo apt-get install -y i2pd 2>/dev/null || echo "      [WARN] i2pd not available via apt."
+    echo "      [INFO] Bundled i2pd not found, trying official repo..."
+    I2PD_APT_OK=0
+    if wget -q --timeout=15 -O /tmp/add_i2pd_repo.sh https://repo.i2pd.xyz/.help/add_repo 2>/dev/null; then
+        bash /tmp/add_i2pd_repo.sh 2>/dev/null || true
+        apt-get update -qq 2>/dev/null || true
+        apt-get install -y i2pd 2>/dev/null && I2PD_APT_OK=1
+    fi
+    if [ "$I2PD_APT_OK" -eq 0 ]; then
+        echo "      [INFO] APT repo unavailable, downloading from GitHub..."
+        ARCH=$(uname -m)
+        I2PD_VER="2.53.1"
+        if [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then
+            I2PD_DEB_URL="https://github.com/PurpleI2P/i2pd/releases/download/${I2PD_VER}/i2pd_${I2PD_VER}_arm64.deb"
+        elif [ "$ARCH" = "armv7l" ] || [ "$ARCH" = "armhf" ]; then
+            I2PD_DEB_URL="https://github.com/PurpleI2P/i2pd/releases/download/${I2PD_VER}/i2pd_${I2PD_VER}_armhf.deb"
+        else
+            I2PD_DEB_URL="https://github.com/PurpleI2P/i2pd/releases/download/${I2PD_VER}/i2pd_${I2PD_VER}_amd64.deb"
+        fi
+        if wget -q --timeout=60 -O /tmp/i2pd_gh.deb "$I2PD_DEB_URL" 2>/dev/null; then
+            dpkg -i /tmp/i2pd_gh.deb 2>/dev/null || apt-get install -f -y 2>/dev/null || true
+            rm -f /tmp/i2pd_gh.deb
+            echo "      i2pd installed from GitHub."
+        else
+            echo "      [WARN] i2pd not available, skipping. Install manually later."
+        fi
+    fi
     if systemctl list-unit-files i2pd.service &>/dev/null; then
-        sudo systemctl enable --now i2pd
-        echo "      i2pd installed from apt."
+        systemctl enable --now i2pd
+        echo "      i2pd service enabled."
     fi
 fi
 
