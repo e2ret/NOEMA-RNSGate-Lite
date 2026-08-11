@@ -1079,6 +1079,19 @@ def chat_files_settings():
     return jsonify({"ok": True, "max_mb": CHAT_FILES_MAX_MB})
 
 
+@app.route("/api/git_status")
+def git_status():
+    try:
+        install_dir = os.path.join(_HOME, "NOEMA-RNSGate-Lite")
+        _sp.run("git fetch origin", shell=True, cwd=install_dir, capture_output=True, timeout=10)
+        r = _sp.run("git rev-list HEAD..origin/main --count", shell=True, cwd=install_dir, capture_output=True, text=True, timeout=5)
+        behind = int(r.stdout.strip() or 0)
+        h = _sp.run("git rev-parse --short HEAD", shell=True, cwd=install_dir, capture_output=True, text=True, timeout=5)
+        commit = h.stdout.strip()
+        return jsonify({"behind": behind, "commit": commit, "update_available": behind > 0})
+    except Exception as e:
+        return jsonify({"behind": 0, "commit": "unknown", "update_available": False, "error": str(e)})
+
 @app.route("/api/run", methods=["POST"])
 def run_command():
     allowed = {
@@ -1091,6 +1104,12 @@ def run_command():
         "disk":            "df -h /",
         "uptime":          "uptime",
         "rns_update":      f"{_RNS_BIN}/pip install --upgrade rns && echo OK",
+        "noema_update":    (
+            f"cd {_HOME}/NOEMA-RNSGate-Lite && git pull 2>&1 && "
+            f"{_HOME}/NOEMA-RNSGate-Lite/.venv/bin/pip install --upgrade rns lxmf lxmfy flask paho-mqtt nomadnet -q 2>&1 && "
+            "sudo systemctl restart dashboard noema_lxmf_bridge rnsd && "
+            "sleep 3 && systemctl is-active dashboard noema_lxmf_bridge rnsd"
+        ),
         "log_cleanup":     (
             "journalctl --vacuum-size=50M 2>&1 && "
             "rm -rf /var/log/i2pd/* && "
