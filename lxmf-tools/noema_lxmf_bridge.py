@@ -41,6 +41,23 @@ TOPIC_RM_POWER = cfg("topics", "rm_power", "message/lxmf/rm_power")
 
 DISPLAY_NAME   = cfg("lxmf", "display_name", "LXMF Bridge")
 
+# ─── Telegram ────────────────────────────────────────────────────────────────
+
+TG_TOKEN       = cfg("telegram", "bot_token",  "")
+TG_CHAT_ID     = cfg("telegram", "chat_id",    "")
+TG_ENABLED     = bool(TG_TOKEN and TG_CHAT_ID)
+
+def tg_notify(text):
+    if not TG_ENABLED:
+        return
+    try:
+        import urllib.request, urllib.parse
+        url = f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage"
+        data = urllib.parse.urlencode({"chat_id": TG_CHAT_ID, "text": text, "parse_mode": "HTML"}).encode()
+        urllib.request.urlopen(url, data, timeout=10)
+    except Exception as e:
+        print(f"[TG] Error: {e}")
+
 # ─── MQTT ────────────────────────────────────────────────────────────────────
 
 _mqtt = None
@@ -164,6 +181,8 @@ def forward_to_mqtt(sender, message):
             "date_time":      time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(message.timestamp)),
             "signature_valid": 1 if message.signature_validated else 0,
         }))
+        if TG_ENABLED:
+            tg_notify(f"📨 <b>LXMF</b>\nОт: <code>{sender[:16]}</code>\n{content[:300]}")
     except Exception as e:
         print(f"[LXMF→MQTT] Error: {e}")
     return False
