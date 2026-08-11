@@ -360,7 +360,7 @@ function chatShowMessages(){
 <div class="shell">
 <div class="topbar">
   <div>
-    <div class="logo" style="display:flex;align-items:center;gap:10px"><img src="logo.png" style="height:28px;width:28px;object-fit:contain;border-radius:2px;border:1px solid var(--bd)"><b>NOEMA <span style="color:var(--teal)">RNSGATE</span> · LITE</b><span id="update-badge" style="display:none;background:var(--am);color:#000;font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;cursor:pointer;letter-spacing:0.5px" onclick="if(confirm('Update NOEMA from GitHub and restart services?'))runCmd('noema_update')">⬆ UPDATE</span></div>
+    <div class="logo" style="display:flex;align-items:center;gap:10px"><img src="logo.png" style="height:28px;width:28px;object-fit:contain;border-radius:2px;border:1px solid var(--bd)"><b>NOEMA <span style="color:var(--teal)">RNSGATE</span> · LITE</b></div>
     <div style="display:flex;flex-wrap:wrap;gap:2px 10px;margin-top:4px">
       <div class="skel" style="font-size:10px;color:var(--mu);font-family:var(--mono)" id="uptime-lbl">—</div>
       <div class="skel" style="font-size:10px;color:var(--mu);font-family:var(--mono)" id="rns-ver-lbl">—</div>
@@ -1037,6 +1037,33 @@ function chatShowMessages(){
         <div id="chat-settings-status" style="margin-top:8px;font-size:11px;color:var(--teal);display:none"></div>
       </div>
 
+      <div class="section-lbl">Telegram Notifications</div>
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:2px;padding:14px;margin-bottom:12px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+          <div>
+            <div style="font-size:11px;color:var(--mu);margin-bottom:4px">Bot Token</div>
+            <input id="tg-token" type="password" placeholder="123456:ABC-..." style="width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px;box-sizing:border-box">
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--mu);margin-bottom:4px">Chat ID</div>
+            <input id="tg-chatid" placeholder="-100123456789" style="width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px;box-sizing:border-box">
+          </div>
+        </div>
+        <div style="display:flex;gap:16px;margin-bottom:10px;flex-wrap:wrap">
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--tx);cursor:pointer">
+            <input type="checkbox" id="tg-notify-bridge" checked> LXMF Bridge messages
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--tx);cursor:pointer">
+            <input type="checkbox" id="tg-notify-chat" checked> Chat messages
+          </label>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="sys-btn teal" onclick="saveTgSettings()">Save</button>
+          <button class="sys-btn" onclick="testTgNotify()">Test</button>
+          <span id="tg-status" style="font-size:11px;color:var(--teal);display:none"></span>
+        </div>
+      </div>
+
       <div class="section-lbl">Versions</div>
       <div style="background:var(--s2);border:1px solid var(--bd);border-radius:2px;padding:14px;margin-bottom:12px">
         <table style="width:100%;border-collapse:collapse;font-family:var(--fn);font-size:12px">
@@ -1161,7 +1188,7 @@ function nav(id,el){
   if(id==="nodes_monitor") loadNodesMonitor();
   if(id==="rnode") loadRnodePanel();
   if(id==="i2p") loadI2pStatus();
-  if(id==="system"){ loadSystem(); loadSystemFiles(); }
+  if(id==="system"){ loadSystem(); loadSystemFiles(); loadTgSettings(); }
   if(id==="rmap") loadRmapNodes();
 }
 
@@ -1905,6 +1932,49 @@ function renderChatMsgs(msgs){
   box.scrollTop = box.scrollHeight;
 }
 
+async function loadTgSettings(){
+  try{
+    const d = await fetch(API+"/api/telegram/settings").then(r=>r.json());
+    if(d.bot_token) document.getElementById("tg-token").value = d.bot_token;
+    if(d.chat_id)   document.getElementById("tg-chatid").value = d.chat_id;
+    if(document.getElementById("tg-notify-bridge")) document.getElementById("tg-notify-bridge").checked = d.notify_bridge !== false;
+    if(document.getElementById("tg-notify-chat"))   document.getElementById("tg-notify-chat").checked   = d.notify_chat   !== false;
+    const st = document.getElementById("tg-status");
+    if(d.enabled){ st.textContent="✅ Enabled"; st.style.display="inline"; }
+  }catch(e){}
+}
+
+async function saveTgSettings(){
+  const token  = document.getElementById("tg-token").value.trim();
+  const chatid = document.getElementById("tg-chatid").value.trim();
+  const st = document.getElementById("tg-status");
+  try{
+    const notify_bridge = document.getElementById("tg-notify-bridge")?.checked ?? true;
+    const notify_chat   = document.getElementById("tg-notify-chat")?.checked ?? true;
+    const r = await fetch(API+"/api/telegram/settings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({bot_token:token,chat_id:chatid,notify_bridge,notify_chat})});
+    const d = await r.json();
+    if(d.ok){ st.textContent="✅ Saved"; st.style.color="var(--teal)"; }
+    else { st.textContent="❌ Error"; st.style.color="var(--rd)"; }
+    st.style.display="inline";
+    setTimeout(()=>st.style.display="none", 3000);
+  }catch(e){ st.textContent="❌ Error"; st.style.display="inline"; }
+}
+
+async function testTgNotify(){
+  const st = document.getElementById("tg-status");
+  try{
+    const token  = document.getElementById("tg-token").value.trim();
+    const chatid = document.getElementById("tg-chatid").value.trim();
+    const url = `https://api.telegram.org/bot${token}/sendMessage`;
+    const r = await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({chat_id:chatid,text:"🔔 NOEMA RNSGate — тест уведомления"})});
+    const d = await r.json();
+    if(d.ok){ st.textContent="✅ Sent"; st.style.color="var(--teal)"; }
+    else { st.textContent="❌ "+d.description; st.style.color="var(--rd)"; }
+    st.style.display="inline";
+    setTimeout(()=>st.style.display="none", 4000);
+  }catch(e){ st.textContent="❌ Error"; st.style.display="inline"; }
+}
+
 function chatSoundRestore(){
   const type = localStorage.getItem("noema_sound_type");
   const vol  = localStorage.getItem("noema_sound_vol");
@@ -1965,20 +2035,6 @@ function chatPushNotify(name, text){
   } else if(Notification.permission !== "denied"){
     Notification.requestPermission();
   }
-}
-
-async function checkGitUpdate(){
-  try{
-    const d = await fetch(API+"/api/git_status").then(r=>r.json());
-    const badge = document.getElementById("update-badge");
-    if(!badge) return;
-    if(d.update_available){
-      badge.style.display = "inline";
-      badge.title = d.behind + " commit(s) behind";
-    } else {
-      badge.style.display = "none";
-    }
-  }catch(e){}
 }
 
 async function pollChatIncoming(){
@@ -2781,6 +2837,7 @@ async function nnAction(action){
 // Init
 loadSystem();
 chatSoundRestore();
+if(document.getElementById("tg-token")) loadTgSettings();
 loadServices();
 checkMqttStatus();
 loadAddresses();
@@ -2802,8 +2859,6 @@ setInterval(pollLxmf,3000);
 setInterval(updateTopology,10000);
 updateTopology();
 setInterval(pollChatIncoming,5000);
-setInterval(checkGitUpdate,300000);
-checkGitUpdate();
 if("Notification" in window && Notification.permission === "default"){ Notification.requestPermission(); }
 // Load contacts and initialize chatLastTs from history at startup
 fetch(API+"/api/chat/contacts").then(r=>r.json()).then(async d=>{

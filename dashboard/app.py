@@ -758,6 +758,12 @@ def _chat_on_receive(message):
 
         _save_chat_msg(src, msg)
         _chat_incoming.append(msg)
+        # Telegram notification for chat messages
+        try:
+            name = msg.get("from_name") or src[:16]
+            text = msg.get("text","")[:200]
+            _tg_send(f"💬 <b>NOEMA Chat</b>\nОт: <code>{name}</code>\n{text}")
+        except: pass
     except: pass
 
 def _load_chat_history(addr):
@@ -1078,6 +1084,51 @@ def chat_files_settings():
         CHAT_FILES_MAX_MB = int(data["max_mb"])
     return jsonify({"ok": True, "max_mb": CHAT_FILES_MAX_MB})
 
+
+def _tg_send(text):
+    """Send Telegram notification using settings from bridge.cfg"""
+    try:
+        import configparser as _cp2, urllib.request as _ur, urllib.parse as _up
+        _c = _cp2.ConfigParser()
+        _c.read("/etc/noema/bridge.cfg")
+        if not _c.has_section("telegram"):
+            return
+        token   = _c["telegram"].get("bot_token","").strip()
+        chat_id = _c["telegram"].get("chat_id","").strip()
+        notify_chat = _c["telegram"].get("notify_chat","1").strip()
+        if not token or not chat_id or notify_chat == "0":
+            return
+        url  = f"https://api.telegram.org/bot{token}/sendMessage"
+        data = _up.urlencode({"chat_id": chat_id, "text": text, "parse_mode": "HTML"}).encode()
+        _ur.urlopen(url, data, timeout=8)
+    except Exception as e:
+        print(f"[TG] Error: {e}")
+
+@app.route("/api/telegram/settings", methods=["GET","POST"])
+def telegram_settings():
+    import configparser as _cp
+    cfg_path = "/etc/noema/bridge.cfg"
+    parser = _cp.ConfigParser()
+    parser.read(cfg_path)
+    if request.method == "POST":
+        data = request.json or {}
+        if not parser.has_section("telegram"):
+            parser.add_section("telegram")
+        parser.set("telegram", "bot_token",    data.get("bot_token",""))
+        parser.set("telegram", "chat_id",      data.get("chat_id",""))
+        parser.set("telegram", "notify_bridge","1" if data.get("notify_bridge",True) else "0")
+        parser.set("telegram", "notify_chat",  "1" if data.get("notify_chat",True)   else "0")
+        with open(cfg_path, "w") as f:
+            parser.write(f)
+        import subprocess as _sp2
+        _sp2.run("systemctl restart noema_lxmf_bridge", shell=True)
+        return jsonify({"ok": True})
+    token   = parser.get("telegram","bot_token","") if parser.has_section("telegram") else ""
+    chat_id = parser.get("telegram","chat_id","")   if parser.has_section("telegram") else ""
+    notify_bridge = parser.get("telegram","notify_bridge","1") if parser.has_section("telegram") else "1"
+    notify_chat   = parser.get("telegram","notify_chat","1")   if parser.has_section("telegram") else "1"
+    return jsonify({"bot_token": token, "chat_id": chat_id, "enabled": bool(token and chat_id),
+                    "notify_bridge": notify_bridge=="1", "notify_chat": notify_chat=="1"})
 
 @app.route("/api/git_status")
 def git_status():
