@@ -1,8 +1,4 @@
-# NOEMA RNSGate Lite — LoRa · MQTT · I2P · Nomadnet
-
-<p align="left">
-  <img src="https://github.com/e2ret/NOEMA-RNSGate-Lite/blob/main/001.png" width="800" alt="NOEMA RNSGate Lite">
-</p>
+# NOEMA RNSGate Lite
 
 **Reticulum Mesh Gateway** — лёгкий шлюз для сети Reticulum, объединяющий радиосвязь LoRa, LXMF мессенджер, MQTT-интеграцию с Home Assistant, анонимную сеть I2P, Nomadnet и современный веб-интерфейс управления.
 
