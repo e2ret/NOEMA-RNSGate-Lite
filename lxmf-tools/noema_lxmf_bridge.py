@@ -182,7 +182,7 @@ def forward_to_mqtt(sender, message):
             "signature_valid": 1 if message.signature_validated else 0,
         }))
         if TG_ENABLED:
-            notify_bridge = _cfg.get("telegram","notify_bridge","1").strip() if _cfg.has_section("telegram") else "1"
+            notify_bridge = _cfg["telegram"].get("notify_bridge","1").strip() if _cfg.has_section("telegram") else "1"
             if notify_bridge != "0":
                 tg_notify(f"📨 <b>LXMF Bridge</b>\nОт: <code>{sender[:16]}</code>\n{content[:300]}")
     except Exception as e:
