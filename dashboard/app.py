@@ -1114,8 +1114,11 @@ def telegram_settings():
         data = request.json or {}
         if not parser.has_section("telegram"):
             parser.add_section("telegram")
-        parser.set("telegram", "bot_token",    data.get("bot_token",""))
-        parser.set("telegram", "chat_id",      data.get("chat_id",""))
+        # Don't overwrite token/chat_id if not provided
+        if data.get("bot_token","").strip():
+            parser.set("telegram", "bot_token", data["bot_token"].strip())
+        if data.get("chat_id","").strip():
+            parser.set("telegram", "chat_id", data["chat_id"].strip())
         parser.set("telegram", "notify_bridge","1" if data.get("notify_bridge",True) else "0")
         parser.set("telegram", "notify_chat",  "1" if data.get("notify_chat",True)   else "0")
         with open(cfg_path, "w") as f:
