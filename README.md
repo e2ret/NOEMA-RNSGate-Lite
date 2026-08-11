@@ -49,6 +49,10 @@ git clone https://github.com/e2ret/NOEMA-RNSGate-Lite.git && cd NOEMA-RNSGate-Li
 
 **[→ Полная документация в Wiki](https://github.com/e2ret/NOEMA-RNSGate-Lite/wiki)**
 
+## Обсуждение
+
+[→ Telegram](https://t.me/reticulum_belgorod/70)
+
 ---
 
 ## Используемые компоненты
