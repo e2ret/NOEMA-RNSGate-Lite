@@ -332,6 +332,28 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 1px var(--
 .mesh-caption{position:absolute;top:6px;left:24px;font-size:9px;letter-spacing:.18em;color:var(--mu);font-family:var(--mono);text-transform:uppercase;pointer-events:none}
 @media(max-width:768px){.mesh-canvas{height:64px}.mesh-caption{display:none}}
 </style>
+
+<style>
+@media(max-width:600px){
+  #chat-grid{ grid-template-columns:1fr !important; }
+  #chat-contacts-pane{ display:flex; }
+  #chat-msgs-pane{ display:none; }
+  #chat-back-btn{ display:block !important; }
+}
+</style>
+<script>
+function chatIsMobile(){ return window.innerWidth<=600; }
+function chatShowContacts(){
+  if(!chatIsMobile()) return;
+  document.getElementById("chat-contacts-pane").style.display="flex";
+  document.getElementById("chat-msgs-pane").style.display="none";
+}
+function chatShowMessages(){
+  if(!chatIsMobile()) return;
+  document.getElementById("chat-contacts-pane").style.display="none";
+  document.getElementById("chat-msgs-pane").style.display="flex";
+}
+</script>
 </head>
 <body>
 <canvas id="bg-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none"></canvas>
@@ -375,6 +397,7 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 1px var(--
     <div class="nav-item"       onclick="nav('rmap',this);loadNodesMonitor();"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="2.3"/><circle cx="18" cy="6" r="2.3"/><circle cx="18" cy="18" r="2.3"/><line x1="8.1" y1="10.9" x2="15.9" y2="7.1"/><line x1="8.1" y1="13.1" x2="15.9" y2="16.9"/></svg><span>Network</span></div>
     <div class="nav-item"       onclick="nav('i2p',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6l7-3Z"/></svg><span>I2P</span></div>
     <div class="nav-item"       onclick="nav('nomadnet',this);loadNomadnet();"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15 9l-2 6-6 2 2-6 6-2Z"/></svg><span>Nomadnet</span></div>
+    <div class="nav-item"       onclick="nav('chat',this);loadChatPanel();" style="position:relative"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Chat</span><span id="chat-badge" style="display:none;position:absolute;top:2px;right:2px;background:#f87171;color:#fff;border-radius:8px;padding:1px 5px;font-size:9px;font-weight:700"></span></div>
     <div class="nav-sep"></div>
     <div class="nav-item"       onclick="nav('logs',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9l3 3-3 3"/><line x1="12" y1="15" x2="17" y2="15"/></svg><span>Logs</span></div>
     <div class="nav-item"       onclick="nav('system',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/><rect x="10" y="10" width="4" height="4"/><line x1="9" y1="2" x2="9" y2="6"/><line x1="15" y1="2" x2="15" y2="6"/><line x1="9" y1="18" x2="9" y2="22"/><line x1="15" y1="18" x2="15" y2="22"/><line x1="2" y1="9" x2="6" y2="9"/><line x1="2" y1="15" x2="6" y2="15"/><line x1="18" y1="9" x2="22" y2="9"/><line x1="18" y1="15" x2="22" y2="15"/></svg><span>System</span></div>
@@ -702,6 +725,14 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 1px var(--
         <button class="sys-btn teal" onclick="apCopy('ap-nn-chat')">COPY</button>
       </div>
 
+      <!-- NOEMA Chat -->
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:2px;padding:14px 16px">
+        <div style="font-size:11px;color:var(--mu);margin-bottom:4px">💬 NOEMA Chat</div>
+        <div style="font-size:10px;color:var(--mu);margin-bottom:6px">LXMF address of the gateway chat. Add to Sideband or CrossTalk to message the gateway directly.</div>
+        <div id="ap-chat-addr" style="font-family:var(--fn);font-size:12px;color:var(--teal);word-break:break-all;margin-bottom:8px">—</div>
+        <button class="sys-btn teal" onclick="apCopy('ap-chat-addr')">COPY</button>
+      </div>
+
       </div>
       <div id="ap-toast" style="display:none;color:var(--gr);font-size:12px;margin-top:8px">✓ Copied</div>
     </div>
@@ -718,6 +749,48 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 1px var(--
         document.getElementById("rbrowser-frame").src = _rbHost;
         document.getElementById("rbrowser-link").href = _rbHost;
       </script>
+    </div>
+
+    <!-- CHAT -->
+    <div class="panel" id="panel-chat">
+      <div id="chat-grid" style="display:grid;grid-template-columns:220px 1fr;flex:1;border:1px solid var(--bd);border-radius:8px;overflow:hidden;min-height:0">
+        <!-- Contacts list -->
+        <div id="chat-contacts-pane" style="border-right:1px solid var(--bd);display:flex;flex-direction:column">
+          <div style="padding:10px 12px;border-bottom:1px solid var(--bd);display:flex;gap:6px;align-items:center">
+            <input id="chat-new-addr" placeholder="LXMF address..." style="flex:1;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:11px;padding:5px 8px">
+            <button class="sys-btn teal" style="padding:4px 8px;font-size:11px" onclick="chatAddContact()">+</button>
+          </div>
+          <div id="chat-contacts-list" style="flex:1;overflow-y:auto"></div>
+          <div style="padding:8px 12px;border-top:1px solid var(--bd);font-size:10px;color:var(--mu);font-family:var(--fn)" id="chat-my-addr">My address: —</div>
+        </div>
+        <!-- Messages -->
+        <div id="chat-msgs-pane" style="display:flex;flex-direction:column;min-height:0">
+          <div style="padding:8px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between">
+            <button id="chat-back-btn" onclick="chatShowContacts()" style="display:none;background:none;border:none;color:var(--teal);font-size:18px;cursor:pointer;padding:0 8px 0 0;line-height:1">‹</button>
+            <div>
+              <div style="display:flex;align-items:center;gap:6px">
+                <div id="chat-peer-name" style="font-size:13px;font-weight:600;color:var(--tx)">—</div>
+                <button id="chat-rename-btn" class="sys-btn" style="display:none;padding:2px 8px;font-size:11px" onclick="chatRenameContact()">✏</button>
+              </div>
+              <div id="chat-peer-addr" style="font-size:10px;color:var(--mu);font-family:var(--fn)"></div>
+            </div>
+            <button id="chat-remove-btn" class="sys-btn rd" style="display:none;padding:2px 8px;font-size:11px" onclick="chatRemoveContact()">Remove</button>
+          </div>
+          <div id="chat-messages" style="flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:6px" ondragover="event.preventDefault();this.style.outline='2px dashed var(--teal)'" ondragleave="this.style.outline=''" ondrop="this.style.outline='';if(event.dataTransfer.files[0]){const fi=document.getElementById('chat-file-input');const dt=new DataTransfer();dt.items.add(event.dataTransfer.files[0]);fi.files=dt.files;uploadChatFile(fi);}">
+            <div style="color:var(--mu);font-size:12px;text-align:center;margin-top:40px">Select a contact</div>
+          </div>
+          <div id="chat-file-preview" style="display:none;padding:6px 12px;background:var(--s3);border-top:1px solid var(--bd);align-items:center;gap:8px">
+            <span id="chat-file-preview-name" style="font-size:11px;color:var(--teal);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+            <button onclick="chatCancelFile()" style="background:none;border:none;color:var(--rd);cursor:pointer;font-size:14px;padding:0 4px">✕</button>
+          </div>
+          <div style="padding:10px 12px;border-top:1px solid var(--bd);display:flex;gap:6px;align-items:center">
+            <input type="file" id="chat-file-input" style="display:none" onchange="uploadChatFile(this)">
+            <button class="sys-btn" onclick="document.getElementById('chat-file-input').click()" title="Attach file" style="padding:5px 9px;font-size:14px">📎</button>
+            <input id="chat-input" placeholder="Message..." style="flex:1;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:6px 10px" onkeydown="if(event.key==='Enter')sendChatMsg()">
+            <button class="sys-btn teal" onclick="sendChatMsg()">Send</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- LOGS -->
@@ -922,6 +995,47 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 1px var(--
         <div id="cmd-output" style="font-family:var(--fn);font-size:11px;color:var(--teal);background:var(--bg);border-radius:2px;padding:8px 10px;min-height:32px;white-space:pre-wrap;display:none"></div>
       </div>
 
+      <div class="section-lbl">Chat Settings</div>
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:14px;margin-bottom:16px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+          <div>
+            <div style="font-size:11px;color:var(--mu);margin-bottom:4px">Max messages per contact</div>
+            <input id="chat-limit-msgs" type="number" value="200" min="10" max="2000" style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px">
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--mu);margin-bottom:4px">Max files folder size (MB)</div>
+            <input id="chat-limit-files" type="number" value="50" min="10" max="500" style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px">
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="sys-btn teal" onclick="saveChatSettings()">Save limits</button>
+          <button class="sys-btn am" onclick="chatCleanupFiles()">Clean files now</button>
+          <button class="sys-btn rd" onclick="chatClearAll()">Clear all history</button>
+        </div>
+        <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;align-items:end">
+          <div>
+            <div style="font-size:11px;color:var(--mu);margin-bottom:4px">Notification sound</div>
+            <select id="chat-sound-type" onchange="chatPreviewSound();localStorage.setItem('noema_sound_type',this.value)" style="width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px">
+              <option value="default">Default (ping)</option>
+              <option value="double">Double beep</option>
+              <option value="high">High tone</option>
+              <option value="low">Low tone</option>
+              <option value="bell">Bell</option>
+              <option value="off">Off</option>
+            </select>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--mu);margin-bottom:4px">Volume</div>
+            <input id="chat-sound-vol" type="range" min="0" max="1" step="0.05" value="0.35" oninput="document.getElementById('chat-sound-pct').textContent=Math.round(this.value*100)+'%';localStorage.setItem('noema_sound_vol',this.value)" style="width:100%;accent-color:var(--teal)">
+            <span id="chat-sound-pct" style="font-size:10px;color:var(--mu)">35%</span>
+          </div>
+          <div>
+            <button class="sys-btn" onclick="chatPreviewSound()" style="width:100%">&#9654; Test</button>
+          </div>
+        </div>
+        <div id="chat-settings-status" style="margin-top:8px;font-size:11px;color:var(--teal);display:none"></div>
+      </div>
+
       <div class="section-lbl">Versions</div>
       <div style="background:var(--s2);border:1px solid var(--bd);border-radius:2px;padding:14px;margin-bottom:12px">
         <table style="width:100%;border-collapse:collapse;font-family:var(--fn);font-size:12px">
@@ -1038,7 +1152,7 @@ function nav(id,el){
   const main = document.querySelector(".main");
   if(id==="rbrowser"){ main.style.overflow="hidden"; main.style.padding="0"; }
   else { main.style.overflow=""; main.style.padding=""; }
-  if(id==="chat") loadChat();
+  if(id==="chat") loadChatPanel();
   if(id==="monitor"){ loadLxmf(); loadRns(); }
   if(id==="system") checkRnsVersion();
   if(id==="configs") loadConfigs();
@@ -1078,15 +1192,17 @@ async function loadSystem(){
   document.getElementById("ip-lbl").textContent=d.ip;
   const cpu=d.cpu||0, ram=d.ram_total?Math.round(d.ram_used/d.ram_total*100):0;
   const disk=d.disk_total?Math.round(d.disk_used/d.disk_total*100):0;
-  document.getElementById("m-cpu").textContent=Math.round(cpu)+"%";
-  document.getElementById("pb-cpu").style.width=cpu+"%";
-  document.getElementById("m-ram").textContent=ram+"%";
-  document.getElementById("pb-ram").style.width=ram+"%";
-  document.getElementById("m-disk").textContent=disk+"%";
-  document.getElementById("pb-disk").style.width=disk+"%";
-  document.getElementById("m-temp").textContent=d.temp+"°C";
+  const setBar = (pbId, valId, pct, val, warn, danger) => {
+    const pb = document.getElementById(pbId);
+    const vm = document.getElementById(valId);
+    if(pb){ pb.style.width=pct+"%"; pb.className="pbf"+(pct>=danger?" r":pct>=warn?" a":""); }
+    if(vm){ vm.className="vl"+(pct>=danger?" rd":pct>=warn?" am":""); if(val!==undefined) vm.textContent=val; }
+  };
+  setBar("pb-cpu",  "m-cpu",  Math.round(cpu),  Math.round(cpu)+"%",  60, 85);
+  setBar("pb-ram",  "m-ram",  ram,               ram+"%",              70, 85);
+  setBar("pb-disk", "m-disk", disk,              disk+"%",             75, 90);
   const tempPct = Math.min(Math.max((d.temp||0)/100*100, 0), 100);
-  const pbTemp = document.getElementById("pb-temp"); if(pbTemp) pbTemp.style.width=tempPct+"%";
+  setBar("pb-temp", "m-temp", tempPct, d.temp+"°C", 50, 70);
   const _si=document.getElementById("sys-info"); if(_si) _si.innerHTML=
     `IP: ${esc(d.ip)}<br>Uptime: ${esc(d.uptime)}<br>RNS: ${esc(d.rns_version)}<br>Python: ${esc(d.py_version)}<br>CPU: ${cpu}%<br>RAM: ${d.ram_used}/${d.ram_total} MB<br>Disk: ${d.disk_used}/${d.disk_total} MB`;
   // home sys
@@ -1145,6 +1261,42 @@ async function restartAll(){
 function showBackupModal(){const m=document.getElementById("backup-modal");m.style.display="flex";}
 function showRestoreModal(){const m=document.getElementById("restore-modal");m.style.display="flex";}
 function showResetModal(){const m=document.getElementById("reset-modal");m.style.display="flex";}
+async function saveChatSettings(){
+  const msgs = parseInt(document.getElementById("chat-limit-msgs").value)||200;
+  const files = parseInt(document.getElementById("chat-limit-files").value)||50;
+  const st = document.getElementById("chat-settings-status");
+  try{
+    await fetch(API+"/api/chat/settings", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({max_msgs:msgs, max_files_mb:files})});
+    st.textContent = "Saved"; st.style.display="block";
+    setTimeout(()=>st.style.display="none", 2000);
+  }catch(e){ st.textContent="Error"; st.style.display="block"; }
+}
+
+async function chatCleanupFiles(){
+  const files = parseInt(document.getElementById("chat-limit-files").value)||50;
+  const st = document.getElementById("chat-settings-status");
+  try{
+    const r = await fetch(API+"/api/chat/cleanup", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({max_files_mb:files})});
+    const d = await r.json();
+    st.textContent = d.freed ? "Freed: "+Math.round(d.freed/1024/1024*10)/10+" MB" : "Done";
+    st.style.display="block";
+    setTimeout(()=>st.style.display="none", 3000);
+  }catch(e){ st.textContent="Error"; st.style.display="block"; }
+}
+
+async function chatClearAll(){
+  if(!confirm("Clear ALL chat history and files?")) return;
+  const st = document.getElementById("chat-settings-status");
+  try{
+    await fetch(API+"/api/chat/history/clear", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({days:0})});
+    await fetch(API+"/api/chat/cleanup", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({max_files_mb:0})});
+    st.textContent = "Cleared"; st.style.display="block";
+    setTimeout(()=>st.style.display="none", 2000);
+    // Refresh chat UI
+    if(chatCurrentAddr) renderChatMsgs([]);
+  }catch(e){ st.textContent="Error"; st.style.display="block"; }
+}
+
 async function doResetIdentity(){
   const st=document.getElementById("reset-status");
   st.textContent="Resetting...";
@@ -1604,6 +1756,75 @@ function refreshAll(){
 }
 
 // CHAT
+async function chatRenameContact(){
+  const current = document.getElementById("chat-peer-name").textContent;
+  const newName = prompt("New name:", current);
+  if(!newName || newName===current) return;
+  const c = chatContacts.find(c=>c.addr===chatCurrentAddr);
+  if(c){ c.name = newName; }
+  await fetch(API+"/api/chat/contacts", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(chatContacts)});
+  document.getElementById("chat-peer-name").textContent = newName;
+  renderChatContacts();
+}
+
+async function chatRemoveContact(){
+  if(!chatCurrentAddr) return;
+  const addr = chatCurrentAddr;
+  chatContacts = chatContacts.filter(c=>c.addr!==addr);
+  await fetch(API+"/api/chat/contacts", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(chatContacts)});
+  await fetch(API+"/api/chat/history/"+addr+"/delete", {method:"POST"});
+  chatCurrentAddr = null;
+  document.getElementById("chat-peer-name").textContent = "—";
+  document.getElementById("chat-peer-addr").textContent = "";
+  document.getElementById("chat-remove-btn").style.display = "none";
+  document.getElementById("chat-rename-btn").style.display = "none";
+  document.getElementById("chat-messages").innerHTML = '<div style="color:var(--mu);font-size:12px;text-align:center;margin-top:40px">Select a contact</div>';
+  renderChatContacts();
+}
+
+async function loadChatPanel(){
+  try{
+    const r = await fetch(API+"/api/chat/address");
+    const d = await r.json();
+    const el = document.getElementById("chat-my-addr");
+    if(el) el.textContent = "My address: " + (d.address||"—");
+  }catch(e){}
+  await loadChatContacts();
+}
+
+async function loadChatContacts(){
+  try{
+    const r = await fetch(API+"/api/chat/contacts");
+    chatContacts = await r.json();
+    renderChatContacts();
+  }catch(e){}
+}
+
+async function chatAddContact(){
+  const addr = (document.getElementById("chat-new-addr").value||"").trim();
+  if(!addr) return;
+  if(!Array.isArray(chatContacts)) chatContacts = [];
+  if(!chatContacts.find(c=>c.addr===addr)){
+    chatContacts.push({addr, name:addr.slice(0,8)});
+    await fetch(API+"/api/chat/contacts", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(chatContacts)});
+    renderChatContacts();
+  }
+  document.getElementById("chat-new-addr").value = "";
+}
+
+async function chatSend(){
+  if(!chatCurrentAddr) return;
+  const input = document.getElementById("chat-input");
+  const text = (input.value||"").trim();
+  if(!text) return;
+  input.value = "";
+  try{
+    await fetch(API+"/api/chat/send", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({to:chatCurrentAddr, text})});
+    const r = await fetch(API+"/api/chat/history/"+chatCurrentAddr);
+    renderChatMsgs(await r.json());
+  }catch(e){}
+}
+
 let chatCurrentAddr = null;
 let chatContacts = [];
 let chatPollTimer = null;
@@ -1643,9 +1864,11 @@ function renderChatContacts(){
 async function openChat(addr, name){
   chatCurrentAddr = addr;
   clearUnread(addr);
+  chatShowMessages();
   document.getElementById("chat-peer-name").textContent = name || addr.slice(0,16)+"…";
   document.getElementById("chat-peer-addr").textContent = addr;
   document.getElementById("chat-remove-btn").style.display = "block";
+  document.getElementById("chat-rename-btn").style.display = "block";
   renderChatContacts();
   const r = await fetch(API+"/api/chat/history/"+addr);
   const msgs = await r.json();
@@ -1656,7 +1879,7 @@ async function openChat(addr, name){
 function renderChatMsgs(msgs){
   const box = document.getElementById("chat-messages");
   if(!box) return;
-  box.innerHTML = msgs.map(m => {
+  box.innerHTML = msgs.filter(m => m.text || m.file_id).map(m => {
     const isOut = m.direction==="out";
     const time = new Date(m.ts*1000).toLocaleTimeString("ru",{hour:"2-digit",minute:"2-digit"});
     let body = "";
@@ -1681,6 +1904,68 @@ function renderChatMsgs(msgs){
   box.scrollTop = box.scrollHeight;
 }
 
+function chatSoundRestore(){
+  const type = localStorage.getItem("noema_sound_type");
+  const vol  = localStorage.getItem("noema_sound_vol");
+  const sel  = document.getElementById("chat-sound-type");
+  const rng  = document.getElementById("chat-sound-vol");
+  const pct  = document.getElementById("chat-sound-pct");
+  if(sel && type) sel.value = type;
+  if(rng && vol){ rng.value = vol; if(pct) pct.textContent = Math.round(vol*100)+"%"; }
+}
+
+function chatPlaySound(){
+  const type = (document.getElementById("chat-sound-type")||{value:"default"}).value;
+  if(type==="off") return;
+  const vol = parseFloat((document.getElementById("chat-sound-vol")||{value:"0.35"}).value)||0.35;
+  try{
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const g = ctx.createGain();
+    g.connect(ctx.destination);
+    const play = (freq, start, dur, fEnd) => {
+      const o = ctx.createOscillator();
+      o.connect(g);
+      o.type = "sine";
+      o.frequency.setValueAtTime(freq, ctx.currentTime+start);
+      if(fEnd) o.frequency.exponentialRampToValueAtTime(fEnd, ctx.currentTime+start+dur);
+      g.gain.setValueAtTime(vol, ctx.currentTime+start);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+start+dur);
+      o.start(ctx.currentTime+start);
+      o.stop(ctx.currentTime+start+dur);
+    };
+    if(type==="default"){ play(880,0,0.22,440); }
+    else if(type==="double"){ play(880,0,0.1,880); play(880,0.15,0.1,880); }
+    else if(type==="high"){ play(1400,0,0.18,1200); }
+    else if(type==="low"){ play(440,0,0.25,220); }
+    else if(type==="bell"){
+      const o=ctx.createOscillator(); o.connect(g);
+      o.type="sine"; o.frequency.setValueAtTime(1046,ctx.currentTime);
+      g.gain.setValueAtTime(vol,ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.6);
+      o.start(ctx.currentTime); o.stop(ctx.currentTime+0.6);
+    }
+  }catch(e){}
+}
+
+function chatPreviewSound(){
+  chatPlaySound();
+}
+
+function chatPushNotify(name, text){
+  if(!("Notification" in window)) return;
+  if(Notification.permission === "granted"){
+    const n = new Notification("💬 NOEMA Chat", {
+      body: name + ": " + (text||"").slice(0,80),
+      icon: "/logo.png",
+      tag: "noema-chat",
+      renotify: true
+    });
+    setTimeout(()=>n.close(), 5000);
+  } else if(Notification.permission !== "denied"){
+    Notification.requestPermission();
+  }
+}
+
 async function pollChatIncoming(){
   try{
     // Load contacts if not yet loaded
@@ -1699,14 +1984,18 @@ async function pollChatIncoming(){
         await fetch(API+"/api/chat/contacts",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(chatContacts)});
         renderChatContacts();
       }
+      const name = chatContacts.find(c=>c.addr===addr)?.name||addr.slice(0,8);
+      const text = msgs.find(m=>m.from===addr)?.text||"";
+      chatPlaySound();
+      chatPushNotify(name, text);
       if(addr===chatCurrentAddr){
         const r2 = await fetch(API+"/api/chat/history/"+addr);
         const all = await r2.json();
         renderChatMsgs(all);
+        toast("💬 "+name+": "+text.slice(0,30));
       } else {
-        const name = chatContacts.find(c=>c.addr===addr)?.name||addr.slice(0,8);
-        toast("💬 "+name+": "+msgs.find(m=>m.from===addr)?.text?.slice(0,30));
-        if(addr!==chatCurrentAddr){ addUnread(msgs.filter(m=>m.from===addr).length, addr); } else { clearUnread(addr); }
+        toast("💬 "+name+": "+text.slice(0,30));
+        addUnread(msgs.filter(m=>m.from===addr).length, addr);
       }
     }
   }catch(e){}
@@ -1726,11 +2015,20 @@ async function uploadChatFile(input){
     const d = await r.json();
     if(!d.ok){ toast("Upload error",false); return; }
     chatPendingFile = d;
-    const inp = document.getElementById("chat-input");
-    inp.placeholder = "📎 " + d.name + " — write signature и click ▶";
-    inp.focus();
-    toast("File ready — write signature и send");
+    const prev = document.getElementById("chat-file-preview");
+    const prevName = document.getElementById("chat-file-preview-name");
+    if(prev && prevName){ prevName.textContent = "📎 " + d.name; prev.style.display="flex"; }
+    document.getElementById("chat-input").focus();
+    toast("File attached — add text or send");
   }catch(e){ toast("Error: "+e, false); }
+}
+
+function chatCancelFile(){
+  chatPendingFile = null;
+  const prev = document.getElementById("chat-file-preview");
+  if(prev) prev.style.display="none";
+  const fi = document.getElementById("chat-file-input");
+  if(fi) fi.value="";
 }
 
 async function renameChatContact(){
@@ -1765,6 +2063,8 @@ async function sendChatMsg(){
     payload.file_size = chatPendingFile.size;
     payload.file_mime = chatPendingFile.mime;
     chatPendingFile = null;
+    const prev = document.getElementById("chat-file-preview");
+    if(prev) prev.style.display="none";
   }
   const r = await fetch(API+"/api/chat/send",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
   const d = await r.json();
@@ -1791,8 +2091,10 @@ async function addChatContact(){
 
 async function removeChatContact(){
   if(!chatCurrentAddr) return;
-  chatContacts = chatContacts.filter(c=>c.addr!==chatCurrentAddr);
+  const addr = chatCurrentAddr;
+  chatContacts = chatContacts.filter(c=>c.addr!==addr);
   await fetch(API+"/api/chat/contacts",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(chatContacts)});
+  await fetch(API+"/api/chat/history/"+addr+"/delete", {method:"POST"});
   chatCurrentAddr = null;
   document.getElementById("chat-peer-name").textContent = "Select contact";
   document.getElementById("chat-peer-addr").textContent = "—";
@@ -1813,13 +2115,18 @@ function showClearChatModal(){
 async function doClearChat(){
   const days = parseInt(document.getElementById("chat-clear-days").value);
   closeModal("clear-chat-modal");
-  const r = await fetch(API+"/api/chat/history/clear",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({days})});
-  const d = await r.json();
-  toast(d.deleted ? `Deleted ${d.deleted} messages` : "History cleared");
-  if(chatCurrentAddr){
-    const r2 = await fetch(API+"/api/chat/history/"+chatCurrentAddr);
-    renderChatMsgs(await r2.json());
-  }
+  try{
+    const r = await fetch(API+"/api/chat/history/clear",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({days})});
+    const d = await r.json();
+    if(d.error){ toast("Error: "+d.error); return; }
+    toast(d.deleted ? `Deleted ${d.deleted} messages` : "History cleared");
+    if(chatCurrentAddr){
+      const r2 = await fetch(API+"/api/chat/history/"+chatCurrentAddr);
+      renderChatMsgs(await r2.json());
+    } else {
+      renderChatMsgs([]);
+    }
+  }catch(e){ toast("Clear failed: "+e); }
 }
 
 // FILES MANAGEMENT
@@ -2291,6 +2598,10 @@ async function loadAddressesPanel(){
     const d = await fetch(API+"/api/i2p/status").then(r=>r.json());
     if(d.b32||d.b32_address) document.getElementById("ap-i2p").textContent = d.b32||d.b32_address;
   }catch(e){}
+  try{
+    const d = await fetch(API+"/api/chat/address").then(r=>r.json());
+    if(d.address) document.getElementById("ap-chat-addr").textContent = d.address;
+  }catch(e){}
 }
 
 function apCopy(id){
@@ -2454,6 +2765,7 @@ async function nnAction(action){
 
 // Init
 loadSystem();
+chatSoundRestore();
 loadServices();
 checkMqttStatus();
 loadAddresses();
@@ -2475,6 +2787,7 @@ setInterval(pollLxmf,3000);
 setInterval(updateTopology,10000);
 updateTopology();
 setInterval(pollChatIncoming,5000);
+if("Notification" in window && Notification.permission === "default"){ Notification.requestPermission(); }
 // Load contacts and initialize chatLastTs from history at startup
 fetch(API+"/api/chat/contacts").then(r=>r.json()).then(async d=>{
   chatContacts=d;

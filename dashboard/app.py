@@ -394,6 +394,36 @@ def get_log(name):
         lines.append({"t": line, "l": lvl})
     return jsonify(lines)
 
+@app.route("/api/chat/settings", methods=["POST"])
+def chat_settings():
+    data = request.json or {}
+    max_msgs = int(data.get("max_msgs", 200))
+    max_files_mb = int(data.get("max_files_mb", 50))
+    # Apply message limit
+    with _chat_lock:
+        try:
+            hist = _chat_json.load(open(CHAT_FILE))
+            for addr in hist:
+                hist[addr] = hist[addr][-max_msgs:]
+            _chat_json.dump(hist, open(CHAT_FILE, "w"))
+        except: pass
+    # Apply file limit
+    try:
+        _chat_cleanup_files(max_mb=max_files_mb)
+    except: pass
+    return jsonify({"ok": True})
+
+@app.route("/api/chat/cleanup", methods=["POST"])
+def chat_cleanup():
+    import glob as _g
+    max_mb = int((request.json or {}).get("max_files_mb", 50))
+    before = sum(os.path.getsize(f) for f in _g.glob(os.path.join(CHAT_FILES_DIR, "*")) if os.path.isfile(f))
+    try:
+        _chat_cleanup_files(max_mb=max_mb)
+    except: pass
+    after = sum(os.path.getsize(f) for f in _g.glob(os.path.join(CHAT_FILES_DIR, "*")) if os.path.isfile(f))
+    return jsonify({"ok": True, "freed": max(0, before - after)})
+
 @app.route("/api/chat/history/clear", methods=["POST"])
 def chat_history_clear():
     import time as _t
@@ -402,18 +432,35 @@ def chat_history_clear():
     with _chat_lock:
         try:
             try:
-                data = _chat_json.load(open(CHAT_FILE))
+                data = _chat_json.load(open(CHAT_FILE, encoding="utf-8"))
             except:
                 data = {}
             deleted = 0
+            removed_fids = set()
             for addr in data:
                 before = len(data[addr])
                 if cutoff > 0:
-                    data[addr] = [m for m in data[addr] if m.get("ts", 0) >= cutoff]
+                    kept = [m for m in data[addr] if m.get("ts", 0) >= cutoff]
+                    removed = [m for m in data[addr] if m.get("ts", 0) < cutoff]
+                    data[addr] = kept
                 else:
+                    removed = data[addr]
                     data[addr] = []
                 deleted += before - len(data[addr])
-            _chat_json.dump(data, open(CHAT_FILE, "w"))
+                for m in removed:
+                    if m.get("file_id"):
+                        removed_fids.add(m["file_id"])
+            _chat_json.dump(data, open(CHAT_FILE, "w", encoding="utf-8"), ensure_ascii=False)
+            # Remove orphaned files
+            meta = _files_get_meta()
+            new_meta = []
+            for m in meta:
+                if m.get("id") in removed_fids:
+                    try: os.remove(os.path.join(CHAT_FILES_DIR, m["id"]))
+                    except: pass
+                else:
+                    new_meta.append(m)
+            _files_save_meta(new_meta)
             return jsonify({"ok": True, "deleted": deleted})
         except Exception as e:
             return jsonify({"error": str(e)}), 500
@@ -457,6 +504,39 @@ def backup_download():
             try:
                 if os.path.isfile(p):
                     zf.write(p, f"identity/rns_destinations/{os.path.basename(p)}")
+            except: pass
+
+        # Chat LXMF identity directory
+        chat_lxmf_dir = os.path.join(_HOME, "dashboard/chat_lxmf")
+        for p in _g.glob(f"{chat_lxmf_dir}/**/*", recursive=True) + _g.glob(f"{chat_lxmf_dir}/*"):
+            try:
+                if os.path.isfile(p):
+                    rel = os.path.relpath(p, os.path.join(_HOME, "dashboard"))
+                    zf.write(p, f"identity/chat_lxmf/{os.path.relpath(p, chat_lxmf_dir)}")
+            except: pass
+
+        # I2P tunnel key (reticulum.dat)
+        for p in ["/var/lib/i2pd/reticulum.dat", "/etc/i2pd/tunnels.d/reticulum.dat"]:
+            if os.path.exists(p):
+                try: zf.write(p, "identity/i2p_tunnel.dat")
+                except: pass
+                break
+
+        # Chat history, contacts, files meta
+        for key, path in [
+            ("data/chat_history.json",      f"{_HOME}/dashboard/chat_history.json"),
+            ("data/chat_contacts.json",     f"{_HOME}/dashboard/chat_contacts.json"),
+            ("data/chat_files_meta.json",   f"{_HOME}/dashboard/chat_files_meta.json"),
+        ]:
+            try: zf.write(path, key)
+            except: pass
+
+        # Chat files
+        chat_files_dir = os.path.join(_HOME, "dashboard/chat_files")
+        for p in _g.glob(f"{chat_files_dir}/*"):
+            try:
+                if os.path.isfile(p):
+                    zf.write(p, f"data/chat_files/{os.path.basename(p)}")
             except: pass
 
     buf.seek(0)
@@ -520,6 +600,45 @@ def backup_restore():
                     fname = os.path.basename(n)
                     if fname:
                         open(os.path.join(rns_dest, fname), "wb").write(zf.read(n))
+
+            # Chat LXMF identity
+            chat_lxmf_dir = os.path.join(_HOME, "dashboard/chat_lxmf")
+            for n in names:
+                if n.startswith("identity/chat_lxmf/"):
+                    fname = n[len("identity/chat_lxmf/"):]
+                    if fname:
+                        p = os.path.join(chat_lxmf_dir, fname)
+                        os.makedirs(os.path.dirname(p), exist_ok=True)
+                        open(p, "wb").write(zf.read(n))
+
+            # I2P tunnel key
+            if "identity/i2p_tunnel.dat" in names:
+                for dest in ["/var/lib/i2pd/reticulum.dat", "/etc/i2pd/tunnels.d/reticulum.dat"]:
+                    try:
+                        os.makedirs(os.path.dirname(dest), exist_ok=True)
+                        open(dest, "wb").write(zf.read("identity/i2p_tunnel.dat"))
+                        break
+                    except: pass
+
+            # Chat history, contacts, files meta
+            chat_restore = {
+                "data/chat_history.json":    f"{_HOME}/dashboard/chat_history.json",
+                "data/chat_contacts.json":   f"{_HOME}/dashboard/chat_contacts.json",
+                "data/chat_files_meta.json": f"{_HOME}/dashboard/chat_files_meta.json",
+            }
+            for arcname, path in chat_restore.items():
+                if arcname in names:
+                    os.makedirs(os.path.dirname(path), exist_ok=True)
+                    open(path, "wb").write(zf.read(arcname))
+
+            # Chat files
+            chat_files_dir = os.path.join(_HOME, "dashboard/chat_files")
+            os.makedirs(chat_files_dir, exist_ok=True)
+            for n in names:
+                if n.startswith("data/chat_files/"):
+                    fname = os.path.basename(n)
+                    if fname:
+                        open(os.path.join(chat_files_dir, fname), "wb").write(zf.read(n))
 
         return jsonify({"ok": True})
     except Exception as e:
@@ -649,18 +768,55 @@ def _load_chat_history(addr):
         return []
 
 def _save_chat_msg(addr, msg):
+    if not msg.get('text') and not msg.get('file_id'):
+        return  # skip empty
     with _chat_lock:
         try:
             try:
-                data = _chat_json.load(open(CHAT_FILE))
+                data = _chat_json.load(open(CHAT_FILE, encoding="utf-8"))
             except:
                 data = {}
             if addr not in data:
                 data[addr] = []
             data[addr].append(msg)
             data[addr] = data[addr][-200:]
-            _chat_json.dump(data, open(CHAT_FILE, "w"))
+            _chat_json.dump(data, open(CHAT_FILE, "w", encoding="utf-8"), ensure_ascii=False)
         except: pass
+    # Cleanup chat files if folder exceeds 50MB
+    try:
+        _chat_cleanup_files(max_mb=50)
+    except: pass
+
+def _chat_cleanup_files(max_mb=50):
+    import glob as _g
+    max_bytes = max_mb * 1024 * 1024
+    files = sorted(
+        [f for f in _g.glob(os.path.join(CHAT_FILES_DIR, "*")) if os.path.isfile(f)],
+        key=os.path.getmtime
+    )
+    total = sum(os.path.getsize(f) for f in files)
+    removed_ids = set()
+    while total > max_bytes and files:
+        oldest = files.pop(0)
+        size = os.path.getsize(oldest)
+        os.remove(oldest)
+        total -= size
+        fid = os.path.basename(oldest)
+        removed_ids.add(fid)
+        try:
+            meta = _files_get_meta()
+            meta = [m for m in meta if m.get("id") != fid]
+            _files_save_meta(meta)
+        except: pass
+    # Remove orphaned file references from chat history
+    if removed_ids:
+        with _chat_lock:
+            try:
+                data = _chat_json.load(open(CHAT_FILE))
+                for addr in data:
+                    data[addr] = [m for m in data[addr] if m.get("file_id") not in removed_ids]
+                _chat_json.dump(data, open(CHAT_FILE, "w"))
+            except: pass
 
 def _load_contacts():
     try:
@@ -713,6 +869,32 @@ def chat_contacts_save():
     contacts = request.json or []
     _save_contacts(contacts)
     return jsonify({"ok": True})
+
+@app.route("/api/chat/history/<addr>/delete", methods=["POST"])
+def chat_history_delete(addr):
+    with _chat_lock:
+        try:
+            try:
+                data = _chat_json.load(open(CHAT_FILE, encoding="utf-8"))
+            except:
+                data = {}
+            msgs = data.pop(addr, [])
+            _chat_json.dump(data, open(CHAT_FILE, "w", encoding="utf-8"), ensure_ascii=False)
+            # Remove files from this contact
+            fids = {m["file_id"] for m in msgs if m.get("file_id")}
+            if fids:
+                meta = _files_get_meta()
+                new_meta = []
+                for m in meta:
+                    if m.get("id") in fids:
+                        try: os.remove(os.path.join(CHAT_FILES_DIR, m["id"]))
+                        except: pass
+                    else:
+                        new_meta.append(m)
+                _files_save_meta(new_meta)
+            return jsonify({"ok": True})
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
 
 @app.route("/api/chat/history/<addr>")
 def chat_history(addr):
