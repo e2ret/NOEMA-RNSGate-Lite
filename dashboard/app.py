@@ -1083,10 +1083,10 @@ def chat_files_settings():
 def git_status():
     try:
         install_dir = os.path.join(_HOME, "NOEMA-RNSGate-Lite")
-        _sp.run("git fetch origin", shell=True, cwd=install_dir, capture_output=True, timeout=10)
-        r = _sp.run("git rev-list HEAD..origin/main --count", shell=True, cwd=install_dir, capture_output=True, text=True, timeout=5)
+        subprocess.run("git fetch origin", shell=True, cwd=install_dir, capture_output=True, timeout=10)
+        r = subprocess.run("git rev-list HEAD..origin/main --count", shell=True, cwd=install_dir, capture_output=True, text=True, timeout=5)
         behind = int(r.stdout.strip() or 0)
-        h = _sp.run("git rev-parse --short HEAD", shell=True, cwd=install_dir, capture_output=True, text=True, timeout=5)
+        h = subprocess.run("git rev-parse --short HEAD", shell=True, cwd=install_dir, capture_output=True, text=True, timeout=5)
         commit = h.stdout.strip()
         return jsonify({"behind": behind, "commit": commit, "update_available": behind > 0})
     except Exception as e:
