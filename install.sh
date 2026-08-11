@@ -54,11 +54,11 @@ cd "$INSTALL_DIR"
 echo "[2b] Installing i2pd..."
 ARCH=$(uname -m)
 if [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then
-    I2PD_DEB="$INSTALL_DIR/packages/i2pd_2.60.0-1forky1_arm64.deb"
+    I2PD_DEB="$INSTALL_DIR/packages/i2pd_2.61.0-1jammy1_arm64.deb"
 elif [ "$ARCH" = "armv7l" ] || [ "$ARCH" = "armhf" ]; then
-    I2PD_DEB="$INSTALL_DIR/packages/i2pd_2.60.0-1forky1_armhf.deb"
+    I2PD_DEB="$INSTALL_DIR/packages/i2pd_2.61.0-1jammy1_armhf.deb"
 else
-    I2PD_DEB="$INSTALL_DIR/packages/i2pd_2.60.0-1forky1_amd64.deb"
+    I2PD_DEB="$INSTALL_DIR/packages/i2pd_2.61.0-1jammy1_amd64.deb"
 fi
 
 if [ -f "$I2PD_DEB" ]; then
