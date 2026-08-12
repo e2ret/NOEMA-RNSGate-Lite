@@ -491,6 +491,13 @@ def backup_download():
             try: zf.write(p, f"pages/{os.path.basename(p)}")
             except: pass
 
+        # Nomadnet chat data
+        for fname in ["chat_log.json", "topic.json", "emoticons.txt", "emoticon.txt", "chatusers.db"]:
+            p = os.path.join(NOMADNET_PAGES_DIR, fname)
+            if os.path.exists(p):
+                try: zf.write(p, f"pages/{fname}")
+                except: pass
+
         for p in _g.glob(f"{SCRIPTS_DIR}/*.py") + _g.glob(f"{SCRIPTS_DIR}/*.sh"):
             try: zf.write(p, f"scripts/{os.path.basename(p)}")
             except: pass
@@ -504,6 +511,16 @@ def backup_download():
             try:
                 if os.path.isfile(p):
                     zf.write(p, f"identity/rns_destinations/{os.path.basename(p)}")
+            except: pass
+
+        # Nomadnet identity and node_address
+        nn_identity = os.path.join(_HOME, ".nomadnetwork/storage/identity")
+        if os.path.exists(nn_identity):
+            try: zf.write(nn_identity, "identity/nomadnet_identity")
+            except: pass
+        nn_addr = os.path.join(_HOME, ".nomadnetwork/node_address")
+        if os.path.exists(nn_addr):
+            try: zf.write(nn_addr, "identity/nomadnet_node_address")
             except: pass
 
         # Chat LXMF identity directory
@@ -579,7 +596,8 @@ def backup_restore():
             # Pages
             os.makedirs(NOMADNET_PAGES_DIR, exist_ok=True)
             for n in names:
-                if n.startswith("pages/") and n.endswith(".mu"):
+                if n.startswith("pages/") and (n.endswith(".mu") or
+                        os.path.basename(n) in {"chat_log.json","topic.json","emoticons.txt","emoticon.txt","chatusers.db"}):
                     fname = os.path.basename(n)
                     if fname:
                         open(os.path.join(NOMADNET_PAGES_DIR, fname), "wb").write(zf.read(n))
@@ -601,6 +619,22 @@ def backup_restore():
                     if fname:
                         open(os.path.join(rns_dest, fname), "wb").write(zf.read(n))
 
+            # Nomadnet identity
+            if "identity/nomadnet_identity" in names:
+                nn_id_path = os.path.join(_HOME, ".nomadnetwork/storage/identity")
+                os.makedirs(os.path.dirname(nn_id_path), exist_ok=True)
+                data = zf.read("identity/nomadnet_identity")
+                if data:  # Only write if not empty
+                    open(nn_id_path, "wb").write(data)
+                    # Recalculate nomadnet address from restored identity
+                    try:
+                        import subprocess as _sp_nn
+                        _venv = os.path.join(_HOME, "NOEMA-RNSGate-Lite/.venv/bin/python3")
+                        _script = os.path.join(_HOME, "NOEMA-RNSGate-Lite/recalc_nn_addr.py")
+                        if os.path.exists(_venv) and os.path.exists(_script):
+                            _sp_nn.run([_venv, _script], timeout=30, capture_output=True)
+                    except: pass
+
             # Chat LXMF identity
             chat_lxmf_dir = os.path.join(_HOME, "dashboard/chat_lxmf")
             for n in names:
@@ -611,8 +645,11 @@ def backup_restore():
                         os.makedirs(os.path.dirname(p), exist_ok=True)
                         open(p, "wb").write(zf.read(n))
 
-            # I2P tunnel key
+            # I2P tunnel key — stop i2pd first to prevent key regeneration
             if "identity/i2p_tunnel.dat" in names:
+                import subprocess as _sp_i2p
+                _sp_i2p.run("systemctl stop i2pd", shell=True, capture_output=True)
+                import time as _t_i2p; _t_i2p.sleep(1)
                 for dest in ["/var/lib/i2pd/reticulum.dat", "/etc/i2pd/tunnels.d/reticulum.dat"]:
                     try:
                         os.makedirs(os.path.dirname(dest), exist_ok=True)
@@ -675,6 +712,8 @@ CHAT_STORAGE = f"{_HOME}/dashboard/chat_lxmf"
 
 def _chat_init():
     global _chat_router, _chat_identity, _chat_dest
+    if _chat_router is not None:
+        return  # Already initialized
     import sys as _sys, glob as _glob
     # Find site-packages in venv
     _sp_paths = _glob.glob(f"{_HOME}/rns-env/lib/python*/site-packages") +                 _glob.glob(f"{_HOME}/MeshGate/.venv/lib/python*/site-packages") + \
@@ -690,10 +729,24 @@ def _chat_init():
         identity = RNS.Identity()
         identity.to_file(identity_file)
     router = LXMF.LXMRouter(identity=identity, storagepath=CHAT_STORAGE)
-    dest = router.register_delivery_identity(identity, display_name="NOEMA Chat")
+    try:
+        dest = router.register_delivery_identity(identity, display_name="NOEMA Chat")
+    except Exception as _reg_e:
+        if "already registered" in str(_reg_e).lower():
+            # Get existing destination
+            dest_hash = RNS.Destination.hash(identity, "lxmf", "delivery")
+            dest = RNS.Destination(identity, RNS.Destination.IN, RNS.Destination.SINGLE, "lxmf", "delivery")
+        else:
+            raise
     router.register_delivery_callback(_chat_on_receive)
     router.announce(destination_hash=dest.hash)
     _chat_router = router
+    _chat_dest = dest
+    # Save address to file for persistent access
+    try:
+        addr_str = RNS.hexrep(dest.hash, delimit=False)
+        open(f"{CHAT_STORAGE}/address", "w").write(addr_str)
+    except: pass
 
     # Re-announce and request paths periodically
     def _announce_loop():
