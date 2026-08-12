@@ -112,6 +112,15 @@ else
     fi
 fi
 
+# --- Fix i2pd file permissions for backup ---
+if [ -f /var/lib/i2pd/reticulum.dat ]; then
+    chmod 644 /var/lib/i2pd/reticulum.dat
+fi
+# Allow root to read all i2pd data for backup
+if [ -d /var/lib/i2pd ]; then
+    chmod 755 /var/lib/i2pd
+fi
+
 # --- Copy logo to dashboard ---
 if [ -f "$INSTALL_DIR/docs/logo.png" ] && [ ! -f "$INSTALL_DIR/dashboard/logo.png" ]; then
     cp "$INSTALL_DIR/docs/logo.png" "$INSTALL_DIR/dashboard/logo.png"
