@@ -378,6 +378,9 @@ install_service "nomadnet" \
     "$CURRENT_HOME" \
     "network.target rnsd.service"
 
+# Add ExecStartPost for recalc_nn_addr.py
+sudo sed -i "/ExecStart=.*/a ExecStartPost=/bin/bash -c 'sleep 10 && $PYTHON $INSTALL_DIR/recalc_nn_addr.py'" /etc/systemd/system/nomadnet.service
+
 SERVICES_LIST="$SERVICES_LIST nomadnet"
 
 sudo systemctl daemon-reload
