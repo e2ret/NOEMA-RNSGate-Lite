@@ -1223,18 +1223,6 @@ function nav(id,el){
   if(id==="chat") loadChatPanel();
   if(id==="monitor"){ loadLxmf(); loadRns(); }
   if(id==="system") checkRnsVersion();
-
-async function checkGitUpdate(){
-  try{
-    const d = await fetch(API+"/api/git_status").then(r=>r.json());
-    const badge = document.getElementById("git-update-badge");
-    if(!badge) return;
-    if(d.update_available){ badge.style.display="inline"; badge.title=d.behind+" commit(s) behind"; }
-    else { badge.style.display="none"; }
-  }catch(e){}
-}
-setInterval(checkGitUpdate,300000);
-checkGitUpdate();
   if(id==="configs") loadConfigs();
 
   if(id==="nodes_monitor") loadNodesMonitor();
@@ -1426,6 +1414,15 @@ async function doResetIdentity(){
       st.style.color="var(--rd)";st.textContent="Ошибка: "+d.error;
     }
   }catch(e){st.style.color="var(--rd)";st.textContent="Ошибка: "+e;}
+}
+async function checkGitUpdate(){
+  try{
+    const d = await fetch(API+"/api/git_status").then(r=>r.json());
+    const badge = document.getElementById("git-update-badge");
+    if(!badge) return;
+    if(d.update_available){ badge.style.display="inline"; badge.title=d.behind+" commit(s) behind"; }
+    else { badge.style.display="none"; }
+  }catch(e){}
 }
 async function checkRnsVersion(){
   try{
@@ -2929,6 +2926,8 @@ loadLxmf();
 loadNodesMonitor();
 loadRns();
 checkRnsVersion();
+checkGitUpdate();
+setInterval(checkGitUpdate,300000);
 
 setInterval(()=>{
   document.querySelectorAll(".skel").forEach(el=>{
