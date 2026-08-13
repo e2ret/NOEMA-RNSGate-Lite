@@ -1212,7 +1212,7 @@ def run_command():
         "uptime":          "uptime",
         "rns_update":      f"{_RNS_BIN}/pip install --upgrade rns && echo OK",
         "noema_update":    (
-            f"cd {_HOME}/NOEMA-RNSGate-Lite && git pull 2>&1 && "
+            f"cd {_HOME}/NOEMA-RNSGate-Lite && git fetch origin 2>&1 && git checkout dashboard/index.html dashboard/app.py lxmf-tools/noema_lxmf_bridge.py 2>&1; git pull 2>&1 && "
             f"{_HOME}/NOEMA-RNSGate-Lite/.venv/bin/pip install --upgrade rns lxmf lxmfy flask paho-mqtt nomadnet -q 2>&1 && "
             "sudo systemctl restart dashboard noema_lxmf_bridge rnsd && "
             "sleep 3 && systemctl is-active dashboard noema_lxmf_bridge rnsd"
