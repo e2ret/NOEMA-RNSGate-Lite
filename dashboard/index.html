@@ -3,9 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="color-scheme" content="dark">
+<meta name="color-scheme" content="light dark">
 <title>NOEMA RNSGate Lite</title>
 <link rel="icon" href="logo.png" type="image/png">
+<script>
+(function(){
+  try{
+    var t = localStorage.getItem('noema-theme');
+    if(t === 'dark') document.documentElement.setAttribute('data-theme','dark');
+  }catch(e){}
+})();
+</script>
 <style>
 @font-face{font-family:'Inter';font-style:normal;font-weight:100 900;font-display:swap;src:url('fonts/inter-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 @font-face{font-family:'Inter';font-style:normal;font-weight:100 900;font-display:swap;src:url('fonts/inter-cyrillic.woff2') format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
@@ -15,28 +23,66 @@
 @font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:100 900;font-display:swap;src:url('fonts/jbmono-cyrillic-ext.woff2') format('woff2');unicode-range:U+0460-052F,U+1C80-1C8A,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F}
 
 :root{
+  color-scheme:light;
+  --bg:#eef2f7;
+  --bg-wash:radial-gradient(ellipse 900px 500px at 8% -8%,rgba(13,166,184,.10),transparent 60%),radial-gradient(ellipse 900px 600px at 100% 0%,rgba(124,58,237,.07),transparent 55%);
+  --s1:rgba(255,255,255,.74);
+  --s2:rgba(255,255,255,.9);
+  --s3:#ffffff;
+  --bd:rgba(21,49,71,.10);
+  --bd-hi:rgba(8,145,178,.4);
+  --tx:#142333;
+  --mu:#67798c;
+  --gr:#16a34a;
+  --am:#b45309;
+  --rd:#dc2626;
+  --bl:#2563eb;
+  --teal:#0c8fa3;
+  --purple:#7c3aed;
+  --indigo:#4f46e5;
+  --sky:#0284c7;
+  --pink:#db2777;
+  --slate:#64748b;
+  --slate2:#334155;
+  --i2ptl:#0d9488;
+  --off:#94a3b8;
+  --chart-grid:rgba(20,35,51,.08);
+  --fn:'Inter',system-ui,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --shadow:0 1px 2px rgba(20,35,51,.04),0 10px 24px rgba(20,35,51,.07);
+  --shadow-lg:0 20px 48px rgba(20,35,51,.14);
+  --glow:0 0 0 4px rgba(12,143,163,.16);
+  --radius:14px;
+  --ease:cubic-bezier(.4,0,.2,1)
+}
+:root[data-theme="dark"]{
   color-scheme:dark;
-  --bg:#07090c;
-  --s1:rgba(15,20,27,.62);
-  --s2:rgba(19,25,33,.75);
-  --s3:rgba(29,37,48,.92);
-  --bd:rgba(150,168,184,.16);
-  --bd-hi:rgba(45,217,232,.35);
+  --bg:#0a0d12;
+  --bg-wash:radial-gradient(ellipse 900px 500px at 8% -8%,rgba(13,166,184,.14),transparent 60%),radial-gradient(ellipse 900px 600px at 100% 0%,rgba(124,58,237,.10),transparent 55%);
+  --s1:rgba(255,255,255,.045);
+  --s2:rgba(255,255,255,.07);
+  --s3:#161b22;
+  --bd:rgba(255,255,255,.11);
+  --bd-hi:rgba(45,217,232,.4);
   --tx:#eaf1f3;
-  --mu:#7f93a3;
+  --mu:#8a9bab;
   --gr:#3ddc84;
   --am:#f5a623;
   --rd:#ff5c5c;
   --bl:#5aa9e6;
   --teal:#2dd8ec;
   --purple:#c99bf5;
-  --fn:'Inter',system-ui,sans-serif;
-  --mono:'JetBrains Mono',ui-monospace,monospace;
-  --shadow:0 10px 24px rgba(0,0,0,.4);
-  --shadow-lg:0 16px 36px rgba(0,0,0,.5);
-  --glow:0 0 18px rgba(45,217,232,.28);
-  --radius:2px;
-  --ease:cubic-bezier(.4,0,.2,1)
+  --indigo:#818cf8;
+  --sky:#38bdf8;
+  --pink:#f472b6;
+  --slate:#94a3b8;
+  --slate2:#cbd5e1;
+  --i2ptl:#2dd4bf;
+  --off:#5b6b7c;
+  --chart-grid:rgba(255,255,255,.08);
+  --shadow:0 1px 2px rgba(0,0,0,.35),0 10px 24px rgba(0,0,0,.45);
+  --shadow-lg:0 20px 48px rgba(0,0,0,.55);
+  --glow:0 0 0 4px rgba(45,217,232,.2)
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
@@ -44,7 +90,8 @@ html,body{height:100%;overflow:hidden}
 html{background:var(--bg)}
 
 body{
-  background:transparent;
+  background:var(--bg-wash);
+  background-attachment:fixed;
   color:var(--tx);
   font-family:var(--fn);
   font-size:14px;
@@ -55,15 +102,15 @@ body{
 
 ::-webkit-scrollbar{width:8px;height:8px}
 ::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:rgba(140,160,148,.22);border-radius:2px}
-::-webkit-scrollbar-thumb:hover{background:rgba(140,160,148,.38)}
+::-webkit-scrollbar-thumb{background:rgba(20,35,51,.16);border-radius:8px}
+::-webkit-scrollbar-thumb:hover{background:rgba(20,35,51,.28)}
 
 :focus-visible{outline:1.5px solid var(--teal);outline-offset:-1.5px}
 
 .skel{
   display:inline-block;min-width:3em;height:1em;vertical-align:-0.15em;
-  color:transparent!important;border-radius:2px;
-  background:linear-gradient(90deg,rgba(140,160,148,.1) 25%,rgba(140,160,148,.22) 37%,rgba(140,160,148,.1) 63%);
+  color:transparent!important;border-radius:6px;
+  background:linear-gradient(90deg,rgba(20,35,51,.06) 25%,rgba(20,35,51,.13) 37%,rgba(20,35,51,.06) 63%);
   background-size:400% 100%;
   animation:skel-shimmer 1.6s ease-in-out infinite
 }
@@ -94,6 +141,17 @@ body{
   transition:border-color .2s,background .2s
 }
 .pill:hover{border-color:var(--bd-hi);background:var(--s3)}
+
+.theme-toggle{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:32px;height:32px;flex-shrink:0;border-radius:50%;
+  border:1px solid var(--bd);background:var(--s2);color:var(--mu);
+  cursor:pointer;transition:border-color .15s var(--ease),color .15s var(--ease),background-color .15s var(--ease)
+}
+.theme-toggle:hover{border-color:var(--bd-hi);color:var(--tx);background:var(--s3)}
+.theme-toggle .i-sun{display:none}
+:root[data-theme="dark"] .theme-toggle .i-sun{display:block}
+:root[data-theme="dark"] .theme-toggle .i-moon{display:none}
 
 .dot{position:relative;display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--gr);flex-shrink:0}
 .dot::after{
@@ -130,29 +188,7 @@ body{
 
 .body{display:flex;flex-direction:column;overflow:hidden;height:100%}
 
-.sidebar{
-  background:var(--bg);
-  border-bottom:1px solid var(--bd);
-  padding:10px 16px;
-  display:flex;
-  flex-wrap:wrap;
-  overflow-x:hidden;
-  overflow-y:hidden;
-  scrollbar-width:none;
-  gap:6px;
-  align-items:center;
-  justify-content:center;
-  min-height:52px;
-  flex-shrink:0;
-  position:relative
-}
-.sidebar::-webkit-scrollbar{display:none}
-.nav-sep{display:none}
 @media(max-width:768px){
-  .sidebar{justify-content:space-around;flex-wrap:nowrap;overflow-x:hidden;padding:0;gap:0;min-height:50px}
-  .nav-item{flex:1;justify-content:center;padding:6px 2px;gap:0;min-width:0;font-size:9px;flex-direction:column;align-items:center}
-  .nav-item span{display:block;margin-top:2px;letter-spacing:.03em;overflow:hidden;text-overflow:ellipsis;max-width:100%;text-align:center}
-  .nav-sep{display:none}
   .topbar{padding:8px 12px}
   .logo b{font-size:13px}
   .logo img{height:26px;width:26px}
@@ -170,35 +206,6 @@ body{
   .svc-btns .sys-btn{flex:1 1 0;min-width:88px;justify-content:center;font-size:11px;padding:7px 8px}
   .ctab{font-size:12px;padding:6px 12px}
   .two-col{grid-template-columns:1fr!important}
-}
-
-.nav-item{
-  display:flex;align-items:center;gap:8px;
-  padding:8px 14px;
-  cursor:pointer;color:var(--mu);
-  transition:color .15s var(--ease),background-color .15s var(--ease),border-color .15s var(--ease);
-  border-radius:var(--radius);
-  border:1px solid var(--bd);
-  background:var(--s2);
-  font-size:12px;font-weight:600;font-family:var(--mono);
-  white-space:nowrap;flex-shrink:0;
-  text-transform:uppercase;letter-spacing:.1em
-}
-.nav-item svg{flex-shrink:0;opacity:.7;transition:opacity .18s var(--ease)}
-.nav-item:hover{color:var(--tx);border-color:var(--mu)}
-.nav-item:hover svg{opacity:1}
-.nav-item.active{
-  color:#0b0f0c;
-  background:var(--teal);
-  border-color:var(--teal);
-  font-weight:700;
-  box-shadow:var(--glow)
-}
-.nav-item.active svg{opacity:1;color:#0b0f0c}
-@media(max-width:768px){
-  .nav-item svg{width:14px;height:14px}
-  .nav-item{flex:1 1 0;justify-content:center;padding:6px 4px;font-size:9px;gap:3px;min-width:0}
-  .nav-item span{display:none}
 }
 
 .sys-btn{
@@ -250,7 +257,19 @@ body{
 
 .svc{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--bd)}
 .svc:last-child{border-bottom:none}
-.svc-n{font-size:14px;font-weight:600;font-family:var(--mono);color:var(--tx)}
+.svc>div:first-child{flex:1}
+.svc-btns{flex:1;text-align:right}
+.svc-n{font-size:14px;font-weight:600;font-family:var(--mono);color:var(--tx);min-width:190px}
+
+.svc-arch-grid{display:grid;grid-template-columns:1fr minmax(220px,340px) 1fr;gap:16px;align-items:center;background:var(--s1);border:1px solid var(--bd);border-radius:16px;padding:18px;box-shadow:var(--shadow)}
+.svc-arch-diagram{min-width:0}
+.svc-mobile-only{display:none}
+@media(max-width:1300px){
+  .svc-arch-grid{grid-template-columns:1fr;padding:14px}
+  .svc-arch-grid>.svc-arch-col{display:none}
+  .svc-arch-diagram{max-width:360px;margin:0 auto}
+  .svc-mobile-only{display:block;margin-top:16px}
+}
 
 .badge{font-size:10px;padding:5px 12px;border-radius:var(--radius);font-weight:700;letter-spacing:.1em;text-transform:uppercase;line-height:1;display:inline-flex;align-items:center;background:transparent}
 .badge.active{color:var(--gr);border:1px solid var(--gr)}
@@ -331,6 +350,41 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 1px var(--
 .mesh-canvas{display:block;width:100%;height:108px}
 .mesh-caption{position:absolute;top:6px;left:24px;font-size:9px;letter-spacing:.18em;color:var(--mu);font-family:var(--mono);text-transform:uppercase;pointer-events:none}
 @media(max-width:768px){.mesh-canvas{height:64px}.mesh-caption{display:none}}
+
+/* ===== Hub shell: persistent pill menu either side, content in the middle ===== */
+.hub-shell{
+  display:flex;flex:1;min-height:0;gap:14px;
+  padding:14px;background:transparent
+}
+.hub-col{
+  display:flex;flex-direction:column;gap:8px;
+  width:216px;flex-shrink:0;overflow-y:auto
+}
+.hub-pill{
+  position:relative;display:flex;align-items:center;gap:10px;
+  padding:8px 14px 8px 8px;flex-shrink:0;
+  background:var(--s1);border:1px solid var(--bd);border-radius:999px;
+  box-shadow:var(--shadow);cursor:pointer;
+  transition:border-color .15s var(--ease),box-shadow .15s var(--ease),background-color .15s var(--ease)
+}
+.hub-pill:hover{border-color:var(--bd-hi);box-shadow:var(--shadow-lg)}
+.hub-pill.active{border-color:var(--teal);background:var(--s3);box-shadow:var(--glow)}
+.hub-pill-ic{
+  width:32px;height:32px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--s2)
+}
+.hub-pill span{font-size:11.5px;font-weight:700;font-family:var(--mono);text-transform:uppercase;letter-spacing:.07em;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:900px){
+  .body{overflow-y:auto}
+  .hub-shell{flex-direction:column;flex:none;padding:10px}
+  .hub-col{width:auto;flex-direction:row;flex-wrap:wrap;overflow:visible;flex:none}
+  .hub-pill{flex:1 1 calc(50% - 4px)}
+  .main{flex:none;overflow-y:visible}
+}
+@media(max-width:480px){
+  .hub-pill{flex:1 1 100%}
+}
 </style>
 
 <style>
@@ -360,7 +414,7 @@ function chatShowMessages(){
 <div class="shell">
 <div class="topbar">
   <div>
-    <div class="logo" style="display:flex;align-items:center;gap:10px"><img src="logo.png" style="height:28px;width:28px;object-fit:contain;border-radius:2px;border:1px solid var(--bd)"><b>NOEMA <span style="color:var(--teal)">RNSGATE</span> · LITE</b></div>
+    <div class="logo" style="display:flex;align-items:center;gap:10px"><img src="logo.png" style="height:28px;width:28px;object-fit:contain;border-radius:12px;border:1px solid var(--bd)"><b>NOEMA <span style="color:var(--teal)">RNSGATE</span> · LITE</b></div>
     <div style="display:flex;flex-wrap:wrap;gap:2px 10px;margin-top:4px">
       <div class="skel" style="font-size:10px;color:var(--mu);font-family:var(--mono)" id="uptime-lbl">—</div>
       <div class="skel" style="font-size:10px;color:var(--mu);font-family:var(--mono)" id="rns-ver-lbl">—</div>
@@ -369,6 +423,10 @@ function chatShowMessages(){
   </div>
   <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
     <div style="display:flex;gap:6px;align-items:center">
+      <button class="theme-toggle" onclick="toggleTheme()" title="Переключить тему" aria-label="Переключить тему">
+        <svg class="i-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        <svg class="i-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+      </button>
       <div class="pill" style="display:inline-flex"><div class="dot" id="dot"></div><span class="skel" id="ip-lbl">—</span></div>
     </div>
   </div>
@@ -387,166 +445,140 @@ function chatShowMessages(){
   <div class="mc"><div class="mc-inner"><div class="lb">LXMF received</div><div class="vl b" id="m-lxmf-recv">0</div></div><div class="pb"><div class="pbf b" id="pb-lxmf-recv" style="width:0%"></div></div></div>
 </div>
 <div class="body">
-  <div class="sidebar">
-    <div class="nav-item active" onclick="nav('services',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span>Services</span></div>
-    <div class="nav-item"       onclick="nav('configs',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="4" x2="5" y2="20"/><circle cx="5" cy="10" r="2.2"/><line x1="12" y1="4" x2="12" y2="20"/><circle cx="12" cy="16" r="2.2"/><line x1="19" y1="4" x2="19" y2="20"/><circle cx="19" cy="7" r="2.2"/></svg><span>Configs</span></div>
-    <div class="nav-item"       onclick="nav('addresses',this);loadAddressesPanel();"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M16 12v1.5a2.5 2.5 0 0 0 5 0V12a9 9 0 1 0-4 7.5"/></svg><span>Addresses</span></div>
-    <div class="nav-item"       onclick="nav('monitor',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2.5-7 4 14L16 12h5"/></svg><span>Monitor</span></div>
-    <div class="nav-sep"></div>
-    <div class="nav-item"       onclick="nav('rnode',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M8.5 8.5a5 5 0 0 0 0 7"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M5.5 5.5a9 9 0 0 0 0 13"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg><span>RNode</span></div>
-    <div class="nav-item"       onclick="nav('rmap',this);loadNodesMonitor();"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="2.3"/><circle cx="18" cy="6" r="2.3"/><circle cx="18" cy="18" r="2.3"/><line x1="8.1" y1="10.9" x2="15.9" y2="7.1"/><line x1="8.1" y1="13.1" x2="15.9" y2="16.9"/></svg><span>Network</span></div>
-    <div class="nav-item"       onclick="nav('i2p',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6l7-3Z"/></svg><span>I2P</span></div>
-    <div class="nav-item"       onclick="nav('nomadnet',this);loadNomadnet();"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15 9l-2 6-6 2 2-6 6-2Z"/></svg><span>Nomadnet</span></div>
-    <div class="nav-item"       onclick="nav('chat',this);loadChatPanel();" style="position:relative"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Chat</span><span id="chat-badge" style="display:none;position:absolute;top:2px;right:2px;background:#f87171;color:#fff;border-radius:8px;padding:1px 5px;font-size:9px;font-weight:700"></span></div>
-    <div class="nav-sep"></div>
-    <div class="nav-item"       onclick="nav('logs',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9l3 3-3 3"/><line x1="12" y1="15" x2="17" y2="15"/></svg><span>Logs</span></div>
-    <div class="nav-item"       onclick="nav('system',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/><rect x="10" y="10" width="4" height="4"/><line x1="9" y1="2" x2="9" y2="6"/><line x1="15" y1="2" x2="15" y2="6"/><line x1="9" y1="18" x2="9" y2="22"/><line x1="15" y1="18" x2="15" y2="22"/><line x1="2" y1="9" x2="6" y2="9"/><line x1="2" y1="15" x2="6" y2="15"/><line x1="18" y1="9" x2="22" y2="9"/><line x1="18" y1="15" x2="22" y2="15"/></svg><span>System</span></div>
-  </div>
-  <div class="main">
+  <div class="hub-shell">
+    <div class="hub-col left">
+      <div class="hub-pill active" onclick="nav('home',this)"><div class="hub-pill-ic" style="color:var(--teal)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div><span>Services</span></div>
+      <div class="hub-pill" onclick="nav('configs',this)"><div class="hub-pill-ic" style="color:var(--bl)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="4" x2="5" y2="20"/><circle cx="5" cy="10" r="2.2"/><line x1="12" y1="4" x2="12" y2="20"/><circle cx="12" cy="16" r="2.2"/><line x1="19" y1="4" x2="19" y2="20"/><circle cx="19" cy="7" r="2.2"/></svg></div><span>Configs</span></div>
+      <div class="hub-pill" onclick="nav('addresses',this);loadAddressesPanel();"><div class="hub-pill-ic" style="color:var(--purple)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M16 12v1.5a2.5 2.5 0 0 0 5 0V12a9 9 0 1 0-4 7.5"/></svg></div><span>Addresses</span></div>
+      <div class="hub-pill" onclick="nav('monitor',this)"><div class="hub-pill-ic" style="color:var(--gr)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2.5-7 4 14L16 12h5"/></svg></div><span>Monitor</span></div>
+      <div class="hub-pill" onclick="nav('rnode',this)"><div class="hub-pill-ic" style="color:var(--am)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M8.5 8.5a5 5 0 0 0 0 7"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M5.5 5.5a9 9 0 0 0 0 13"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></div><span>RNode</span></div>
+      <div class="hub-pill" onclick="nav('rmap',this);loadNodesMonitor();"><div class="hub-pill-ic" style="color:var(--indigo)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="2.3"/><circle cx="18" cy="6" r="2.3"/><circle cx="18" cy="18" r="2.3"/><line x1="8.1" y1="10.9" x2="15.9" y2="7.1"/><line x1="8.1" y1="13.1" x2="15.9" y2="16.9"/></svg></div><span>Network</span></div>
+    </div>
+    <div class="main">
 
-    <!-- SERVICES -->
-    <div class="panel active" id="panel-services">
-      <div style="display:grid;grid-template-columns:1fr;gap:20px;align-items:start">
-      <div>
-      <div id="svc-list"></div>
-      <div class="brow">
-        <button class="sys-btn am" onclick="restartAll()">restart all</button>
-      </div>
-      </div>
-      <div style="display:none">
-      <div style="margin-bottom:16px;background:var(--s1);border:1px solid var(--bd);border-radius:2px;padding:10px;box-shadow:var(--shadow)">
+    <!-- HOME / SERVICES -->
+    <div class="panel active" id="panel-home">
+      <div style="flex:1">
+      <div class="section-lbl" style="margin-bottom:10px">System architecture — live</div>
+      <div class="svc-arch-grid">
+        <div class="svc-arch-col">
+          <div id="svc-list-left"></div>
+          <div class="brow">
+            <button class="sys-btn am" onclick="restartAll()">restart all</button>
+          </div>
+        </div>
+        <div class="svc-arch-diagram">
         <style>
           @keyframes mg-flow { to { stroke-dashoffset: -24; } }
-          @keyframes mg-ring { 0%,100%{r:10;opacity:.6} 50%{r:14;opacity:0} }
+          @keyframes mg-ring { 0%,100%{r:26;opacity:.55} 50%{r:31;opacity:0} }
+          @keyframes mg-ring-hub { 0%,100%{r:38;opacity:.5} 50%{r:45;opacity:0} }
           .mg-flow { stroke-dasharray: 6 6; animation: mg-flow 1.4s linear infinite; }
           .mg-flow.slow { animation-duration: 2.2s; }
-          .mg-flow.off { opacity: 0.15; stroke: #444 !important; animation: none; stroke-dasharray: 4 8; }
-          .mg-nc { transition: all .3s; }
-          .mg-nc.dim { opacity: .25; filter: grayscale(1); }
-          .mg-ring { animation: mg-ring 2s ease-out infinite; }
-          .mg-tbtn { cursor: pointer; }
-          .mg-tbtn rect { transition: fill .15s; }
-          .mg-tbtn:hover rect { fill: #2a2d50 !important; }
+          .mg-flow.off { opacity: 0.18; stroke: var(--off) !important; animation: none; stroke-dasharray: 4 8; }
+          .mg-nc { transition: opacity .3s, filter .3s; }
+          .mg-nc.dim { opacity: .3; filter: grayscale(1); }
+          .mg-ring { animation: mg-ring 2.4s ease-out infinite; }
         </style>
-        <svg viewBox="0 0 700 440" style="width:100%;height:auto;max-height:320px;display:block">
+        <svg viewBox="0 0 700 480" style="display:block;width:100%;height:auto;max-height:460px">
           <defs>
             <marker id="mg-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
               <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             </marker>
           </defs>
 
-          <!-- Lines: all nodes to center hub -->
-          <line id="mg-l-rnode" x1="155" y1="84"  x2="262" y2="142" class="mg-flow slow" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#mg-arr)"/>
-          <line id="mg-l-net"   x1="350" y1="84"  x2="350" y2="142" class="mg-flow slow" stroke="#60a5fa" stroke-width="1.5" marker-end="url(#mg-arr)"/>
-          <line id="mg-l-rns"   x1="155" y1="180" x2="262" y2="180" class="mg-flow" stroke="#2dd4bf" stroke-width="2" marker-end="url(#mg-arr)" marker-start="url(#mg-arr)"/>
-          <line id="mg-l-mqtt"  x1="438" y1="180" x2="545" y2="180" class="mg-flow slow" stroke="#a78bfa" stroke-width="2" marker-end="url(#mg-arr)" marker-start="url(#mg-arr)"/>
-          <line id="mg-l-i2p"   x1="438" y1="218" x2="545" y2="276" class="mg-flow slow" stroke="#34d399" stroke-width="1.5" marker-end="url(#mg-arr)" marker-start="url(#mg-arr)"/>
+          <!-- Spokes: hub to each service -->
+          <line id="mg-l-rnode" x1="350" y1="202" x2="350" y2="101" class="mg-flow slow" stroke="var(--am)" stroke-width="1.5" marker-end="url(#mg-arr)"/>
+          <line id="mg-l-rns"   x1="317.1" y1="221" x2="229.5" y2="171" class="mg-flow" stroke="var(--bl)" stroke-width="2" marker-end="url(#mg-arr)" marker-start="url(#mg-arr)"/>
+          <line id="mg-l-mqtt"  x1="382.9" y1="221" x2="470.5" y2="171" class="mg-flow slow" stroke="var(--purple)" stroke-width="1.5" marker-end="url(#mg-arr)" marker-start="url(#mg-arr)"/>
+          <line id="mg-l-i2p"   x1="382.9" y1="259" x2="470.5" y2="310" class="mg-flow slow" stroke="var(--gr)" stroke-width="1.5" marker-end="url(#mg-arr)" marker-start="url(#mg-arr)"/>
+          <line id="mg-l-nn"    x1="317.1" y1="259" x2="229.5" y2="310" class="mg-flow slow" stroke="var(--indigo)" stroke-width="1.5" marker-end="url(#mg-arr)" marker-start="url(#mg-arr)"/>
+          <line id="mg-l-rb"    x1="350" y1="278" x2="350" y2="379" class="mg-flow slow" stroke="var(--sky)" stroke-width="1.5" marker-end="url(#mg-arr)" marker-start="url(#mg-arr)"/>
 
           <!-- Line labels -->
-          <text x="180" y="105" font-family="Courier New" font-size="10" fill="#fbbf24" text-anchor="middle">LoRa</text>
-          <text x="375" y="115" font-family="Courier New" font-size="10" fill="#60a5fa" text-anchor="middle">announces</text>
-          <text x="208" y="168" font-family="Courier New" font-size="10" fill="#2dd4bf" text-anchor="middle">LXMF</text>
-          <text x="491" y="168" font-family="Courier New" font-size="10" fill="#a78bfa" text-anchor="middle">MQTT</text>
-          <text x="478" y="252" font-family="Courier New" font-size="10" fill="#34d399" text-anchor="middle">I2P</text>
+          <text x="366" y="150" font-family="'JetBrains Mono',monospace" font-size="10" fill="var(--am)" text-anchor="middle">LoRa</text>
+          <text x="243" y="200" font-family="'JetBrains Mono',monospace" font-size="10" fill="var(--bl)" text-anchor="middle">LXMF</text>
+          <text x="457" y="200" font-family="'JetBrains Mono',monospace" font-size="10" fill="var(--purple)" text-anchor="middle">MQTT</text>
+          <text x="457" y="292" font-family="'JetBrains Mono',monospace" font-size="10" fill="var(--gr)" text-anchor="middle">I2P</text>
+          <text x="243" y="292" font-family="'JetBrains Mono',monospace" font-size="10" fill="var(--indigo)" text-anchor="middle">Nomadnet</text>
+          <text x="366" y="335" font-family="'JetBrains Mono',monospace" font-size="10" fill="var(--sky)" text-anchor="middle">Browser</text>
 
-          <!-- Node: RNode (top-left) -->
+          <!-- Node: RNode (top) -->
           <g class="mg-nc" id="mg-n-rnode">
-            <rect x="20" y="36" width="135" height="78" rx="12" fill="#1a1810" stroke="#fbbf24" stroke-width="1.5"/>
-            <circle cx="87" cy="64" r="9" fill="none" stroke="#fbbf24" stroke-width="0.5" class="mg-ring" style="animation-duration:2.6s"/>
-            <circle cx="87" cy="64" r="5" fill="#fbbf24"><animate attributeName="opacity" values="1;.4;1" dur="2.8s" repeatCount="indefinite"/></circle>
-            <text x="87" y="86" font-family="Courier New" font-size="12" fill="#e8eaf6" font-weight="700" text-anchor="middle">RNode</text>
-            <text x="87" y="101" font-family="Courier New" font-size="9.5" fill="#fbbf24" text-anchor="middle">LoRa 869 MHz</text>
+            <circle cx="350" cy="75" r="26" fill="none" stroke="var(--am)" stroke-width="0.5" class="mg-ring" style="animation-duration:2.6s"/>
+            <circle cx="350" cy="75" r="22" fill="var(--s3)" stroke="var(--am)" stroke-width="2"/>
+            <text x="350" y="80" font-family="'JetBrains Mono',monospace" font-size="12" font-weight="700" fill="var(--am)" text-anchor="middle">RN</text>
+            <text x="350" y="33" font-family="'JetBrains Mono',monospace" font-size="12" font-weight="700" fill="var(--tx)" text-anchor="middle">RNode</text>
+            <text x="350" y="47" font-family="'JetBrains Mono',monospace" font-size="9.5" fill="var(--am)" text-anchor="middle">LoRa 869 MHz</text>
           </g>
 
-          <!-- Globe: RNS Network (top-right) -->
-          <g class="mg-nc" id="mg-n-net">
-            <rect x="282" y="36" width="135" height="78" rx="12" fill="#10182a" stroke="#60a5fa" stroke-width="1.5"/>
-            <circle cx="350" cy="64" r="16" fill="none" stroke="#60a5fa" stroke-width="1" opacity="0.6"/>
-            <ellipse cx="350" cy="64" rx="16" ry="6" fill="none" stroke="#60a5fa" stroke-width="0.6" opacity="0.5"/>
-            <ellipse cx="350" cy="64" rx="9" ry="16" fill="none" stroke="#60a5fa" stroke-width="0.6" opacity="0.4"/>
-            <circle cx="345" cy="60" r="1.8" fill="#60a5fa"><animate attributeName="opacity" values="0.9;0.2;0.9" dur="2.1s" repeatCount="indefinite"/></circle>
-            <circle cx="357" cy="68" r="1.4" fill="#60a5fa"><animate attributeName="opacity" values="0.7;0.1;0.7" dur="3s" repeatCount="indefinite"/></circle>
-            <text x="350" y="91" font-family="Courier New" font-size="12" fill="#e8eaf6" font-weight="700" text-anchor="middle">RNS Network</text>
-            <text x="350" y="106" font-family="Courier New" font-size="9.5" fill="#60a5fa" text-anchor="middle">public mesh</text>
-          </g>
-
-          <!-- Node: Reticulum (mid-left) -->
+          <!-- Node: Reticulum (upper-left) -->
           <g class="mg-nc" id="mg-n-rns">
-            <rect x="20" y="142" width="135" height="78" rx="12" fill="#10201c" stroke="#2dd4bf" stroke-width="1.5"/>
-            <circle cx="87" cy="170" r="14" fill="none" stroke="#2dd4bf" stroke-width="0.5" class="mg-ring"/>
-            <circle cx="87" cy="170" r="7" fill="#2dd4bf"><animate attributeName="opacity" values="1;.5;1" dur="2s" repeatCount="indefinite"/></circle>
-            <text x="87" y="192" font-family="Courier New" font-size="12" fill="#e8eaf6" font-weight="700" text-anchor="middle">Reticulum</text>
-            <text x="87" y="207" font-family="Courier New" font-size="9.5" fill="#2dd4bf" text-anchor="middle" id="mg-rns-status">rnsd · active</text>
+            <circle cx="207" cy="158" r="26" fill="none" stroke="var(--bl)" stroke-width="0.5" class="mg-ring"/>
+            <circle cx="207" cy="158" r="22" fill="var(--s3)" stroke="var(--bl)" stroke-width="2"/>
+            <text x="207" y="163" font-family="'JetBrains Mono',monospace" font-size="12" font-weight="700" fill="var(--bl)" text-anchor="middle">RS</text>
+            <text x="207" y="116" font-family="'JetBrains Mono',monospace" font-size="12" font-weight="700" fill="var(--tx)" text-anchor="middle">Reticulum</text>
+            <text x="207" y="130" font-family="'JetBrains Mono',monospace" font-size="9.5" fill="var(--bl)" text-anchor="middle" id="mg-rns-status">rnsd · active</text>
           </g>
 
           <!-- Node: NOEMA hub (center) -->
           <g class="mg-nc" id="mg-n-hub">
-            <rect x="262" y="142" width="176" height="78" rx="14" fill="#15241c" stroke="#4ade9a" stroke-width="2"/>
-            <circle cx="350" cy="166" r="16" fill="none" stroke="#4ade9a" stroke-width="0.5" class="mg-ring" style="animation-duration:1.8s"/>
-            <circle cx="350" cy="166" r="8" fill="#4ade9a"><animate attributeName="opacity" values="1;.6;1" dur="1.6s" repeatCount="indefinite"/></circle>
-            <text x="350" y="189" font-family="Courier New" font-size="13" fill="#e8eaf6" font-weight="700" text-anchor="middle">NOEMA RNSGate</text>
-            <text x="350" y="204" font-family="Courier New" font-size="9.5" fill="#8b90c0" text-anchor="middle">noema_lxmf_bridge</text>
-            <text x="350" y="216" font-family="Courier New" font-size="9.5" fill="#4ade9a" text-anchor="middle" id="mg-hub-status">● active</text>
+            <circle cx="350" cy="240" r="40" fill="none" stroke="var(--teal)" stroke-width="0.5" style="animation:mg-ring-hub 2s ease-out infinite"/>
+            <circle cx="350" cy="240" r="34" fill="var(--s3)" stroke="var(--teal)" stroke-width="2.5"/>
+            <text x="350" y="245" font-family="'JetBrains Mono',monospace" font-size="15" font-weight="700" fill="var(--teal)" text-anchor="middle">GW</text>
+            <text x="350" y="292" font-family="'JetBrains Mono',monospace" font-size="12" font-weight="700" fill="var(--tx)" text-anchor="middle">NOEMA RNSGate</text>
+            <text x="350" y="306" font-family="'JetBrains Mono',monospace" font-size="9.5" fill="var(--mu)" text-anchor="middle">noema_lxmf_bridge</text>
+            <text x="350" y="320" font-family="'JetBrains Mono',monospace" font-size="9.5" font-weight="700" fill="var(--teal)" text-anchor="middle" id="mg-hub-status">● active</text>
           </g>
 
-          <!-- Node: MQTT Broker (mid-right) -->
+          <!-- Node: MQTT Broker (upper-right) -->
           <g class="mg-nc" id="mg-n-mqtt">
-            <rect x="545" y="142" width="135" height="78" rx="12" fill="#1c1730" stroke="#a78bfa" stroke-width="1.5"/>
-            <circle cx="612" cy="170" r="14" fill="none" stroke="#a78bfa" stroke-width="0.5" class="mg-ring" style="animation-duration:2.4s"/>
-            <circle cx="612" cy="170" r="7" fill="#a78bfa"><animate attributeName="opacity" values="1;.5;1" dur="2.4s" repeatCount="indefinite"/></circle>
-            <text x="612" y="192" font-family="Courier New" font-size="12" fill="#e8eaf6" font-weight="700" text-anchor="middle">MQTT</text>
-            <text x="612" y="207" font-family="Courier New" font-size="9.5" fill="#a78bfa" text-anchor="middle" id="mg-mqtt-status">broker · —</text>
+            <circle cx="493" cy="158" r="26" fill="none" stroke="var(--purple)" stroke-width="0.5" class="mg-ring" style="animation-duration:2.4s"/>
+            <circle cx="493" cy="158" r="22" fill="var(--s3)" stroke="var(--purple)" stroke-width="2"/>
+            <text x="493" y="163" font-family="'JetBrains Mono',monospace" font-size="12" font-weight="700" fill="var(--purple)" text-anchor="middle">MQ</text>
+            <text x="493" y="116" font-family="'JetBrains Mono',monospace" font-size="12" font-weight="700" fill="var(--tx)" text-anchor="middle">MQTT</text>
+            <text x="493" y="130" font-family="'JetBrains Mono',monospace" font-size="9.5" fill="var(--purple)" text-anchor="middle" id="mg-mqtt-status">broker · —</text>
           </g>
 
-          <!-- Node: I2P (bottom-right) -->
+          <!-- Node: I2P (lower-right) -->
           <g class="mg-nc" id="mg-n-i2p">
-            <rect x="545" y="238" width="135" height="78" rx="12" fill="#0f211a" stroke="#34d399" stroke-width="1.5"/>
-            <circle cx="612" cy="266" r="14" fill="none" stroke="#34d399" stroke-width="0.5" class="mg-ring" style="animation-duration:2.8s"/>
-            <circle cx="612" cy="266" r="7" fill="#34d399"><animate attributeName="opacity" values="1;.5;1" dur="2.8s" repeatCount="indefinite"/></circle>
-            <text x="612" y="288" font-family="Courier New" font-size="12" fill="#e8eaf6" font-weight="700" text-anchor="middle">I2P</text>
-            <text x="612" y="303" font-family="Courier New" font-size="9.5" fill="#34d399" text-anchor="middle" id="mg-i2p-status">i2pd · —</text>
+            <circle cx="493" cy="323" r="26" fill="none" stroke="var(--gr)" stroke-width="0.5" class="mg-ring" style="animation-duration:2.8s"/>
+            <circle cx="493" cy="323" r="22" fill="var(--s3)" stroke="var(--gr)" stroke-width="2"/>
+            <text x="493" y="328" font-family="'JetBrains Mono',monospace" font-size="12" font-weight="700" fill="var(--gr)" text-anchor="middle">I2P</text>
+            <text x="493" y="361" font-family="'JetBrains Mono',monospace" font-size="12" font-weight="700" fill="var(--tx)" text-anchor="middle">I2P</text>
+            <text x="493" y="375" font-family="'JetBrains Mono',monospace" font-size="9.5" fill="var(--gr)" text-anchor="middle" id="mg-i2p-status">i2pd · —</text>
           </g>
 
-          <!-- Line: hub to Nomadnet -->
-          <line id="mg-l-nn" x1="350" y1="220" x2="90" y2="358" class="mg-flow slow" stroke="#818cf8" stroke-width="1.5" marker-end="url(#mg-arr)" marker-start="url(#mg-arr)"/>
-          <text x="210" y="285" font-family="Courier New" font-size="10" fill="#818cf8" text-anchor="middle">Nomadnet</text>
-
-          <!-- Node: Nomadnet (bottom-left) -->
+          <!-- Node: Nomadnet (lower-left) -->
           <g class="mg-nc" id="mg-n-nn">
-            <rect x="20" y="330" width="140" height="78" rx="12" fill="#1a1830" stroke="#818cf8" stroke-width="1.5"/>
-            <circle cx="90" cy="358" r="14" fill="none" stroke="#818cf8" stroke-width="0.5" class="mg-ring" style="animation-duration:3s"/>
-            <circle cx="90" cy="358" r="7" fill="#818cf8"><animate attributeName="opacity" values="1;.5;1" dur="3s" repeatCount="indefinite"/></circle>
-            <text x="90" y="380" font-family="Courier New" font-size="12" fill="#e8eaf6" font-weight="700" text-anchor="middle">Nomadnet</text>
-            <text x="90" y="395" font-family="Courier New" font-size="9.5" fill="#818cf8" text-anchor="middle" id="mg-nn-status">nomadnet · —</text>
+            <circle cx="207" cy="323" r="26" fill="none" stroke="var(--indigo)" stroke-width="0.5" class="mg-ring" style="animation-duration:3s"/>
+            <circle cx="207" cy="323" r="22" fill="var(--s3)" stroke="var(--indigo)" stroke-width="2"/>
+            <text x="207" y="328" font-family="'JetBrains Mono',monospace" font-size="12" font-weight="700" fill="var(--indigo)" text-anchor="middle">NN</text>
+            <text x="207" y="361" font-family="'JetBrains Mono',monospace" font-size="12" font-weight="700" fill="var(--tx)" text-anchor="middle">Nomadnet</text>
+            <text x="207" y="375" font-family="'JetBrains Mono',monospace" font-size="9.5" fill="var(--indigo)" text-anchor="middle" id="mg-nn-status">nomadnet · —</text>
           </g>
-          <!-- Line: hub to rBrowser -->
-          <line id="mg-l-rb" x1="438" y1="220" x2="545" y2="358" class="mg-flow slow" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#mg-arr)" marker-start="url(#mg-arr)"/>
-          <text x="510" y="308" font-family="Courier New" font-size="10" fill="#38bdf8" text-anchor="middle">Browser</text>
 
-          <!-- Node: rBrowser (bottom-right) -->
+          <!-- Node: rBrowser (bottom) -->
           <g class="mg-nc" id="mg-n-rb">
-            <rect x="545" y="330" width="135" height="78" rx="12" fill="#0f1f2a" stroke="#38bdf8" stroke-width="1.5"/>
-            <circle cx="612" cy="358" r="14" fill="none" stroke="#38bdf8" stroke-width="0.5" class="mg-ring" style="animation-duration:2.5s"/>
-            <circle cx="612" cy="358" r="7" fill="#38bdf8"><animate attributeName="opacity" values="1;.5;1" dur="2.5s" repeatCount="indefinite"/></circle>
-            <text x="612" y="380" font-family="Courier New" font-size="12" fill="#e8eaf6" font-weight="700" text-anchor="middle">rBrowser</text>
-            <text x="612" y="395" font-family="Courier New" font-size="9.5" fill="#38bdf8" text-anchor="middle" id="mg-rb-status">rbrowser · —</text>
+            <circle cx="350" cy="405" r="26" fill="none" stroke="var(--sky)" stroke-width="0.5" class="mg-ring" style="animation-duration:2.5s"/>
+            <circle cx="350" cy="405" r="22" fill="var(--s3)" stroke="var(--sky)" stroke-width="2"/>
+            <text x="350" y="410" font-family="'JetBrains Mono',monospace" font-size="12" font-weight="700" fill="var(--sky)" text-anchor="middle">RB</text>
+            <text x="350" y="443" font-family="'JetBrains Mono',monospace" font-size="12" font-weight="700" fill="var(--tx)" text-anchor="middle">rBrowser</text>
+            <text x="350" y="457" font-family="'JetBrains Mono',monospace" font-size="9.5" fill="var(--sky)" text-anchor="middle" id="mg-rb-status">rbrowser · —</text>
           </g>
         </svg>
+        </div>
+        <div class="svc-arch-col" id="svc-list-right"></div>
       </div>
-        <div style="display:none">
-          <div class="section-lbl" style="margin-bottom:8px">Recent messages</div>
-          <div id="home-msgs" style="font-size:12px;line-height:1.9;color:var(--mu);min-height:120px;max-height:200px;overflow-y:auto">no messages</div>
+      <div class="svc-mobile-only">
+        <div id="svc-list-mobile"></div>
+        <div class="brow">
+          <button class="sys-btn am" onclick="restartAll()">restart all</button>
         </div>
-        <div style="display:none">
-          <div>
-            <div class="section-lbl" style="margin-bottom:8px">Public Nodes</div>
-            <div id="home-nodes" style="font-size:12px;line-height:1.9">—</div>
-          </div>
-          <div style="background:var(--s1);border:1px solid var(--bd);border-radius:2px;padding:10px 14px;box-shadow:var(--shadow)">
-            <div class="section-lbl" style="margin-bottom:8px">RNS interfaces</div>
-            <div id="home-rns" style="font-size:12px;line-height:1.9">—</div>
-          </div>
-        </div>
+      </div>
+      <div style="display:none">
+        <div id="home-msgs">no messages</div>
+        <div id="home-nodes">—</div>
+        <div id="home-rns">—</div>
       </div>
       </div>
     </div>
@@ -554,14 +586,14 @@ function chatShowMessages(){
     <!-- MONITOR -->
     <div class="panel" id="panel-monitor">
       <div class="two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;flex:1;min-height:0">
-        <div style="display:flex;flex-direction:column;background:var(--s1);border:1px solid var(--bd);border-radius:2px;overflow:hidden">
+        <div style="display:flex;flex-direction:column;background:var(--s1);border:1px solid var(--bd);border-radius:12px;overflow:hidden">
           <div style="padding:8px 12px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between">
             <div class="section-lbl" style="margin:0">LXMF Messages</div>
             <button class="sys-btn" onclick="clearLxmf()">CLEAR</button>
           </div>
           <div class="lxmf-box" id="lxmf-box" style="flex:1;height:auto;border-radius:0;border:none"></div>
         </div>
-        <div style="display:flex;flex-direction:column;background:var(--s1);border:1px solid var(--bd);border-radius:2px;overflow:hidden">
+        <div style="display:flex;flex-direction:column;background:var(--s1);border:1px solid var(--bd);border-radius:12px;overflow:hidden">
           <div style="padding:8px 12px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between">
             <div class="section-lbl" style="margin:0">RNS interfaces</div>
             <button class="sys-btn teal" onclick="loadRns()">REFRESH</button>
@@ -579,7 +611,7 @@ function chatShowMessages(){
       </div>
 
       <!-- Status -->
-      <div id="i2p-status-block" style="background:var(--s2);border:1px solid var(--bd);border-radius:2px;padding:12px 14px;margin-bottom:12px">
+      <div id="i2p-status-block" style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:12px 14px;margin-bottom:12px">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
           <div id="i2p-dot" class="dot" style="width:10px;height:10px;background:var(--mu)"></div>
           <div style="font-size:13px;font-weight:700;color:var(--tx)">i2pd daemon</div>
@@ -602,11 +634,11 @@ function chatShowMessages(){
 
       <!-- Reticulum integration -->
       <div class="section-lbl" style="margin-bottom:8px">Reticulum Interface</div>
-      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:2px;padding:12px 14px;margin-bottom:12px">
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:12px 14px;margin-bottom:12px">
         <div style="font-size:11px;color:var(--mu);margin-bottom:8px">Add I2P interface to Reticulum config pointing to a remote node:</div>
         <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
-          <input id="i2p-peer-addr" placeholder="xxxxx.b32.i2p" style="flex:1;min-width:200px;background:var(--bg);border:1px solid var(--bd);border-radius:2px;padding:6px 10px;color:var(--tx);font-size:12px;font-family:var(--fn)">
-          <input id="i2p-peer-name" placeholder="Interface name" value="I2P-Node" style="width:120px;background:var(--bg);border:1px solid var(--bd);border-radius:2px;padding:6px 10px;color:var(--tx);font-size:12px">
+          <input id="i2p-peer-addr" placeholder="xxxxx.b32.i2p" style="flex:1;min-width:200px;background:var(--bg);border:1px solid var(--bd);border-radius:12px;padding:6px 10px;color:var(--tx);font-size:12px;font-family:var(--fn)">
+          <input id="i2p-peer-name" placeholder="Interface name" value="I2P-Node" style="width:120px;background:var(--bg);border:1px solid var(--bd);border-radius:12px;padding:6px 10px;color:var(--tx);font-size:12px">
           <button class="sys-btn teal" onclick="i2pAddInterface()">ADD TO CONFIG</button>
         </div>
         <div id="i2p-rns-status" style="font-size:11px;color:var(--mu)"></div>
@@ -614,14 +646,14 @@ function chatShowMessages(){
 
       <!-- Setup tunnel -->
       <div class="section-lbl" style="margin-bottom:8px">Local Tunnel Setup</div>
-      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:2px;padding:12px 14px;margin-bottom:12px">
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:12px 14px;margin-bottom:12px">
         <div style="font-size:11px;color:var(--mu);margin-bottom:8px">Create incoming I2P tunnel for this MeshGate (so others can connect anonymously):</div>
         <button class="sys-btn teal" onclick="i2pAction('setup_tunnel')">SETUP I2P TUNNEL</button>
         <div id="i2p-tunnel-result" style="margin-top:8px;font-size:11px;color:var(--teal);font-family:var(--fn)"></div>
       </div>
 
       <!-- Output -->
-      <div id="i2p-output" style="font-family:var(--fn);font-size:11px;color:var(--teal);background:var(--bg);border:1px solid var(--bd);border-radius:2px;padding:8px 10px;min-height:32px;white-space:pre-wrap;display:none"></div>
+      <div id="i2p-output" style="font-family:var(--fn);font-size:11px;color:var(--teal);background:var(--bg);border:1px solid var(--bd);border-radius:12px;padding:8px 10px;min-height:32px;white-space:pre-wrap;display:none"></div>
     </div>
 
     <!-- NOMADNET -->
@@ -653,7 +685,7 @@ function chatShowMessages(){
         <div id="nn-file-label" style="font-size:11px;color:var(--mu);flex-shrink:0">—</div>
 
         <!-- Editor -->
-        <textarea id="nn-editor" style="flex:1;min-height:0;width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:2px;padding:10px;color:var(--tx);font-family:var(--fn);font-size:12px;resize:none;box-sizing:border-box" spellcheck="false"></textarea>
+        <textarea id="nn-editor" style="flex:1;min-height:0;width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:12px;padding:10px;color:var(--tx);font-family:var(--fn);font-size:12px;resize:none;box-sizing:border-box" spellcheck="false"></textarea>
 
         <!-- Action buttons -->
         <div style="display:flex;gap:8px;align-items:center;flex-shrink:0;flex-wrap:wrap">
@@ -665,10 +697,10 @@ function chatShowMessages(){
         </div>
 
         <!-- Cron block (scripts only) -->
-        <div id="nn-cron-block" style="display:none;background:var(--s2);border:1px solid var(--bd);border-radius:2px;padding:10px 14px;flex-shrink:0">
+        <div id="nn-cron-block" style="display:none;background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:10px 14px;flex-shrink:0">
           <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
             <span style="font-size:13px;color:var(--mu);text-transform:uppercase;letter-spacing:.06em">Schedule</span>
-            <select id="nn-cron-select" style="font-family:var(--fn);font-size:13px;padding:5px 10px;border-radius:2px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);cursor:pointer">
+            <select id="nn-cron-select" style="font-family:var(--fn);font-size:13px;padding:5px 10px;border-radius:12px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);cursor:pointer">
               <option value="">— disabled —</option>
               <option value="*/5 * * * *">Every 5 min</option>
               <option value="*/15 * * * *">Every 15 min</option>
@@ -682,7 +714,7 @@ function chatShowMessages(){
           </div>
         </div>
 
-        <div id="nn-output" style="font-family:var(--fn);font-size:11px;color:var(--teal);background:var(--bg);border:1px solid var(--bd);border-radius:2px;padding:8px 10px;white-space:pre-wrap;display:none;flex-shrink:0"></div>
+        <div id="nn-output" style="font-family:var(--fn);font-size:11px;color:var(--teal);background:var(--bg);border:1px solid var(--bd);border-radius:12px;padding:8px 10px;white-space:pre-wrap;display:none;flex-shrink:0"></div>
       </div>
     </div>
 
@@ -692,7 +724,7 @@ function chatShowMessages(){
       <div class="two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
 
       <!-- LXMF Bridge -->
-      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:2px;padding:14px 16px">
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:14px 16px">
         <div style="font-size:11px;color:var(--mu);margin-bottom:4px">🔹 LXMF Bridge</div>
         <div style="font-size:10px;color:var(--mu);margin-bottom:6px">For receiving commands from Reticulum to MQTT / Home Assistant. Add to Sideband as a contact.</div>
         <div id="ap-lxmf-bridge" style="font-family:var(--fn);font-size:12px;color:var(--teal);word-break:break-all;margin-bottom:8px">—</div>
@@ -702,7 +734,7 @@ function chatShowMessages(){
 
 
       <!-- I2P -->
-      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:2px;padding:14px 16px">
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:14px 16px">
         <div style="font-size:11px;color:var(--mu);margin-bottom:4px">🔹 I2P Address (b32)</div>
         <div style="font-size:10px;color:var(--mu);margin-bottom:6px">Anonymous connection without public IP. Share with another gateway.</div>
         <div id="ap-i2p" style="font-family:var(--fn);font-size:12px;color:var(--teal);word-break:break-all;margin-bottom:8px">—</div>
@@ -710,7 +742,7 @@ function chatShowMessages(){
       </div>
 
       <!-- Nomadnet Node -->
-      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:2px;padding:14px 16px">
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:14px 16px">
         <div style="font-size:11px;color:var(--mu);margin-bottom:4px">🌐 Nomadnet Node</div>
         <div style="font-size:10px;color:var(--mu);margin-bottom:6px">Gateway info page in the Reticulum network.</div>
         <div id="ap-nn-node" style="font-family:var(--fn);font-size:12px;color:var(--teal);word-break:break-all;margin-bottom:8px">—</div>
@@ -718,7 +750,7 @@ function chatShowMessages(){
       </div>
 
       <!-- Nomadnet Chat -->
-      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:2px;padding:14px 16px">
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:14px 16px">
         <div style="font-size:11px;color:var(--mu);margin-bottom:4px">💬 Nomadnet Chat</div>
         <div style="font-size:10px;color:var(--mu);margin-bottom:6px">IRC-style chat in the Nomadnet network. Open in Nomadnet browser.</div>
         <div id="ap-nn-chat" style="font-family:var(--fn);font-size:12px;color:var(--teal);word-break:break-all;margin-bottom:8px">—</div>
@@ -726,7 +758,7 @@ function chatShowMessages(){
       </div>
 
       <!-- NOEMA Chat -->
-      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:2px;padding:14px 16px">
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:14px 16px">
         <div style="font-size:11px;color:var(--mu);margin-bottom:4px">💬 NOEMA Chat</div>
         <div style="font-size:10px;color:var(--mu);margin-bottom:6px">LXMF address of the gateway chat. Add to Sideband or CrossTalk to message the gateway directly.</div>
         <div id="ap-chat-addr" style="font-family:var(--fn);font-size:12px;color:var(--teal);word-break:break-all;margin-bottom:8px">—</div>
@@ -743,7 +775,7 @@ function chatShowMessages(){
         <a id="rbrowser-link" href="#" target="_blank" class="sys-btn teal" style="text-decoration:none">OPEN RBROWSER</a>
         <span style="font-size:11px;color:var(--mu)">rBrowser · порт 5000</span>
       </div>
-      <iframe id="rbrowser-frame" style="width:100%;height:calc(100vh - 200px);border:none;border-radius:2px;flex:1"></iframe>
+      <iframe id="rbrowser-frame" style="width:100%;height:calc(100vh - 200px);border:none;border-radius:12px;flex:1"></iframe>
       <script>
         var _rbHost = "http://"+window.location.hostname+":5000";
         document.getElementById("rbrowser-frame").src = _rbHost;
@@ -796,7 +828,7 @@ function chatShowMessages(){
     <!-- LOGS -->
     <div class="panel" id="panel-logs">
       <div class="log-toolbar" style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-        <select id="log-unit" onchange="loadLogs()" style="background:var(--s2);border:1px solid var(--bd);border-radius:2px;color:var(--tx);padding:4px 8px;font-family:var(--fn);font-size:12px">
+        <select id="log-unit" onchange="loadLogs()" style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;color:var(--tx);padding:4px 8px;font-family:var(--fn);font-size:12px">
           <option value="noema_lxmf_bridge">noema_lxmf_bridge</option>
           <option value="rnsd">rnsd</option>
           <option value="nomadnet">nomadnet</option>
@@ -840,31 +872,31 @@ function chatShowMessages(){
 
         <!-- [reticulum] section -->
         <div class="section-lbl">Reticulum</div>
-        <div style="background:var(--s2);border:1px solid var(--bd);border-radius:2px;padding:12px;margin-bottom:16px">
+        <div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:12px;margin-bottom:16px">
           <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">
             <div>
               <div style="font-size:11px;color:var(--mu);margin-bottom:3px">enable_transport</div>
-              <select id="rns-main-transport" style="width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:2px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px">
+              <select id="rns-main-transport" style="width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:12px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px">
                 <option value="Yes">Yes</option><option value="No">No</option>
               </select>
             </div>
             <div>
               <div style="font-size:11px;color:var(--mu);margin-bottom:3px">share_instance</div>
-              <select id="rns-main-share" style="width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:2px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px">
+              <select id="rns-main-share" style="width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:12px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px">
                 <option value="Yes">Yes</option><option value="No">No</option>
               </select>
             </div>
             <div>
               <div style="font-size:11px;color:var(--mu);margin-bottom:3px">shared_instance_port</div>
-              <input id="rns-main-siport" value="37428" style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--bd);border-radius:2px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px">
+              <input id="rns-main-siport" value="37428" style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--bd);border-radius:12px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px">
             </div>
             <div>
               <div style="font-size:11px;color:var(--mu);margin-bottom:3px">instance_control_port</div>
-              <input id="rns-main-icport" value="37429" style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--bd);border-radius:2px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px">
+              <input id="rns-main-icport" value="37429" style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--bd);border-radius:12px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px">
             </div>
             <div>
               <div style="font-size:11px;color:var(--mu);margin-bottom:3px">panic_on_interface_error</div>
-              <select id="rns-main-panic" style="width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:2px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px">
+              <select id="rns-main-panic" style="width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:12px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px">
                 <option value="No">No</option><option value="Yes">Yes</option>
               </select>
             </div>
@@ -873,7 +905,7 @@ function chatShowMessages(){
 
         <!-- Interfaces -->
         <div class="section-lbl" style="margin-bottom:8px">Interfaces</div>
-        <div id="rns-cfg-ifaces" style="border:1px solid var(--bd);border-radius:2px;overflow:hidden;min-height:200px">
+        <div id="rns-cfg-ifaces" style="border:1px solid var(--bd);border-radius:12px;overflow:hidden;min-height:200px">
           <div style="display:grid;grid-template-columns:200px 1fr" id="rns-ifaces-split">
             <div id="rns-iface-list" style="border-right:1px solid var(--bd);overflow-y:auto"></div>
             <div id="rns-iface-detail" style="padding:16px;overflow-y:auto"><div style="color:var(--mu);font-size:12px;margin-top:40px;text-align:center">Select an interface</div></div>
@@ -890,15 +922,15 @@ function chatShowMessages(){
 
       <!-- Add Interface Modal -->
       <div id="add-iface-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center">
-        <div style="background:var(--s1);border:1px solid var(--bd);border-radius:2px;padding:20px;width:90%;max-width:400px">
+        <div style="background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:20px;width:90%;max-width:400px">
           <div style="font-size:14px;font-weight:600;margin-bottom:16px">Add Interface</div>
           <div style="margin-bottom:12px">
             <div style="font-size:11px;color:var(--mu);margin-bottom:4px">Interface Name</div>
-            <input id="new-iface-name" placeholder="My Interface" style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--bd);border-radius:2px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:6px 10px">
+            <input id="new-iface-name" placeholder="My Interface" style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--bd);border-radius:12px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:6px 10px">
           </div>
           <div style="margin-bottom:16px">
             <div style="font-size:11px;color:var(--mu);margin-bottom:4px">Type</div>
-            <select id="new-iface-type" onchange="updateNewIfaceHint()" style="width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:2px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:6px 10px">
+            <select id="new-iface-type" onchange="updateNewIfaceHint()" style="width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:12px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:6px 10px">
               <option value="AutoInterface">AutoInterface — local LAN/WiFi discovery</option>
               <option value="TCPClientInterface">TCPClientInterface — connect to TCP server</option>
               <option value="TCPServerInterface">TCPServerInterface — listen for connections</option>
@@ -909,7 +941,7 @@ function chatShowMessages(){
               <option value="SerialInterface">SerialInterface — serial port</option>
             </select>
           </div>
-          <div id="new-iface-hint" style="font-size:11px;color:var(--mu);margin-bottom:16px;padding:8px;background:var(--bg);border-radius:2px"></div>
+          <div id="new-iface-hint" style="font-size:11px;color:var(--mu);margin-bottom:16px;padding:8px;background:var(--bg);border-radius:12px"></div>
           <div style="display:flex;gap:8px">
             <button class="sys-btn teal" onclick="confirmAddIface()">ADD</button>
             <button class="sys-btn" onclick="hideAddIfaceModal()">CANCEL</button>
@@ -927,11 +959,11 @@ function chatShowMessages(){
       <div id="rnode-status" style="margin-bottom:12px"></div>
       <div id="rnode-metrics" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:16px"></div>
       <div class="two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
-        <div style="background:var(--s1);border:1px solid var(--bd);border-radius:2px;padding:10px 12px;min-width:0;overflow:hidden">
+        <div style="background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:10px 12px;min-width:0;overflow:hidden">
           <div class="section-lbl" style="margin-bottom:8px">Airtime % (15s)</div>
           <div style="position:relative;height:160px"><canvas id="rnode-chart-airtime"></canvas></div>
         </div>
-        <div style="background:var(--s1);border:1px solid var(--bd);border-radius:2px;padding:10px 12px;min-width:0;overflow:hidden">
+        <div style="background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:10px 12px;min-width:0;overflow:hidden">
           <div class="section-lbl" style="margin-bottom:8px">Noise dBm</div>
           <div style="position:relative;height:160px"><canvas id="rnode-chart-noise"></canvas></div>
         </div>
@@ -952,12 +984,12 @@ function chatShowMessages(){
           </div>
         </div>
         <div id="nodes-monitor-list"></div>
-        <div id="add-node-form" style="display:none;margin-top:10px;padding:10px;background:var(--s1);border:1px solid var(--bd);border-radius:2px">
+        <div id="add-node-form" style="display:none;margin-top:10px;padding:10px;background:var(--s1);border:1px solid var(--bd);border-radius:12px">
           <div style="font-size:12px;font-weight:700;margin-bottom:8px">New node</div>
           <div style="display:flex;gap:6px;flex-wrap:wrap">
-            <input id="new-node-name" placeholder="Name" style="flex:1;min-width:80px;font-family:var(--fn);font-size:12px;padding:5px 8px;border:1px solid var(--bd);border-radius:2px;background:var(--bg);color:var(--tx)">
-            <input id="new-node-host" placeholder="host" style="flex:2;min-width:120px;font-family:var(--fn);font-size:12px;padding:5px 8px;border:1px solid var(--bd);border-radius:2px;background:var(--bg);color:var(--tx)">
-            <input id="new-node-port" placeholder="port" value="4242" style="width:60px;font-family:var(--fn);font-size:12px;padding:5px 8px;border:1px solid var(--bd);border-radius:2px;background:var(--bg);color:var(--tx)">
+            <input id="new-node-name" placeholder="Name" style="flex:1;min-width:80px;font-family:var(--fn);font-size:12px;padding:5px 8px;border:1px solid var(--bd);border-radius:12px;background:var(--bg);color:var(--tx)">
+            <input id="new-node-host" placeholder="host" style="flex:2;min-width:120px;font-family:var(--fn);font-size:12px;padding:5px 8px;border:1px solid var(--bd);border-radius:12px;background:var(--bg);color:var(--tx)">
+            <input id="new-node-port" placeholder="port" value="4242" style="width:60px;font-family:var(--fn);font-size:12px;padding:5px 8px;border:1px solid var(--bd);border-radius:12px;background:var(--bg);color:var(--tx)">
             <button class="sys-btn teal" onclick="addNode()">Add</button>
             <button class="sys-btn" onclick="hideAddNode()">Cancel</button>
           </div>
@@ -965,7 +997,7 @@ function chatShowMessages(){
         <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--bd)">
           <div class="section-lbl">rnprobe</div>
           <div style="display:flex;gap:6px;margin-bottom:8px">
-            <input id="probe-addr" placeholder="LXMF address" style="flex:1;font-family:var(--fn);font-size:12px;padding:5px 8px;border:1px solid var(--bd);border-radius:2px;background:var(--s1);color:var(--tx)">
+            <input id="probe-addr" placeholder="LXMF address" style="flex:1;font-family:var(--fn);font-size:12px;padding:5px 8px;border:1px solid var(--bd);border-radius:12px;background:var(--s1);color:var(--tx)">
             <button class="sys-btn teal" onclick="doProbe()">▶ probe</button>
           </div>
           <div id="probe-result" style="font-size:12px;font-family:var(--fn);color:var(--mu);white-space:pre-wrap"></div>
@@ -982,7 +1014,7 @@ function chatShowMessages(){
       </div>
 
       <div class="section-lbl">Quick Commands</div>
-      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:2px;padding:10px 14px;margin-bottom:12px">
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:10px 14px;margin-bottom:12px">
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
           <button class="sys-btn" onclick="runCmd('find_ports')">Ports</button>
           <button class="sys-btn" onclick="runCmd('rnstatus')">RNStatus</button>
@@ -993,7 +1025,7 @@ function chatShowMessages(){
           <button class="sys-btn rd" onclick="runCmd('log_cleanup')">🗑 Clean Logs</button>
           <button class="sys-btn teal" onclick="if(confirm('Update NOEMA from GitHub and restart services?')) runCmd('noema_update')">⬆ Update NOEMA</button>
         </div>
-        <div id="cmd-output" style="font-family:var(--fn);font-size:11px;color:var(--teal);background:var(--bg);border-radius:2px;padding:8px 10px;min-height:32px;white-space:pre-wrap;display:none"></div>
+        <div id="cmd-output" style="font-family:var(--fn);font-size:11px;color:var(--teal);background:var(--bg);border-radius:12px;padding:8px 10px;min-height:32px;white-space:pre-wrap;display:none"></div>
       </div>
 
       <div class="section-lbl">Chat Settings</div>
@@ -1038,7 +1070,7 @@ function chatShowMessages(){
       </div>
 
       <div class="section-lbl">Telegram Notifications</div>
-      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:2px;padding:14px;margin-bottom:12px">
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:12px">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
           <div>
             <div style="font-size:11px;color:var(--mu);margin-bottom:4px">Bot Token</div>
@@ -1065,7 +1097,7 @@ function chatShowMessages(){
       </div>
 
       <div class="section-lbl">Versions</div>
-      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:2px;padding:14px;margin-bottom:12px">
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:12px">
         <table style="width:100%;border-collapse:collapse;font-family:var(--fn);font-size:12px">
           <thead>
             <tr style="border-bottom:1px solid var(--bd)">
@@ -1099,6 +1131,14 @@ function chatShowMessages(){
       </div>
     </div>
 
+  </div>
+    <div class="hub-col right">
+      <div class="hub-pill" onclick="nav('i2p',this)"><div class="hub-pill-ic" style="color:var(--i2ptl)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6l7-3Z"/></svg></div><span>I2P</span></div>
+      <div class="hub-pill" onclick="nav('nomadnet',this);loadNomadnet();"><div class="hub-pill-ic" style="color:var(--sky)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15 9l-2 6-6 2 2-6 6-2Z"/></svg></div><span>Nomadnet</span></div>
+      <div class="hub-pill" onclick="nav('chat',this);loadChatPanel();"><div class="hub-pill-ic" style="color:var(--pink)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><span>Chat</span><span id="chat-badge" style="display:none;position:absolute;top:-4px;right:-4px;background:#f87171;color:#fff;border-radius:8px;padding:1px 5px;font-size:9px;font-weight:700"></span></div>
+      <div class="hub-pill" onclick="nav('logs',this)"><div class="hub-pill-ic" style="color:var(--slate)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9l3 3-3 3"/><line x1="12" y1="15" x2="17" y2="15"/></svg></div><span>Logs</span></div>
+      <div class="hub-pill" onclick="nav('system',this)"><div class="hub-pill-ic" style="color:var(--slate2)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/><rect x="10" y="10" width="4" height="4"/><line x1="9" y1="2" x2="9" y2="6"/><line x1="15" y1="2" x2="15" y2="6"/><line x1="9" y1="18" x2="9" y2="22"/><line x1="15" y1="18" x2="15" y2="22"/><line x1="2" y1="9" x2="6" y2="9"/><line x1="2" y1="15" x2="6" y2="15"/><line x1="18" y1="9" x2="22" y2="9"/><line x1="18" y1="15" x2="22" y2="15"/></svg></div><span>System</span></div>
+    </div>
   </div>
 </div>
 </div>
@@ -1140,7 +1180,7 @@ function chatShowMessages(){
 
 <!-- Reboot Modal -->
 <div id="reset-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:1000;align-items:center;justify-content:center">
-  <div style="background:var(--s2);border:1px solid var(--rd);border-radius:2px;padding:24px;max-width:420px;text-align:center">
+  <div style="background:var(--s2);border:1px solid var(--rd);border-radius:12px;padding:24px;max-width:420px;text-align:center">
     <div style="font-size:16px;font-weight:700;color:var(--rd);margin-bottom:12px">⚠ Reset Identity</div>
     <div style="font-size:13px;color:var(--mu);margin-bottom:20px">Reset: LXMF adress, I2P tonnel, Reticulum identity, chat history.<br><br></div>
     <div style="display:flex;gap:8px;justify-content:center">
@@ -1162,7 +1202,7 @@ function chatShowMessages(){
 </div>
 <!-- QR Modal -->
 <div id="qr-modal" onclick="this.style.display='none'">
-  <div id="qr-box" style="background:#fff;padding:20px;border-radius:2px;box-shadow:0 20px 60px rgba(0,0,0,.3)"></div>
+  <div id="qr-box" style="background:#fff;padding:20px;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.3)"></div>
   <div style="color:#fff;font-size:12px;font-family:var(--fn)" id="qr-addr"></div>
 </div>
 <script>
@@ -1173,7 +1213,7 @@ let lxmfMsgs=[];
 function toggleBurger(){const m=document.getElementById("burger-menu");m.classList.toggle("open");}
 function closeBurger(){document.getElementById("burger-menu").classList.remove("open");}
 function nav(id,el){
-  document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
+  document.querySelectorAll(".hub-pill").forEach(n=>n.classList.remove("active"));
   document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
   el.classList.add("active");
   document.getElementById("panel-"+id).classList.add("active");
@@ -1201,6 +1241,13 @@ function toast(msg,ok=true){
 }
 
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+function cssVar(name){return getComputedStyle(document.documentElement).getPropertyValue(name).trim()}
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute("data-theme")==="dark"?"dark":"light";
+  const next = cur==="dark"?"light":"dark";
+  document.documentElement.setAttribute("data-theme", next);
+  try{ localStorage.setItem("noema-theme", next); }catch(e){}
+}
 
 // Clock
 setInterval(()=>{
@@ -1255,8 +1302,26 @@ async function loadServices(){
   const r=await fetch(API+"/api/services");
   const data=await r.json();
   if(window.meshSetStatus) data.forEach(s=>window.meshSetStatus(s.name,s.status==="active"));
-  const el=document.getElementById("svc-list");
-  el.innerHTML=data.map(s=>`
+  const left=document.getElementById("svc-list-left");
+  const right=document.getElementById("svc-list-right");
+  if(left) left.innerHTML=data.map(s=>`
+    <div class="svc">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="dot" style="width:10px;height:10px;background:${s.status==="active"?"var(--gr)":"var(--rd)"}"></div>
+        <div class="svc-n">${esc(s.name)}</div>
+        <span class="badge ${s.status}">${esc(s.status)}</span>
+      </div>
+    </div>`).join("");
+  if(right) right.innerHTML=data.map(s=>`
+    <div class="svc" style="justify-content:flex-end">
+      <div class="svc-btns">
+        <button class="sys-btn teal" onclick="svcAction('${s.name}','start')">▶ start</button>
+        <button class="sys-btn rd" onclick="svcAction('${s.name}','stop')">■ stop</button>
+        <button class="sys-btn am" onclick="svcAction('${s.name}','restart')">↺ restart</button>
+      </div>
+    </div>`).join("");
+  const mobile=document.getElementById("svc-list-mobile");
+  if(mobile) mobile.innerHTML=data.map(s=>`
     <div class="svc">
       <div style="display:flex;align-items:center;gap:10px">
         <div class="dot" style="width:10px;height:10px;background:${s.status==="active"?"var(--gr)":"var(--rd)"}"></div>
@@ -1741,7 +1806,7 @@ function showQR(){
   const modal=document.getElementById("qr-modal");
   modal.style.display="flex";
   document.getElementById("qr-addr").textContent=addr;
-  document.getElementById("qr-box").innerHTML=`<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}" style="width:200px;height:200px;border-radius:2px">`;
+  document.getElementById("qr-box").innerHTML=`<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}" style="width:200px;height:200px;border-radius:12px">`;
 }
 
 // Addresses
@@ -1878,7 +1943,7 @@ function renderChatContacts(){
   }
   el.innerHTML = chatContacts.map((c,i) => {
     const unread = _contactUnread[c.addr] || 0;
-    const badge = unread > 0 ? `<span style="background:#f87171;color:#fff;border-radius:2px;padding:1px 5px;font-size:9px;margin-left:4px">${unread}</span>` : '';
+    const badge = unread > 0 ? `<span style="background:#f87171;color:#fff;border-radius:12px;padding:1px 5px;font-size:9px;margin-left:4px">${unread}</span>` : '';
     return `<div onclick="openChat('${c.addr}','${esc(c.name||'')}')" style="padding:9px 12px;cursor:pointer;border-bottom:1px solid var(--bd);border-left:2px solid ${chatCurrentAddr===c.addr?'var(--teal)':'transparent'};background:${chatCurrentAddr===c.addr?'var(--s3)':'transparent'}">
       <div style="display:flex;align-items:center;justify-content:space-between">
         <div style="font-size:12px;font-weight:700;color:${unread>0?'var(--tx)':'var(--tx)'}">${esc(c.name||c.addr.slice(0,8))}</div>
@@ -1914,7 +1979,7 @@ function renderChatMsgs(msgs){
     if(m.file_id){
       const isImg = m.file_mime && m.file_mime.startsWith("image/");
       if(isImg){
-        body = `<img src="/api/chat/files/${m.file_id}/preview" style="max-width:220px;max-height:180px;border-radius:2px;display:block;cursor:pointer;margin-bottom:4px" onclick="window.open('/api/chat/files/${m.file_id}/preview')">`;
+        body = `<img src="/api/chat/files/${m.file_id}/preview" style="max-width:220px;max-height:180px;border-radius:12px;display:block;cursor:pointer;margin-bottom:4px" onclick="window.open('/api/chat/files/${m.file_id}/preview')">`;
       } else {
         body = `<a href="/api/chat/files/${m.file_id}" style="color:var(--teal);font-size:12px;text-decoration:none;display:block;margin-bottom:4px">📎 ${esc(m.file_name||'file')} ${m.file_size?'('+Math.round(m.file_size/1024)+' КБ)':''}</a>`;
       }
@@ -2219,15 +2284,15 @@ async function loadSystemFiles(){
       const time = new Date(f.ts*1000).toLocaleString("ru",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"});
       return `<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--bd)">
         <div style="display:flex;align-items:center;gap:8px;min-width:0">
-          ${isImg?`<img src="/api/chat/files/${f.id}/preview" style="width:32px;height:32px;object-fit:cover;border-radius:2px;flex-shrink:0">`:'<div style="width:32px;height:32px;background:var(--bg);border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">📎</div>'}
+          ${isImg?`<img src="/api/chat/files/${f.id}/preview" style="width:32px;height:32px;object-fit:cover;border-radius:12px;flex-shrink:0">`:'<div style="width:32px;height:32px;background:var(--bg);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">📎</div>'}
           <div style="min-width:0">
             <div style="color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px">${esc(f.name)}</div>
             <div style="color:var(--mu);font-size:10px">${size} · ${time}</div>
           </div>
         </div>
         <div style="display:flex;gap:4px;flex-shrink:0">
-          <a href="/api/chat/files/${f.id}" style="color:var(--teal);text-decoration:none;font-size:11px;padding:2px 6px;border:1px solid var(--teal);border-radius:2px">↓</a>
-          <button onclick="deleteFile('${f.id}')" style="background:transparent;border:1px solid var(--rd);color:var(--rd);border-radius:2px;padding:2px 6px;font-size:11px;cursor:pointer;font-family:var(--fn)">✕</button>
+          <a href="/api/chat/files/${f.id}" style="color:var(--teal);text-decoration:none;font-size:11px;padding:2px 6px;border:1px solid var(--teal);border-radius:12px">↓</a>
+          <button onclick="deleteFile('${f.id}')" style="background:transparent;border:1px solid var(--rd);color:var(--rd);border-radius:12px;padding:2px 6px;font-size:11px;cursor:pointer;font-family:var(--fn)">✕</button>
         </div>
       </div>`;
     }).join("");
@@ -2286,20 +2351,20 @@ async function loadRmapNodes(){
         const l=document.createElementNS("http://www.w3.org/2000/svg","line");
         l.setAttribute("x1","50%");l.setAttribute("y1","50%");
         l.setAttribute("x2",p.x+"%");l.setAttribute("y2",p.y+"%");
-        l.setAttribute("stroke",isOn?"#3ddc84":"#4a5750");
+        l.setAttribute("stroke",isOn?"#16a34a":"var(--off)");
         l.setAttribute("stroke-width","1");
         l.setAttribute("stroke-dasharray",isOn?"5 5":"3 8");
-        l.setAttribute("opacity",isOn?"0.4":"0.2");
+        l.setAttribute("opacity",isOn?"0.45":"0.35");
         ln.appendChild(l);
       }
       const m=document.createElement("div");
       m.style.cssText="position:absolute;transform:translate(-50%,-50%);cursor:pointer;left:"+p.x+"%;top:"+p.y+"%";
-      const ds=isMe?"width:17px;height:17px;background:#60a5fa;border:2px solid #60a5fa;box-shadow:0 0 10px #60a5fa70"
-        :isOn?"width:13px;height:13px;background:#4ade9a;border:2px solid #4ade9a;box-shadow:0 0 8px #4ade9a60"
-        :"width:11px;height:11px;background:#333;border:2px solid #555";
-      const ring=isOn&&!isMe?'<div style="position:absolute;inset:-5px;border-radius:50%;border:1px solid #4ade9a50;animation:rmap-ring 2.5s ease-out infinite"></div>':'';
+      const ds=isMe?"width:17px;height:17px;background:#2563eb;border:2px solid #2563eb;box-shadow:0 0 10px #2563eb55"
+        :isOn?"width:13px;height:13px;background:#16a34a;border:2px solid #16a34a;box-shadow:0 0 8px #16a34a4d"
+        :"width:11px;height:11px;background:var(--bd);border:2px solid var(--off)";
+      const ring=isOn&&!isMe?'<div style="position:absolute;inset:-5px;border-radius:50%;border:1px solid #16a34a40;animation:rmap-ring 2.5s ease-out infinite"></div>':'';
       m.innerHTML='<div style="border-radius:50%;'+ds+'">'+ring+'</div>'
-        +'<div style="position:absolute;top:18px;left:50%;transform:translateX(-50%);background:var(--bg);border:1px solid var(--bd);border-radius:2px;padding:1px 7px;font-size:10px;white-space:nowrap;font-family:var(--fn);color:'+(isOn?'var(--tx)':'var(--mu)')+'">'+esc(n.name)+'</div>';
+        +'<div style="position:absolute;top:18px;left:50%;transform:translateX(-50%);background:var(--bg);border:1px solid var(--bd);border-radius:12px;padding:1px 7px;font-size:10px;white-space:nowrap;font-family:var(--fn);color:'+(isOn?'var(--tx)':'var(--mu)')+'">'+esc(n.name)+'</div>';
       m.onclick=()=>{
         clearTimeout(_rmapT);
         const pop=document.getElementById("rmap-popup");
@@ -2421,7 +2486,7 @@ function selectRnode(idx){
   ].filter(Boolean);
 
   if(metricsEl) metricsEl.innerHTML = metrics.map(m=>`
-    <div style="background:var(--s2);border:1px solid var(--bd);border-radius:2px;padding:8px 10px">
+    <div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:8px 10px">
       <div style="font-size:14px;margin-bottom:3px">${m.icon}</div>
       <div style="font-size:9px;color:var(--mu);letter-spacing:.07em;text-transform:uppercase;margin-bottom:2px">${esc(m.label)}</div>
       <div style="font-size:12px;font-weight:700;color:var(--teal)">${esc(m.value)}</div>
@@ -2458,8 +2523,8 @@ async function loadRnodeCharts(rnodeName){
         animation:false,
         plugins:{legend:{display:false}},
         scales:{
-          x:{ticks:{color:"#8b90c0",font:{size:9},maxTicksLimit:8},grid:{color:"#3d4270"}},
-          y:{ticks:{color:"#8b90c0",font:{size:9}},grid:{color:"#3d4270"}}
+          x:{ticks:{color:cssVar("--mu"),font:{size:9},maxTicksLimit:8},grid:{color:cssVar("--chart-grid")}},
+          y:{ticks:{color:cssVar("--mu"),font:{size:9}},grid:{color:cssVar("--chart-grid")}}
         }
       }
     });
@@ -2492,7 +2557,7 @@ async function loadTrafficCharts(){
       const safeId = "tc-"+name.replace(/[^a-z0-9]/gi,"_");
       if(!document.getElementById(safeId)){
         const div = document.createElement("div");
-        div.style.cssText = "background:var(--s1);border:1px solid var(--bd);border-radius:2px;padding:10px 12px;min-width:0;overflow:hidden";
+        div.style.cssText = "background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:10px 12px;min-width:0;overflow:hidden";
         const shortName = name.replace(/.*\[/,"").replace(/\].*/,"");
         div.innerHTML = `<div class="section-lbl" style="margin-bottom:4px;font-size:10px">${esc(shortName)}</div><div style="position:relative;height:80px"><canvas id="${safeId}"></canvas></div>`;
         container.appendChild(div);
@@ -2548,10 +2613,10 @@ async function loadTrafficCharts(){
         },
         options:{
           responsive:true,maintainAspectRatio:false,animation:false,
-          plugins:{legend:{display:true,labels:{color:"#8b90c0",font:{size:8},boxWidth:8}}},
+          plugins:{legend:{display:true,labels:{color:cssVar("--mu"),font:{size:8},boxWidth:8}}},
           scales:{
             x:{display:false},
-            y:{ticks:{color:"#8b90c0",font:{size:8}},grid:{color:"#3d4270"}}
+            y:{ticks:{color:cssVar("--mu"),font:{size:8}},grid:{color:cssVar("--chart-grid")}}
           }
         }
       });
@@ -2888,9 +2953,9 @@ fetch(API+"/api/chat/contacts").then(r=>r.json()).then(async d=>{
     N.forEach(n=>{n.x+=n.vx;n.y+=n.vy;n.p+=.02;if(n.x<0||n.x>W)n.vx*=-1;if(n.y<0||n.y>H)n.vy*=-1;});
     for(let i=0;i<N.length;i++)for(let j=i+1;j<N.length;j++){
       const dx=N[i].x-N[j].x,dy=N[i].y-N[j].y,d=Math.sqrt(dx*dx+dy*dy);
-      if(d<150){ctx.beginPath();ctx.strokeStyle=`rgba(45,217,232,${(1-d/150)*.1})`;ctx.lineWidth=.8;ctx.moveTo(N[i].x,N[i].y);ctx.lineTo(N[j].x,N[j].y);ctx.stroke();}
+      if(d<150){ctx.beginPath();ctx.strokeStyle=`rgba(12,143,163,${(1-d/150)*.14})`;ctx.lineWidth=.8;ctx.moveTo(N[i].x,N[i].y);ctx.lineTo(N[j].x,N[j].y);ctx.stroke();}
     }
-    N.forEach(n=>{const a=(Math.sin(n.p)*.5+.5)*.4+.12;ctx.beginPath();ctx.arc(n.x,n.y,n.r,0,6.28);ctx.fillStyle=`rgba(45,217,232,${a})`;ctx.fill();});
+    N.forEach(n=>{const a=(Math.sin(n.p)*.5+.5)*.35+.1;ctx.beginPath();ctx.arc(n.x,n.y,n.r,0,6.28);ctx.fillStyle=`rgba(12,143,163,${a})`;ctx.fill();});
     requestAnimationFrame(draw);
   }
   window.addEventListener('resize',()=>{resize();init();draw();});
@@ -3109,7 +3174,7 @@ const IFACE_HINTS = {
 };
 
 function inpStyle() {
-  return 'width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--bd);border-radius:2px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px';
+  return 'width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--bd);border-radius:12px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px';
 }
 
 function renderIfaceField(idx, fieldDef, val) {
@@ -3157,7 +3222,7 @@ function renderIfacesList(ifaces) {
 
   list.innerHTML = (ifaces||[]).map((iface, idx) => {
     const type = (iface.params && iface.params.type) || 'Unknown';
-    const color = type.includes('RNode') ? 'var(--teal)' : type.includes('I2P') ? 'var(--am)' : type.includes('TCP')||type.includes('Back') ? '#6c8ebf' : 'var(--mu)';
+    const color = type.includes('RNode') ? 'var(--teal)' : type.includes('I2P') ? 'var(--am)' : type.includes('TCP')||type.includes('Back') ? 'var(--bl)' : 'var(--mu)';
     const deleted = _deletedIfaces && _deletedIfaces.has(idx);
     return `<div id="iface-list-item-${idx}" onclick="selectIface(${idx})"
       style="padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--bd);user-select:none;${deleted?'opacity:0.3;pointer-events:none;':''}"
@@ -3189,7 +3254,7 @@ function selectIface(idx) {
   if(!iface || !detail) return;
 
   const type = (iface.params && iface.params.type) || 'Unknown';
-  const color = type.includes('RNode') ? 'var(--teal)' : type.includes('I2P') ? 'var(--am)' : type.includes('TCP')||type.includes('Back') ? '#6c8ebf' : 'var(--mu)';
+  const color = type.includes('RNode') ? 'var(--teal)' : type.includes('I2P') ? 'var(--am)' : type.includes('TCP')||type.includes('Back') ? 'var(--bl)' : 'var(--mu)';
   const fields = RNS_IFACE_FIELDS[type] || Object.keys(iface.params||{}).filter(k=>k!=='type').map(k=>({k,label:k,type:'text',default:''}));
   const fieldRows = fields.map(f => renderIfaceField(idx, f, iface.params && iface.params[f.k])).join('');
 
@@ -3197,7 +3262,7 @@ function selectIface(idx) {
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
       <div style="font-size:13px;font-weight:600;color:${color}">[[ ${esc(iface.name)} ]]</div>
       <div style="display:flex;align-items:center;gap:8px">
-        <span style="font-size:11px;color:var(--mu);background:var(--bg);padding:2px 8px;border-radius:2px">${esc(type)}</span>
+        <span style="font-size:11px;color:var(--mu);background:var(--bg);padding:2px 8px;border-radius:12px">${esc(type)}</span>
         <button class="sys-btn rd" style="padding:2px 10px;font-size:11px" onclick="deleteRnsIface(${idx})">DELETE</button>
       </div>
     </div>
