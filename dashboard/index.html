@@ -452,7 +452,6 @@ function chatShowMessages(){
       <div class="hub-pill" onclick="nav('addresses',this);loadAddressesPanel();"><div class="hub-pill-ic" style="color:var(--purple)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M16 12v1.5a2.5 2.5 0 0 0 5 0V12a9 9 0 1 0-4 7.5"/></svg></div><span>Addresses</span></div>
       <div class="hub-pill" onclick="nav('monitor',this)"><div class="hub-pill-ic" style="color:var(--gr)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2.5-7 4 14L16 12h5"/></svg></div><span>Monitor</span></div>
       <div class="hub-pill" onclick="nav('rnode',this)"><div class="hub-pill-ic" style="color:var(--am)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M8.5 8.5a5 5 0 0 0 0 7"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M5.5 5.5a9 9 0 0 0 0 13"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></div><span>RNode</span></div>
-      <div class="hub-pill" onclick="nav('rmap',this);loadNodesMonitor();"><div class="hub-pill-ic" style="color:var(--indigo)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="2.3"/><circle cx="18" cy="6" r="2.3"/><circle cx="18" cy="18" r="2.3"/><line x1="8.1" y1="10.9" x2="15.9" y2="7.1"/><line x1="8.1" y1="13.1" x2="15.9" y2="16.9"/></svg></div><span>Network</span></div>
     </div>
     <div class="main">
 
@@ -1209,6 +1208,7 @@ function chatShowMessages(){
 const API="";
 let cfgData={},curCfg=null;
 let lxmfMsgs=[];
+let _nodeStatuses = {}; // host:port -> bool
 
 function toggleBurger(){const m=document.getElementById("burger-menu");m.classList.toggle("open");}
 function closeBurger(){document.getElementById("burger-menu").classList.remove("open");}
@@ -1754,6 +1754,16 @@ function downloadConfig(){
 }
 
 // Nodes monitor
+async function loadNodeStatuses() {
+  try {
+    const d = await fetch(API+"/api/nodes_monitor").then(r=>r.json());
+    _nodeStatuses = {};
+    (Array.isArray(d)?d:(d.nodes||[])).forEach(n => {
+      _nodeStatuses[n.host+':'+n.port] = n.online===true || n.status==='online';
+    });
+  } catch(e) {}
+}
+
 async function loadNodesMonitor(){
   const el=document.getElementById("nodes-monitor-list");
   el.textContent="checking...";
@@ -3216,7 +3226,10 @@ function renderIfaceField(idx, fieldDef, val) {
 
 async function loadRnsConfig() {
   try {
-    const d = await fetch(API+'/api/rns_config_parsed').then(r=>r.json());
+    const [d] = await Promise.all([
+      fetch(API+'/api/rns_config_parsed').then(r=>r.json()),
+      loadNodeStatuses()
+    ]);
     if(d.error){ alert(d.error); return; }
     _rnsCfgData = d;
     _deletedIfaces.clear();
@@ -3246,7 +3259,10 @@ function renderIfacesList(ifaces) {
     return `<div id="iface-list-item-${idx}" onclick="selectIface(${idx})"
       style="padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--bd);user-select:none;${deleted?'opacity:0.3;pointer-events:none;':''}"
       onmouseenter="this.style.background='var(--s2)'" onmouseleave="this.style.background=(_selectedIface===${idx}?'var(--s2)':'')">
-      <div style="font-size:12px;font-weight:600;color:${color}">[[ ${esc(iface.name)} ]]</div>
+      <div style="display:flex;align-items:center;gap:6px">
+        ${(()=>{const h=(iface.params&&iface.params.target_host)||'';const p=(iface.params&&iface.params.target_port)||'4242';const key=h+':'+p;if(type.includes('TCPClient')&&h&&key in _nodeStatuses){const on=_nodeStatuses[key];return '<span style="width:7px;height:7px;border-radius:50%;background:'+(on?'var(--gr)':'var(--rd)')+';flex-shrink:0;display:inline-block"></span>';}return '';})()}
+        <div style="font-size:12px;font-weight:600;color:${color}">[[ ${esc(iface.name)} ]]</div>
+      </div>
       <div style="font-size:10px;color:var(--mu);margin-top:2px">${esc(type)}</div>
     </div>`;
   }).join('');
