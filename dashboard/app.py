@@ -1588,14 +1588,14 @@ def rns_config_save():
         lines = ["[reticulum]\n"]
         for k, v in rns.items():
             lines.append(f"  {k} = {v}\n")
-        lines.append("\n")
+        lines.append("\n[interfaces]\n\n")
 
         for iface in interfaces:
             name = iface.get("name", "Interface")
             params = iface.get("params", {})
-            lines.append(f"[[{name}]]\n")
+            lines.append(f"  [[{name}]]\n")
             for k, v in params.items():
-                lines.append(f"  {k} = {v}\n")
+                lines.append(f"    {k} = {v}\n")
             lines.append("\n")
 
         # Backup
