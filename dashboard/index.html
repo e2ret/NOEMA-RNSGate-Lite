@@ -344,8 +344,6 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 1px var(--
   align-items:center;justify-content:center;flex-direction:column;gap:16px
 }
 
-@keyframes rmap-ring{0%{transform:scale(1);opacity:.7}100%{transform:scale(2.8);opacity:0}}
-
 .hero{position:relative;border-bottom:1px solid var(--bd);background:var(--bg)}
 .mesh-canvas{display:block;width:100%;height:108px}
 .mesh-caption{position:absolute;top:6px;left:24px;font-size:9px;letter-spacing:.18em;color:var(--mu);font-family:var(--mono);text-transform:uppercase;pointer-events:none}
@@ -970,40 +968,6 @@ function chatShowMessages(){
     </div>
 
     <!-- RETICULUM NODES -->
-    <!-- nodes_monitor merged into rmap -->
-
-    <!-- RMAP -->
-    <div class="panel" id="panel-rmap">
-      <div style="width:100%">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <div class="section-lbl" style="margin:0">Public Nodes</div>
-          <div style="display:flex;gap:6px">
-            <button class="sys-btn teal" onclick="loadNodesMonitor()">CHECK</button>
-            <button class="sys-btn" onclick="showAddNode()">ADD</button>
-          </div>
-        </div>
-        <div id="nodes-monitor-list"></div>
-        <div id="add-node-form" style="display:none;margin-top:10px;padding:10px;background:var(--s1);border:1px solid var(--bd);border-radius:12px">
-          <div style="font-size:12px;font-weight:700;margin-bottom:8px">New node</div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap">
-            <input id="new-node-name" placeholder="Name" style="flex:1;min-width:80px;font-family:var(--fn);font-size:12px;padding:5px 8px;border:1px solid var(--bd);border-radius:12px;background:var(--bg);color:var(--tx)">
-            <input id="new-node-host" placeholder="host" style="flex:2;min-width:120px;font-family:var(--fn);font-size:12px;padding:5px 8px;border:1px solid var(--bd);border-radius:12px;background:var(--bg);color:var(--tx)">
-            <input id="new-node-port" placeholder="port" value="4242" style="width:60px;font-family:var(--fn);font-size:12px;padding:5px 8px;border:1px solid var(--bd);border-radius:12px;background:var(--bg);color:var(--tx)">
-            <button class="sys-btn teal" onclick="addNode()">Add</button>
-            <button class="sys-btn" onclick="hideAddNode()">Cancel</button>
-          </div>
-        </div>
-        <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--bd)">
-          <div class="section-lbl">rnprobe</div>
-          <div style="display:flex;gap:6px;margin-bottom:8px">
-            <input id="probe-addr" placeholder="LXMF address" style="flex:1;font-family:var(--fn);font-size:12px;padding:5px 8px;border:1px solid var(--bd);border-radius:12px;background:var(--s1);color:var(--tx)">
-            <button class="sys-btn teal" onclick="doProbe()">▶ probe</button>
-          </div>
-          <div id="probe-result" style="font-size:12px;font-family:var(--fn);color:var(--mu);white-space:pre-wrap"></div>
-        </div>
-      </div>
-    </div>
-
     <!-- SYSTEM -->
     <div class="panel" id="panel-system">
       <div class="section-lbl">Backup & Restore</div>
@@ -1225,11 +1189,9 @@ function nav(id,el){
   if(id==="system") checkRnsVersion();
   if(id==="configs") loadConfigs();
 
-  if(id==="nodes_monitor") loadNodesMonitor();
   if(id==="rnode") loadRnodePanel();
   if(id==="i2p") loadI2pStatus();
   if(id==="system"){ loadSystem(); loadSystemFiles(); loadTgSettings(); }
-  if(id==="rmap") loadRmapNodes();
 }
 
 function toast(msg,ok=true){
@@ -1534,8 +1496,6 @@ async function loadLxmf(){
   const pbRecv=document.getElementById("pb-lxmf-recv"); if(pbRecv) pbRecv.style.width=Math.min(recv/maxLxmf*100,100)+"%";
   // last msg
   if(lxmfMsgs.length>0){
-    const last=lxmfMsgs[lxmfMsgs.length-1];
-    document.getElementById("m-last-msg").textContent=last.substring(0,30)+"…";
     // home msgs
     const recent=lxmfMsgs.slice(-5).reverse();
     document.getElementById("home-msgs").innerHTML=recent.map(m=>{
@@ -1653,9 +1613,6 @@ async function pollLxmf(){
       lxmfMsgs=[...lxmfMsgs,...d.msgs];
       lxmfTotal=d.total;
       renderLxmf();
-      const last=lxmfMsgs[lxmfMsgs.length-1];
-      const {content:lc}=parseLxmfMsg(last);
-      document.getElementById("m-last-msg").textContent=lc.substring(0,30)+(lc.length>30?"…":"");
     }
     const s=await fetch(API+"/api/lxmf/stats").then(r=>r.json());
     document.getElementById("m-lxmf-sent").textContent=s.count?.sent||0;
@@ -1765,63 +1722,13 @@ async function loadNodeStatuses() {
 }
 
 async function loadNodesMonitor(){
-  const el=document.getElementById("nodes-monitor-list");
-  el.textContent="checking...";
   const r=await fetch(API+"/api/nodes_monitor");
   const nodes=await r.json();
-  el.innerHTML=nodes.map(n=>`
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--s3)">
-      <div>
-        <div style="font-weight:700">${esc(n.name)}</div>
-        <div style="font-size:11px;color:var(--mu)">${esc(n.host)}:${n.port}</div>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <div style="width:8px;height:8px;border-radius:50%;background:${n.status==="online"?"var(--gr)":"var(--rd)"}"></div>
-        <span style="font-size:11px;color:${n.status==="online"?"var(--gr)":"var(--rd)"}">${n.status}</span>
-        <button class="sys-btn rd" onclick="removeNode('${esc(n.host)}',${n.port})">✕</button>
-      </div>
-    </div>`).join("");
-  // home nodes
   document.getElementById("home-nodes").innerHTML=nodes.map(n=>`
     <div style="display:flex;align-items:center;gap:6px">
       <div style="width:6px;height:6px;border-radius:50%;background:${n.status==="online"?"var(--gr)":"var(--rd)"}"></div>
       ${esc(n.name)}
     </div>`).join("")||"—";
-}
-
-let _nodesList=[];
-async function removeNode(host,port){
-  const r=await fetch(API+"/api/nodes_monitor");
-  _nodesList=await r.json();
-  _nodesList=_nodesList.filter(n=>!(n.host===host&&n.port===port));
-  await fetch(API+"/api/nodes_monitor",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(_nodesList)});
-  loadNodesMonitor();
-}
-
-function showAddNode(){document.getElementById("add-node-form").style.display="block";}
-function hideAddNode(){document.getElementById("add-node-form").style.display="none";}
-
-async function addNode(){
-  const name=document.getElementById("new-node-name").value.trim();
-  const host=document.getElementById("new-node-host").value.trim();
-  const port=parseInt(document.getElementById("new-node-port").value)||4242;
-  if(!host)return;
-  const r=await fetch(API+"/api/nodes_monitor");
-  const nodes=await r.json();
-  nodes.push({name:name||host,host,port});
-  await fetch(API+"/api/nodes_monitor",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(nodes)});
-  hideAddNode();
-  loadNodesMonitor();
-}
-
-// rnprobe
-async function doProbe(){
-  const addr=document.getElementById("probe-addr").value.trim();
-  if(!addr)return;
-  document.getElementById("probe-result").textContent="checking...";
-  const r=await fetch(API+"/api/rnprobe",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({addr})});
-  const d=await r.json();
-  document.getElementById("probe-result").textContent=d.output||d.error||"no response";
 }
 
 // QR
@@ -2347,66 +2254,6 @@ async function doClearFiles(){
   await fetch(API+"/api/chat/files/clear",{method:"POST"});
   toast("All files deleted");
   loadSystemFiles();
-}
-
-// RMAP NODES
-let _rmapT;
-async function loadRmapNodes(){
-  try{
-    const r=await fetch(API+"/api/nodes_monitor?_="+Date.now());
-    const nodes=await r.json();
-    const myIp=document.getElementById("ip-lbl").textContent||"—";
-    const all=[{name:"MeshGate",host:myIp,port:8081,status:"online",me:true},...nodes];
-    const mk=document.getElementById("rmap-markers");
-    const ln=document.getElementById("rmap-lines");
-    if(!mk||!ln)return;
-    mk.innerHTML="";ln.innerHTML="";
-    const cx=50,cy=50,rad=34;
-    const oth=all.filter(n=>!n.me);
-    const pos=all.map((n,i)=>{
-      if(n.me)return{x:cx,y:cy};
-      const idx=oth.indexOf(n);
-      const a=(2*Math.PI*idx/oth.length)-Math.PI/2;
-      return{x:Math.round(cx+rad*Math.cos(a)),y:Math.round(cy+rad*Math.sin(a))};
-    });
-    let on=0,off=0;
-    all.forEach((n,i)=>{
-      const p=pos[i];const isMe=!!n.me;const isOn=n.status==="online";
-      if(!isMe){isOn?on++:off++;}
-      if(!isMe){
-        const l=document.createElementNS("http://www.w3.org/2000/svg","line");
-        l.setAttribute("x1","50%");l.setAttribute("y1","50%");
-        l.setAttribute("x2",p.x+"%");l.setAttribute("y2",p.y+"%");
-        l.setAttribute("stroke",isOn?"#16a34a":"var(--off)");
-        l.setAttribute("stroke-width","1");
-        l.setAttribute("stroke-dasharray",isOn?"5 5":"3 8");
-        l.setAttribute("opacity",isOn?"0.45":"0.35");
-        ln.appendChild(l);
-      }
-      const m=document.createElement("div");
-      m.style.cssText="position:absolute;transform:translate(-50%,-50%);cursor:pointer;left:"+p.x+"%;top:"+p.y+"%";
-      const ds=isMe?"width:17px;height:17px;background:#2563eb;border:2px solid #2563eb;box-shadow:0 0 10px #2563eb55"
-        :isOn?"width:13px;height:13px;background:#16a34a;border:2px solid #16a34a;box-shadow:0 0 8px #16a34a4d"
-        :"width:11px;height:11px;background:var(--bd);border:2px solid var(--off)";
-      const ring=isOn&&!isMe?'<div style="position:absolute;inset:-5px;border-radius:50%;border:1px solid #16a34a40;animation:rmap-ring 2.5s ease-out infinite"></div>':'';
-      m.innerHTML='<div style="border-radius:50%;'+ds+'">'+ring+'</div>'
-        +'<div style="position:absolute;top:18px;left:50%;transform:translateX(-50%);background:var(--bg);border:1px solid var(--bd);border-radius:12px;padding:1px 7px;font-size:10px;white-space:nowrap;font-family:var(--fn);color:'+(isOn?'var(--tx)':'var(--mu)')+'">'+esc(n.name)+'</div>';
-      m.onclick=()=>{
-        clearTimeout(_rmapT);
-        const pop=document.getElementById("rmap-popup");
-        document.getElementById("rp-name").textContent=n.name;
-        document.getElementById("rp-host").textContent=n.host||"—";
-        document.getElementById("rp-port").textContent=n.port||"—";
-        document.getElementById("rp-status").innerHTML=isOn?'<span style="color:var(--gr)">● online</span>':'<span style="color:var(--rd)">● offline</span>';
-        let l=(p.x+4)+"%",t=(p.y+4)+"%";
-        if(p.x>60)l=(p.x-32)+"%";if(p.y>60)t=(p.y-34)+"%";
-        pop.style.left=l;pop.style.top=t;pop.style.display="block";
-        _rmapT=setTimeout(()=>pop.style.display="none",3000);
-      };
-      mk.appendChild(m);
-    });
-    document.getElementById("rmap-stats").textContent="● "+on+" online  ○ "+off+" offline";
-  }catch(e){}
 }
 
 // UNREAD
@@ -3326,7 +3173,7 @@ function collectRnsConfig() {
     .map((iface, origIdx) => {
       const actualIdx = [...Array(_rnsCfgData.interfaces.length).keys()]
         .filter(i => !_deletedIfaces.has(i))[origIdx] ?? origIdx;
-      return {name: iface.name, params: {type: iface.params.type, ...(ifaceMap[actualIdx] || {})}};
+      return {name: iface.name, params: {...iface.params, ...(ifaceMap[actualIdx] || {})}};
     });
 
   return { reticulum: rns, interfaces };
