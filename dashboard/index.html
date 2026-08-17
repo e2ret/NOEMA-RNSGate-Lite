@@ -193,7 +193,7 @@ body{
   .logo b{font-size:13px}
   .logo img{height:26px;width:26px}
   #uptime-lbl{font-size:9.5px;margin-top:1px!important}
-  #rns-ver-lbl,#clock-lbl{display:none}
+  #clock-lbl{display:none}
   .pill{padding:3px 10px;margin-top:2px}
   .metrics{grid-template-columns:repeat(4,1fr);gap:6px;padding:6px 8px}
   .mc{padding:6px 8px}
@@ -1233,8 +1233,8 @@ async function loadSystem(){
   const r=await fetch(API+"/api/system?_="+Date.now());
   const d=await r.json();
   document.getElementById("uptime-lbl").textContent="Uptime: "+d.uptime;
-  document.getElementById("rns-ver-lbl").textContent="RNS: "+d.rns_version+" · Python: "+d.py_version;
-    try{const vr=await fetch(API+"/api/version").then(r=>r.json());const vl=document.getElementById("rns-ver-lbl");if(vl&&vr.version)vl.textContent+=" · Dashboard: v1.1.0";}catch(e){}
+  document.getElementById("rns-ver-lbl").textContent="";
+    try{const vr=await fetch(API+"/api/version").then(r=>r.json());const vl=document.getElementById("rns-ver-lbl");if(vl&&vr.version)vl.textContent="Dashboard: v"+vr.version;}catch(e){}
   document.getElementById("ip-lbl").textContent=d.ip;
   const cpu=d.cpu||0, ram=d.ram_total?Math.round(d.ram_used/d.ram_total*100):0;
   const disk=d.disk_total?Math.round(d.disk_used/d.disk_total*100):0;

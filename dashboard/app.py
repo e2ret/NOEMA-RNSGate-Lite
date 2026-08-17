@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-__version__ = "1.0.0"
+__version__ = "1.2.0"
 import subprocess, threading, os
 from collections import deque
 from flask import Flask, jsonify, request, send_from_directory
@@ -1541,6 +1541,7 @@ def script_cron_set(name):
         return jsonify({"ok": False, "error": str(e)})
 
 
+@app.route("/api/version")
 def version(): return jsonify({"version": __version__})
 @app.route("/api/rns_config_parsed")
 def rns_config_parsed():
