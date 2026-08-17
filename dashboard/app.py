@@ -1179,10 +1179,10 @@ def telegram_settings():
         import subprocess as _sp2
         _sp2.run("systemctl restart noema_lxmf_bridge", shell=True)
         return jsonify({"ok": True})
-    token   = parser.get("telegram","bot_token","") if parser.has_section("telegram") else ""
-    chat_id = parser.get("telegram","chat_id","")   if parser.has_section("telegram") else ""
-    notify_bridge = parser.get("telegram","notify_bridge","1") if parser.has_section("telegram") else "1"
-    notify_chat   = parser.get("telegram","notify_chat","1")   if parser.has_section("telegram") else "1"
+    token   = parser.get("telegram","bot_token",fallback="") if parser.has_section("telegram") else ""
+    chat_id = parser.get("telegram","chat_id",fallback="")   if parser.has_section("telegram") else ""
+    notify_bridge = parser.get("telegram","notify_bridge",fallback="1") if parser.has_section("telegram") else "1"
+    notify_chat   = parser.get("telegram","notify_chat",fallback="1")   if parser.has_section("telegram") else "1"
     return jsonify({"bot_token": token, "chat_id": chat_id, "enabled": bool(token and chat_id),
                     "notify_bridge": notify_bridge=="1", "notify_chat": notify_chat=="1"})
 
@@ -1206,7 +1206,7 @@ def run_command():
         "rnstatus":        f"{_RNS_BIN}/rnstatus",
         "restart_rnsd":    "sudo systemctl restart rnsd && sleep 2 && systemctl is-active rnsd",
         "restart_lxmf":    "sudo systemctl restart noema_lxmf_bridge && sleep 1 && systemctl is-active noema_lxmf_bridge",
-        "restart_dash":    "sudo systemctl restart dashboard",
+        "restart_dash":    None,  # handled separately
         "free_mem":        "LC_ALL=C free -h",
         "disk":            "df -h /",
         "uptime":          "uptime",
@@ -1235,6 +1235,9 @@ def run_command():
     cmd_id = (request.json or {}).get("cmd", "")
     if cmd_id not in allowed:
         return jsonify({"error": "unknown command"}), 400
+    if cmd_id == "restart_dash":
+        subprocess.Popen("sleep 2 && systemctl restart dashboard", shell=True)
+        return jsonify({"output": "Restarting...", "rc": 0})
     out, rc = sh(allowed[cmd_id])
     return jsonify({"output": out, "rc": rc})
 
@@ -1721,6 +1724,31 @@ def reset_identity():
     except Exception as e:
         return jsonify({"ok": False, "error": str(e)})
 
+
+
+
+@app.route("/api/cron/rnsd", methods=["GET", "POST"])
+def cron_rnsd():
+    cron_line = "0 4 * * * systemctl restart rnsd"
+    def get_crontab():
+        try:
+            r = subprocess.run(["crontab", "-l"], capture_output=True, text=True)
+            return r.stdout if r.returncode == 0 else ""
+        except Exception:
+            return ""
+    def set_crontab(lines):
+        text = chr(10).join(lines) + chr(10)
+        p = subprocess.Popen(["crontab", "-"], stdin=subprocess.PIPE, text=True)
+        p.communicate(text)
+    if request.method == "GET":
+        return jsonify({"enabled": cron_line in get_crontab()})
+    data = request.get_json(silent=True) or {}
+    enabled = bool(data.get("enabled", False))
+    lines = [l for l in get_crontab().splitlines() if cron_line not in l and l.strip()]
+    if enabled:
+        lines.append(cron_line)
+    set_crontab(lines)
+    return jsonify({"enabled": enabled})
 
 @app.route("/<path:filename>")
 def static_files(filename): return send_from_directory(".", filename)

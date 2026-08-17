@@ -1086,6 +1086,15 @@ function chatShowMessages(){
         <button id="rns-update-btn" style="display:none" onclick="rnsUpdate()"></button>
       </div>
 
+      <div class="section-lbl">Maintenance</div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--tx)">
+          <input type="checkbox" id="cron-rnsd-toggle" onchange="setCronRnsd(this.checked)" style="width:16px;height:16px;cursor:pointer">
+          Перезапускать rnsd каждую ночь в 04:00 (освобождает память)
+        </label>
+        <span id="cron-rnsd-status" style="font-size:11px;color:var(--mu)"></span>
+      </div>
+
       <div class="section-lbl">System</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button class="sys-btn am" onclick="svcAction('dashboard','restart')">Restart Dashboard</button>
@@ -1191,7 +1200,7 @@ function nav(id,el){
 
   if(id==="rnode") loadRnodePanel();
   if(id==="i2p") loadI2pStatus();
-  if(id==="system"){ loadSystem(); loadSystemFiles(); loadTgSettings(); }
+  if(id==="system"){ loadSystem(); loadSystemFiles(); loadTgSettings(); loadCronRnsd(); }
 }
 
 function toast(msg,ok=true){
@@ -3228,6 +3237,24 @@ async function saveRnsConfig() {
   } catch(e){ st.style.color='var(--rd)'; st.textContent='Error: '+e; }
 }
 
+
+async function loadCronRnsd(){
+  try{
+    const d = await fetch(API+"/api/cron/rnsd").then(r=>r.json());
+    document.getElementById("cron-rnsd-toggle").checked = d.enabled;
+    document.getElementById("cron-rnsd-status").textContent = d.enabled ? "✅ включён" : "";
+  }catch(e){}
+}
+
+async function setCronRnsd(enabled){
+  const st = document.getElementById("cron-rnsd-status");
+  try{
+    const d = await fetch(API+"/api/cron/rnsd",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({enabled})}).then(r=>r.json());
+    st.textContent = d.enabled ? "✅ включён" : "выключен";
+    st.style.color = d.enabled ? "var(--teal)" : "var(--mu)";
+    setTimeout(()=>{ st.textContent = d.enabled ? "✅ включён" : ""; st.style.color="var(--mu)"; }, 3000);
+  }catch(e){ st.textContent="❌ Ошибка"; }
+}
 </script>
 </body>
 </html>
