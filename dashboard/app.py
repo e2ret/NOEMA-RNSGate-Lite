@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-__version__ = "1.2.1"
+__version__ = "1.3.0"
 import subprocess, threading, os
 from collections import deque
 from flask import Flask, jsonify, request, send_from_directory
