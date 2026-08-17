@@ -41,6 +41,18 @@ TOPIC_RM_POWER = cfg("topics", "rm_power", "message/lxmf/rm_power")
 
 DISPLAY_NAME   = cfg("lxmf", "display_name", "LXMF Bridge")
 
+# ─── Access Control ──────────────────────────────────────────────────────────
+
+ACCESS_ENABLED   = cfg("access", "enabled", "0") == "1"
+ACCESS_WHITELIST = set(x.strip() for x in cfg("access", "whitelist", "").split(",") if x.strip())
+ACCESS_RATE_LIMIT = int(cfg("access", "rate_limit", "5") or "5")
+ACCESS_COOLDOWN   = int(cfg("access", "cooldown", "60") or "60")
+
+def _is_allowed(sender_hash):
+    if not ACCESS_ENABLED:
+        return True
+    return sender_hash in ACCESS_WHITELIST
+
 # ─── Telegram ────────────────────────────────────────────────────────────────
 
 TG_TOKEN       = cfg("telegram", "bot_token",  "")
@@ -141,8 +153,8 @@ bot = LXMFBot(
     storage_type="json",
     storage_path=STORAGE_PATH,
     config_path=CONFIG_DIR,
-    rate_limit=5,
-    cooldown=60,
+    rate_limit=ACCESS_RATE_LIMIT,
+    cooldown=ACCESS_COOLDOWN,
     command_prefix="/",
     first_message_enabled=True,
     message_persistence_enabled=True,
@@ -161,6 +173,9 @@ except Exception as e:
 
 @bot.on_first_message()
 def welcome(sender, message):
+    if not _is_allowed(sender):
+        print(f"[ACCESS] Blocked first message from {sender} (not whitelisted)")
+        return True
     bot.send(sender,
         "👋 NOEMA LXMF Bridge\n\n"
         "Commands: /status /ping /info\n"
@@ -170,6 +185,9 @@ def welcome(sender, message):
 
 @bot.on_message()
 def forward_to_mqtt(sender, message):
+    if not _is_allowed(sender):
+        print(f"[ACCESS] Blocked message from {sender} (not whitelisted)")
+        return True
     try:
         content = message.content.decode("utf-8", errors="replace").strip()
         title   = message.title.decode("utf-8", errors="replace").strip() if message.title else ""
