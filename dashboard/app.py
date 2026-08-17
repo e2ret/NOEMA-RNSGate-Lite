@@ -700,6 +700,16 @@ import json as _chat_json
 import threading as _chat_th
 
 CHAT_FILE = f"{_HOME}/dashboard/chat_history.json"
+
+def _load_chat_access():
+    import configparser as _cp5
+    parser = _cp5.ConfigParser()
+    parser.read("/etc/noema/bridge.cfg")
+    enabled = parser.get("chat_access", "enabled", fallback="0") == "1"
+    wl = set(x.strip() for x in parser.get("chat_access", "whitelist", fallback="").split(",") if x.strip())
+    return enabled, wl
+
+_chat_access_enabled, _chat_access_whitelist = _load_chat_access()
 CONTACTS_FILE = f"{_HOME}/dashboard/chat_contacts.json"
 
 _chat_lock = _chat_th.Lock()
@@ -777,6 +787,9 @@ def _chat_on_receive(message):
     import RNS, time as _t, uuid as _uid, mimetypes as _mt
     try:
         src = RNS.hexrep(message.source_hash, delimit=False)
+        if _chat_access_enabled and src not in _chat_access_whitelist:
+            print(f"[CHAT ACCESS] Blocked message from {src} (not whitelisted)")
+            return
         text = message.content.decode("utf-8") if isinstance(message.content, bytes) else str(message.content)
         ts = int(_t.time())
         msg = {"ts": ts, "from": src, "to": "me", "text": text, "direction": "in"}
@@ -1750,6 +1763,67 @@ def cron_rnsd():
         lines.append(cron_line)
     set_crontab(lines)
     return jsonify({"enabled": enabled})
+
+
+
+@app.route("/api/access/settings", methods=["GET", "POST"])
+def access_settings():
+    import configparser as _cp3
+    BRIDGE_CFG = "/etc/noema/bridge.cfg"
+    parser = _cp3.ConfigParser()
+    parser.read(BRIDGE_CFG)
+    if request.method == "GET":
+        enabled = parser.get("access", "enabled", fallback="0") == "1"
+        whitelist_raw = parser.get("access", "whitelist", fallback="")
+        whitelist = [x.strip() for x in whitelist_raw.split(",") if x.strip()]
+        rate_limit = parser.get("access", "rate_limit", fallback="5")
+        cooldown = parser.get("access", "cooldown", fallback="60")
+        return jsonify({"enabled": enabled, "whitelist": whitelist, "rate_limit": rate_limit, "cooldown": cooldown})
+
+    data = request.get_json(silent=True) or {}
+    if not parser.has_section("access"):
+        parser.add_section("access")
+    if "enabled" in data:
+        parser.set("access", "enabled", "1" if data.get("enabled") else "0")
+    if "whitelist" in data:
+        wl = data.get("whitelist") or []
+        parser.set("access", "whitelist", ",".join(x.strip() for x in wl if x.strip()))
+    if "rate_limit" in data:
+        parser.set("access", "rate_limit", str(int(data.get("rate_limit", 5))))
+    if "cooldown" in data:
+        parser.set("access", "cooldown", str(int(data.get("cooldown", 60))))
+    with open(BRIDGE_CFG, "w") as f:
+        parser.write(f)
+    import subprocess as _sp3
+    _sp3.Popen("sleep 1 && systemctl restart noema_lxmf_bridge", shell=True)
+    return jsonify({"ok": True, "restarting": True})
+
+@app.route("/api/chat_access/settings", methods=["GET", "POST"])
+def chat_access_settings():
+    import configparser as _cp4
+    BRIDGE_CFG = "/etc/noema/bridge.cfg"
+    parser = _cp4.ConfigParser()
+    parser.read(BRIDGE_CFG)
+    if request.method == "GET":
+        enabled = parser.get("chat_access", "enabled", fallback="0") == "1"
+        whitelist_raw = parser.get("chat_access", "whitelist", fallback="")
+        whitelist = [x.strip() for x in whitelist_raw.split(",") if x.strip()]
+        return jsonify({"enabled": enabled, "whitelist": whitelist})
+
+    data = request.get_json(silent=True) or {}
+    if not parser.has_section("chat_access"):
+        parser.add_section("chat_access")
+    if "enabled" in data:
+        parser.set("chat_access", "enabled", "1" if data.get("enabled") else "0")
+    if "whitelist" in data:
+        wl = data.get("whitelist") or []
+        parser.set("chat_access", "whitelist", ",".join(x.strip() for x in wl if x.strip()))
+    with open(BRIDGE_CFG, "w") as f:
+        parser.write(f)
+    global _chat_access_enabled, _chat_access_whitelist
+    _chat_access_enabled = parser.get("chat_access", "enabled", fallback="0") == "1"
+    _chat_access_whitelist = set(x.strip() for x in parser.get("chat_access", "whitelist", fallback="").split(",") if x.strip())
+    return jsonify({"ok": True})
 
 @app.route("/<path:filename>")
 def static_files(filename): return send_from_directory(".", filename)

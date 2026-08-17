@@ -970,14 +970,11 @@ function chatShowMessages(){
     <!-- RETICULUM NODES -->
     <!-- SYSTEM -->
     <div class="panel" id="panel-system">
-      <div class="section-lbl">Backup & Restore</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px">
-        <button class="sys-btn teal" onclick="showBackupModal()">Download Backup</button>
-        <button class="sys-btn am" onclick="showRestoreModal()">Restore</button>
-      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start" id="system-cols">
+      <div id="system-col-left">
 
       <div class="section-lbl">Quick Commands</div>
-      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:10px 14px;margin-bottom:12px">
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:10px 14px;margin-bottom:20px">
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
           <button class="sys-btn" onclick="runCmd('find_ports')">Ports</button>
           <button class="sys-btn" onclick="runCmd('rnstatus')">RNStatus</button>
@@ -991,8 +988,27 @@ function chatShowMessages(){
         <div id="cmd-output" style="font-family:var(--fn);font-size:11px;color:var(--teal);background:var(--bg);border-radius:12px;padding:8px 10px;min-height:32px;white-space:pre-wrap;display:none"></div>
       </div>
 
+      <div class="section-lbl">Maintenance</div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--tx)">
+          <input type="checkbox" id="cron-rnsd-toggle" onchange="setCronRnsd(this.checked)" style="width:16px;height:16px;cursor:pointer">
+          Перезапускать rnsd каждую ночь в 04:00 (освобождает память)
+        </label>
+        <span id="cron-rnsd-status" style="font-size:11px;color:var(--mu)"></span>
+      </div>
+
+      <div class="section-lbl">System</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px">
+        <button class="sys-btn am" onclick="svcAction('dashboard','restart')">Restart Dashboard</button>
+        <button class="sys-btn rd" onclick="showRebootModal()">Reboot</button>
+        <button class="sys-btn rd" onclick="showResetModal()">Reset All Identity</button>
+      </div>
+
+      </div>
+      <div id="system-col-right">
+
       <div class="section-lbl">Chat Settings</div>
-      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:14px;margin-bottom:16px">
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:14px;margin-bottom:20px">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
           <div>
             <div style="font-size:11px;color:var(--mu);margin-bottom:4px">Max messages per contact</div>
@@ -1032,8 +1048,61 @@ function chatShowMessages(){
         <div id="chat-settings-status" style="margin-top:8px;font-size:11px;color:var(--teal);display:none"></div>
       </div>
 
+      <div class="section-lbl">Bridge Access Control</div>
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:14px;margin-bottom:20px">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--tx);margin-bottom:12px">
+          <input type="checkbox" id="access-enabled-toggle" style="width:16px;height:16px;cursor:pointer">
+          Разрешать сообщения только с адресов из списка (whitelist)
+        </label>
+
+        <div style="font-size:11px;color:var(--mu);margin-bottom:6px">Разрешённые LXMF-адреса</div>
+        <div id="access-whitelist" style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px"></div>
+        <div style="display:flex;gap:8px;margin-bottom:16px">
+          <input id="access-new-addr" type="text" placeholder="hex LXMF адрес" style="flex:1;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px;box-sizing:border-box">
+          <button class="sys-btn" onclick="accessAddAddr()">Добавить</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+          <div>
+            <div style="font-size:11px;color:var(--mu);margin-bottom:4px">Rate limit (сообщений/мин)</div>
+            <input id="access-rate-limit" type="number" value="5" min="1" max="100" style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px">
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--mu);margin-bottom:4px">Cooldown (сек)</div>
+            <input id="access-cooldown" type="number" value="60" min="10" max="3600" style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px">
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="sys-btn teal" onclick="saveAccessSettings()">Save</button>
+          <span id="access-status" style="font-size:11px;color:var(--teal);display:none"></span>
+        </div>
+        <div style="font-size:10px;color:var(--mu);margin-top:8px">Изменения перезапускают LXMF Bridge автоматически.</div>
+      </div>
+
+      <div class="section-lbl">Chat Access Control</div>
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:14px;margin-bottom:20px">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--tx);margin-bottom:12px">
+          <input type="checkbox" id="chat-access-enabled-toggle" style="width:16px;height:16px;cursor:pointer">
+          Разрешать сообщения в чат только с адресов из списка (whitelist)
+        </label>
+
+        <div style="font-size:11px;color:var(--mu);margin-bottom:6px">Разрешённые LXMF-адреса</div>
+        <div id="chat-access-whitelist" style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px"></div>
+        <div style="display:flex;gap:8px;margin-bottom:16px">
+          <input id="chat-access-new-addr" type="text" placeholder="hex LXMF адрес" style="flex:1;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px;box-sizing:border-box">
+          <button class="sys-btn" onclick="chatAccessAddAddr()">Добавить</button>
+        </div>
+
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="sys-btn teal" onclick="saveChatAccessSettings()">Save</button>
+          <span id="chat-access-status" style="font-size:11px;color:var(--teal);display:none"></span>
+        </div>
+        <div style="font-size:10px;color:var(--mu);margin-top:8px">Применяется сразу, без перезапуска.</div>
+      </div>
+
       <div class="section-lbl">Telegram Notifications</div>
-      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:12px">
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:20px">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
           <div>
             <div style="font-size:11px;color:var(--mu);margin-bottom:4px">Bot Token</div>
@@ -1059,8 +1128,14 @@ function chatShowMessages(){
         </div>
       </div>
 
+      <div class="section-lbl">Backup & Restore</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px">
+        <button class="sys-btn teal" onclick="showBackupModal()">Download Backup</button>
+        <button class="sys-btn am" onclick="showRestoreModal()">Restore</button>
+      </div>
+
       <div class="section-lbl">Versions</div>
-      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:12px">
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:20px">
         <table style="width:100%;border-collapse:collapse;font-family:var(--fn);font-size:12px">
           <thead>
             <tr style="border-bottom:1px solid var(--bd)">
@@ -1086,22 +1161,13 @@ function chatShowMessages(){
         <button id="rns-update-btn" style="display:none" onclick="rnsUpdate()"></button>
       </div>
 
-      <div class="section-lbl">Maintenance</div>
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--tx)">
-          <input type="checkbox" id="cron-rnsd-toggle" onchange="setCronRnsd(this.checked)" style="width:16px;height:16px;cursor:pointer">
-          Перезапускать rnsd каждую ночь в 04:00 (освобождает память)
-        </label>
-        <span id="cron-rnsd-status" style="font-size:11px;color:var(--mu)"></span>
       </div>
-
-      <div class="section-lbl">System</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="sys-btn am" onclick="svcAction('dashboard','restart')">Restart Dashboard</button>
-        <button class="sys-btn rd" onclick="showRebootModal()">Reboot</button>
-        <button class="sys-btn rd" onclick="showResetModal()">Reset All Identity</button>
       </div>
     </div>
+
+    <style>
+      @media(max-width:900px){ #system-cols{grid-template-columns:1fr !important} }
+    </style>
 
   </div>
     <div class="hub-col right">
@@ -1200,7 +1266,7 @@ function nav(id,el){
 
   if(id==="rnode") loadRnodePanel();
   if(id==="i2p") loadI2pStatus();
-  if(id==="system"){ loadSystem(); loadSystemFiles(); loadTgSettings(); loadCronRnsd(); }
+  if(id==="system"){ loadSystem(); loadSystemFiles(); loadTgSettings(); loadCronRnsd(); loadAccessSettings(); loadChatAccessSettings(); }
 }
 
 function toast(msg,ok=true){
@@ -1937,6 +2003,116 @@ function renderChatMsgs(msgs){
     </div>`;
   }).join("");
   box.scrollTop = box.scrollHeight;
+}
+
+let _accessWhitelist = [];
+
+function renderAccessWhitelist(){
+  const box = document.getElementById("access-whitelist");
+  if(!box) return;
+  if(_accessWhitelist.length === 0){
+    box.innerHTML = '<div style="font-size:11px;color:var(--mu)">Список пуст — если whitelist включён, никто не сможет писать.</div>';
+    return;
+  }
+  box.innerHTML = _accessWhitelist.map((addr,i) =>
+    `<div style="display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--bd);border-radius:5px;padding:5px 8px">
+      <span style="font-family:var(--fn);font-size:11px;color:var(--tx);flex:1;word-break:break-all">${esc(addr)}</span>
+      <button class="sys-btn rd" style="padding:2px 8px;font-size:10px" onclick="accessRemoveAddr(${i})">✕</button>
+    </div>`
+  ).join("");
+}
+
+function accessAddAddr(){
+  const inp = document.getElementById("access-new-addr");
+  const val = inp.value.trim();
+  if(!val) return;
+  if(!_accessWhitelist.includes(val)) _accessWhitelist.push(val);
+  inp.value = "";
+  renderAccessWhitelist();
+}
+
+function accessRemoveAddr(i){
+  _accessWhitelist.splice(i,1);
+  renderAccessWhitelist();
+}
+
+async function loadAccessSettings(){
+  try{
+    const d = await fetch(API+"/api/access/settings").then(r=>r.json());
+    document.getElementById("access-enabled-toggle").checked = !!d.enabled;
+    _accessWhitelist = d.whitelist || [];
+    renderAccessWhitelist();
+    if(d.rate_limit) document.getElementById("access-rate-limit").value = d.rate_limit;
+    if(d.cooldown)   document.getElementById("access-cooldown").value   = d.cooldown;
+  }catch(e){}
+}
+
+async function saveAccessSettings(){
+  const st = document.getElementById("access-status");
+  try{
+    const enabled    = document.getElementById("access-enabled-toggle").checked;
+    const rate_limit = document.getElementById("access-rate-limit").value;
+    const cooldown   = document.getElementById("access-cooldown").value;
+    const r = await fetch(API+"/api/access/settings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({enabled,whitelist:_accessWhitelist,rate_limit,cooldown})});
+    const d = await r.json();
+    st.textContent = d.ok ? "✅ Saved · Bridge перезапускается" : "❌ Error";
+    st.style.color = d.ok ? "var(--teal)" : "var(--rd)";
+    st.style.display = "inline";
+    setTimeout(()=>st.style.display="none", 4000);
+  }catch(e){ st.textContent="❌ Error"; st.style.display="inline"; }
+}
+
+let _chatAccessWhitelist = [];
+
+function renderChatAccessWhitelist(){
+  const box = document.getElementById("chat-access-whitelist");
+  if(!box) return;
+  if(_chatAccessWhitelist.length === 0){
+    box.innerHTML = '<div style="font-size:11px;color:var(--mu)">Список пуст — если whitelist включён, никто не сможет писать в чат.</div>';
+    return;
+  }
+  box.innerHTML = _chatAccessWhitelist.map((addr,i) =>
+    `<div style="display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--bd);border-radius:5px;padding:5px 8px">
+      <span style="font-family:var(--fn);font-size:11px;color:var(--tx);flex:1;word-break:break-all">${esc(addr)}</span>
+      <button class="sys-btn rd" style="padding:2px 8px;font-size:10px" onclick="chatAccessRemoveAddr(${i})">✕</button>
+    </div>`
+  ).join("");
+}
+
+function chatAccessAddAddr(){
+  const inp = document.getElementById("chat-access-new-addr");
+  const val = inp.value.trim();
+  if(!val) return;
+  if(!_chatAccessWhitelist.includes(val)) _chatAccessWhitelist.push(val);
+  inp.value = "";
+  renderChatAccessWhitelist();
+}
+
+function chatAccessRemoveAddr(i){
+  _chatAccessWhitelist.splice(i,1);
+  renderChatAccessWhitelist();
+}
+
+async function loadChatAccessSettings(){
+  try{
+    const d = await fetch(API+"/api/chat_access/settings").then(r=>r.json());
+    document.getElementById("chat-access-enabled-toggle").checked = !!d.enabled;
+    _chatAccessWhitelist = d.whitelist || [];
+    renderChatAccessWhitelist();
+  }catch(e){}
+}
+
+async function saveChatAccessSettings(){
+  const st = document.getElementById("chat-access-status");
+  try{
+    const enabled = document.getElementById("chat-access-enabled-toggle").checked;
+    const r = await fetch(API+"/api/chat_access/settings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({enabled,whitelist:_chatAccessWhitelist})});
+    const d = await r.json();
+    st.textContent = d.ok ? "✅ Saved" : "❌ Error";
+    st.style.color = d.ok ? "var(--teal)" : "var(--rd)";
+    st.style.display = "inline";
+    setTimeout(()=>st.style.display="none", 4000);
+  }catch(e){ st.textContent="❌ Error"; st.style.display="inline"; }
 }
 
 async function loadTgSettings(){
