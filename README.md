@@ -6,10 +6,10 @@
 ---
 
 ## Возможности
-
 - Reticulum Mesh (TCP/IP + LoRa через RNode)
 - LXMF Bridge → MQTT → Home Assistant
 - Встроенный P2P чат (LXMF) с уведомлениями и вложениями
+- Access Control: whitelist LXMF-адресов и rate limiting против спама
 - Telegram уведомления при входящих сообщениях
 - Анонимная сеть I2P (соединение шлюзов без публичного IP)
 - Nomadnet Node + редактор страниц + IRC-чат
@@ -21,19 +21,15 @@
 ---
 
 ## ⚠️ Важно
-
 Проект создан в личных целях и распространяется **как есть**, без гарантий работоспособности. Требуется понимание основ: Linux, TCP/IP, MQTT, базовое администрирование.
 
 ---
 
 ## Установка
-
 Требования: Debian/Ubuntu, Python 3.10+, root.
-
 ```bash
 git clone https://github.com/e2ret/NOEMA-RNSGate-Lite.git && cd NOEMA-RNSGate-Lite && sudo bash install.sh
 ```
-
 Скрипт автоматически устанавливает все зависимости, спрашивает параметры MQTT брокера и запускает systemd сервисы.
 
 > **Примечание:** в процессе установки дважды потребуется нажать Enter — для инициализации Nomadnet и настройки cron-задач.
@@ -41,7 +37,6 @@ git clone https://github.com/e2ret/NOEMA-RNSGate-Lite.git && cd NOEMA-RNSGate-Li
 ---
 
 ## Первое подключение
-
 1. Подключите Ethernet-кабель к роутеру
 2. Найдите устройство в списке клиентов роутера
 3. Откройте браузер: `http://IP_ШЛЮЗА:8081`
@@ -50,17 +45,14 @@ git clone https://github.com/e2ret/NOEMA-RNSGate-Lite.git && cd NOEMA-RNSGate-Li
 ---
 
 ## Документация
-
 **[→ Полная документация в Wiki](https://github.com/e2ret/NOEMA-RNSGate-Lite/wiki)**
 
 ## Обсуждение
-
 [→ Telegram](https://t.me/reticulum_belgorod/70)
 
 ---
 
 ## Используемые компоненты
-
 - [Reticulum (RNS)](https://github.com/markqvist/Reticulum) — Mark Qvist, MIT
 - [LXMF](https://github.com/markqvist/LXMF) — Mark Qvist, MIT
 - [Nomadnet](https://github.com/markqvist/NomadNet) — Mark Qvist, GPL-3.0
@@ -73,7 +65,6 @@ git clone https://github.com/e2ret/NOEMA-RNSGate-Lite.git && cd NOEMA-RNSGate-Li
 ---
 
 ## Благодарности
-
 **Mark Qvist** — Reticulum, LXMF, Nomadnet · **fr33n0w** — rBrowser · **PurpleI2P Team** — i2pd
 
 Спасибо всем разработчикам, благодаря которым экосистема Reticulum продолжает развиваться.
