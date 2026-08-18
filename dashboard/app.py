@@ -1768,7 +1768,7 @@ def reset_identity():
         import threading as _thr
         _thr.Thread(target=_recalc_nn, daemon=True).start()
         # Restart all services in background - dashboard last
-        _sp.Popen(f"sleep 1 && sudo systemctl restart i2pd rnsd noema_lxmf_bridge nomadnet && sleep 8 && {_HOME}/NOEMA-RNSGate-Lite/.venv/bin/python3 {_HOME}/NOEMA-RNSGate/recalc_nn_addr.py && sleep 2 && sudo systemctl restart dashboard", shell=True)
+        _sp.Popen(f"sleep 1 && sudo systemctl restart i2pd rnsd noema_lxmf_bridge nomadnet && sleep 8 && {_HOME}/NOEMA-RNSGate-Lite/.venv/bin/python3 {_HOME}/NOEMA-RNSGate-Lite/recalc_nn_addr.py && sleep 2 && sudo systemctl restart dashboard", shell=True)
         return jsonify({"ok": True})
     except Exception as e:
         return jsonify({"ok": False, "error": str(e)})
