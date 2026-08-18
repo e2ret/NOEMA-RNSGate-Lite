@@ -919,7 +919,7 @@ function chatShowMessages(){
 
       <!-- Add Interface Modal -->
       <div id="add-iface-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center">
-        <div style="background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:20px;width:90%;max-width:400px">
+        <div style="background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:20px;width:90%;max-width:400px;max-height:85vh;overflow-y:auto">
           <div style="font-size:14px;font-weight:600;margin-bottom:16px">Add Interface</div>
           <div style="margin-bottom:12px">
             <div style="font-size:11px;color:var(--mu);margin-bottom:4px">Interface Name</div>
@@ -927,7 +927,7 @@ function chatShowMessages(){
           </div>
           <div style="margin-bottom:16px">
             <div style="font-size:11px;color:var(--mu);margin-bottom:4px">Type</div>
-            <select id="new-iface-type" onchange="updateNewIfaceHint()" style="width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:12px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:6px 10px">
+            <select id="new-iface-type" onchange="renderNewIfaceFields()" style="width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:12px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:6px 10px">
               <option value="AutoInterface">AutoInterface — local LAN/WiFi discovery</option>
               <option value="TCPClientInterface">TCPClientInterface — connect to TCP server</option>
               <option value="TCPServerInterface">TCPServerInterface — listen for connections</option>
@@ -939,7 +939,8 @@ function chatShowMessages(){
             </select>
           </div>
           <div id="new-iface-hint" style="font-size:11px;color:var(--mu);margin-bottom:16px;padding:8px;background:var(--bg);border-radius:12px"></div>
-          <div style="display:flex;gap:8px">
+          <div id="new-iface-fields"></div>
+          <div style="display:flex;gap:8px;margin-top:8px">
             <button class="sys-btn teal" onclick="confirmAddIface()">ADD</button>
             <button class="sys-btn" onclick="hideAddIfaceModal()">CANCEL</button>
           </div>
@@ -1703,10 +1704,14 @@ async function pollLxmf(){
 }
 
 // RNS
+let _rnstatusByName = {}; // interface name -> status string ("Up"/"Down"/etc)
+
 async function loadRns(){
   const r=await fetch(API+"/api/rnstatus");
   const d=await r.json();
   const ifaces=d.interfaces||[];
+  _rnstatusByName = {};
+  ifaces.forEach(i => { _rnstatusByName[i.name] = i.fields["Status"] || ""; });
   const el=document.getElementById("rns-list");
   el.innerHTML=ifaces.map(i=>{
     const status=i.fields["Status"]||"—";
@@ -3279,7 +3284,7 @@ async function loadRnsConfig() {
   try {
     const [d] = await Promise.all([
       fetch(API+'/api/rns_config_parsed').then(r=>r.json()),
-      loadNodeStatuses()
+      loadRns()
     ]);
     if(d.error){ alert(d.error); return; }
     _rnsCfgData = d;
@@ -3311,7 +3316,14 @@ function renderIfacesList(ifaces) {
       style="padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--bd);user-select:none;${deleted?'opacity:0.3;pointer-events:none;':''}"
       onmouseenter="this.style.background='var(--s2)'" onmouseleave="this.style.background=(_selectedIface===${idx}?'var(--s2)':'')">
       <div style="display:flex;align-items:center;gap:6px">
-        ${(()=>{const h=(iface.params&&iface.params.target_host)||'';const p=(iface.params&&iface.params.target_port)||'4242';const key=h+':'+p;if(type.includes('TCPClient')&&h&&key in _nodeStatuses){const on=_nodeStatuses[key];return '<span style="width:7px;height:7px;border-radius:50%;background:'+(on?'var(--gr)':'var(--rd)')+';flex-shrink:0;display:inline-block"></span>';}return '';})()}
+        ${(()=>{
+          if(!(type.includes('TCPClient')||type.includes('TCPServer')||type.includes('Backbone')||type.includes('I2P'))) return '';
+          const nameKey = Object.keys(_rnstatusByName).find(k => k.includes(iface.name));
+          if(!nameKey) return '';
+          const status = _rnstatusByName[nameKey];
+          const on = status === 'Up';
+          return '<span style="width:7px;height:7px;border-radius:50%;background:'+(on?'var(--gr)':'var(--rd)')+';flex-shrink:0;display:inline-block" title="'+esc(status)+'"></span>';
+        })()}
         <div style="font-size:12px;font-weight:600;color:${color}">[[ ${esc(iface.name)} ]]</div>
       </div>
       <div style="font-size:10px;color:var(--mu);margin-top:2px">${esc(type)}</div>
@@ -3392,7 +3404,7 @@ function deleteRnsIface(idx) {
 function showAddIfaceModal() {
   const m = document.getElementById('add-iface-modal');
   m.style.display='flex';
-  updateNewIfaceHint();
+  renderNewIfaceFields();
 }
 function hideAddIfaceModal() {
   document.getElementById('add-iface-modal').style.display='none';
@@ -3401,13 +3413,36 @@ function updateNewIfaceHint() {
   const type = document.getElementById('new-iface-type').value;
   document.getElementById('new-iface-hint').textContent = IFACE_HINTS[type] || '';
 }
+function renderNewIfaceFields() {
+  updateNewIfaceHint();
+  const type = document.getElementById('new-iface-type').value;
+  const fields = RNS_IFACE_FIELDS[type] || [];
+  const box = document.getElementById('new-iface-fields');
+  box.innerHTML = fields.map(f => {
+    const id = 'new-iface-f-' + f.k;
+    let input;
+    if (f.type === 'select') {
+      input = `<select id="${id}" style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--bd);border-radius:12px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:6px 10px">` +
+        f.opts.map(o => `<option value="${esc(o)}" ${o===f.default?'selected':''}>${esc(o)}</option>`).join('') +
+        `</select>`;
+    } else {
+      input = `<input id="${id}" value="${esc(f.default||'')}" style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--bd);border-radius:12px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:6px 10px">`;
+    }
+    const hint = f.hint ? `<div style="font-size:10px;color:var(--mu);margin-top:2px">${esc(f.hint)}</div>` : '';
+    return `<div style="margin-bottom:10px"><div style="font-size:11px;color:var(--mu);margin-bottom:4px">${esc(f.label)}</div>${input}${hint}</div>`;
+  }).join('');
+}
 function confirmAddIface() {
   const name = document.getElementById('new-iface-name').value.trim();
   const type = document.getElementById('new-iface-type').value;
   if(!name){ alert('Enter interface name'); return; }
   const fields = RNS_IFACE_FIELDS[type] || [];
   const params = {type};
-  fields.forEach(f => { if(f.default) params[f.k] = f.default; });
+  fields.forEach(f => {
+    const el = document.getElementById('new-iface-f-' + f.k);
+    const val = el ? el.value.trim() : (f.default || '');
+    if (val !== '') params[f.k] = val;
+  });
   if(!_rnsCfgData) _rnsCfgData = {reticulum:{}, interfaces:[]};
   _rnsCfgData.interfaces.push({name, params});
   renderIfacesList(_rnsCfgData.interfaces);
