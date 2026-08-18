@@ -24,6 +24,29 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
+# --- Journald log size limit ---
+echo "[1/7] Limiting systemd journal size..."
+if ! grep -q '^SystemMaxUse=' /etc/systemd/journald.conf 2>/dev/null; then
+    sed -i 's/#SystemMaxUse=/SystemMaxUse=200M/' /etc/systemd/journald.conf
+    systemctl restart systemd-journald
+    echo "      journald capped at 200M."
+fi
+
+# --- Logrotate for tcp_watchdog log ---
+if [ ! -f /etc/logrotate.d/noema_tcp_watchdog ]; then
+    cat > /etc/logrotate.d/noema_tcp_watchdog << 'LOGROTATEEOF'
+/var/log/noema_tcp_watchdog.log {
+    weekly
+    rotate 4
+    missingok
+    notifempty
+    compress
+    delaycompress
+}
+LOGROTATEEOF
+    echo "      Configured logrotate for tcp_watchdog log."
+fi
+
 # --- System dependencies ---
 echo "[1/7] Installing system dependencies..."
 sudo apt-get update -qq
