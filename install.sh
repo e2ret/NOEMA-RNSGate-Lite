@@ -218,6 +218,10 @@ echo "[5/7] Setting up lxmf-tools..."
 mkdir -p "$LXMF_TOOLS_DIR"
 mkdir -p /etc/noema
 cp "$INSTALL_DIR/lxmf-tools/noema_lxmf_bridge.py" "$LXMF_TOOLS_DIR/noema_lxmf_bridge.py"
+if [ -f "$INSTALL_DIR/lxmf-tools/tcp_watchdog.py" ]; then
+    cp "$INSTALL_DIR/lxmf-tools/tcp_watchdog.py" "$LXMF_TOOLS_DIR/tcp_watchdog.py"
+    echo "      Copied tcp_watchdog.py"
+fi
 
 if [ -f "/etc/noema/bridge.cfg" ]; then
     echo "      LXMF Bridge config already exists, skipping."
