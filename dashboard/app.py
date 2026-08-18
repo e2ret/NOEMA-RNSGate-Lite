@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-__version__ = "1.3.0"
+__version__ = "1.2.1"
 import subprocess, threading, os
 from collections import deque
 from flask import Flask, jsonify, request, send_from_directory
@@ -710,6 +710,38 @@ def _load_chat_access():
     return enabled, wl
 
 _chat_access_enabled, _chat_access_whitelist = _load_chat_access()
+
+# ─── Deduplication ───────────────────────────────────────────────────────────
+# Same LXMF message can arrive more than once over multiple paths/retransmits.
+
+_chat_dedup_lock = threading.Lock()
+_chat_seen_messages = {}  # message_id -> first_seen_timestamp
+_CHAT_DEDUP_TTL = 3600  # 1 hour
+
+def _chat_is_duplicate(message, src):
+    import time as _t_dedup
+    msg_id = None
+    try:
+        if hasattr(message, "hash") and message.hash:
+            msg_id = message.hash.hex() if isinstance(message.hash, (bytes, bytearray)) else str(message.hash)
+    except Exception:
+        msg_id = None
+    if not msg_id:
+        try:
+            import hashlib
+            raw = f"{src}|{message.content}|{message.timestamp}".encode("utf-8", errors="replace")
+            msg_id = hashlib.sha256(raw).hexdigest()
+        except Exception:
+            return False
+    now = _t_dedup.time()
+    with _chat_dedup_lock:
+        expired = [k for k, t in _chat_seen_messages.items() if now - t > _CHAT_DEDUP_TTL]
+        for k in expired:
+            del _chat_seen_messages[k]
+        if msg_id in _chat_seen_messages:
+            return True
+        _chat_seen_messages[msg_id] = now
+        return False
 CONTACTS_FILE = f"{_HOME}/dashboard/chat_contacts.json"
 
 _chat_lock = _chat_th.Lock()
@@ -789,6 +821,9 @@ def _chat_on_receive(message):
         src = RNS.hexrep(message.source_hash, delimit=False)
         if _chat_access_enabled and src not in _chat_access_whitelist:
             print(f"[CHAT ACCESS] Blocked message from {src} (not whitelisted)")
+            return
+        if _chat_is_duplicate(message, src):
+            print(f"[CHAT DEDUP] Dropped duplicate message from {src}")
             return
         text = message.content.decode("utf-8") if isinstance(message.content, bytes) else str(message.content)
         ts = int(_t.time())
@@ -1759,6 +1794,33 @@ def cron_rnsd():
     data = request.get_json(silent=True) or {}
     enabled = bool(data.get("enabled", False))
     lines = [l for l in get_crontab().splitlines() if cron_line not in l and l.strip()]
+    if enabled:
+        lines.append(cron_line)
+    set_crontab(lines)
+    return jsonify({"enabled": enabled})
+
+@app.route("/api/cron/tcp_watchdog", methods=["GET", "POST"])
+def cron_tcp_watchdog():
+    watchdog_path = f"{_HOME}/lxmf-tools/tcp_watchdog.py"
+    python_bin = f"{_HOME}/NOEMA-RNSGate-Lite/.venv/bin/python3"
+    cron_line = f"*/5 * * * * {python_bin} {watchdog_path} >> /var/log/noema_tcp_watchdog.log 2>&1"
+    def get_crontab():
+        try:
+            r = subprocess.run(["crontab", "-l"], capture_output=True, text=True)
+            return r.stdout if r.returncode == 0 else ""
+        except Exception:
+            return ""
+    def set_crontab(lines):
+        text = chr(10).join(lines) + chr(10)
+        p = subprocess.Popen(["crontab", "-"], stdin=subprocess.PIPE, text=True)
+        p.communicate(text)
+    if request.method == "GET":
+        current = get_crontab()
+        enabled = any("tcp_watchdog.py" in l for l in current.splitlines())
+        return jsonify({"enabled": enabled})
+    data = request.get_json(silent=True) or {}
+    enabled = bool(data.get("enabled", False))
+    lines = [l for l in get_crontab().splitlines() if "tcp_watchdog.py" not in l and l.strip()]
     if enabled:
         lines.append(cron_line)
     set_crontab(lines)
