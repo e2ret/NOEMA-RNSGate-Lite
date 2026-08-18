@@ -36,14 +36,6 @@ git clone https://github.com/e2ret/NOEMA-RNSGate-Lite.git && cd NOEMA-RNSGate-Li
 
 ---
 
-## Первое подключение
-1. Подключите Ethernet-кабель к роутеру
-2. Найдите устройство в списке клиентов роутера
-3. Откройте браузер: `http://IP_ШЛЮЗА:8081`
-4. SSH: `ssh root@IP_ШЛЮЗА` (пароль по умолчанию: `1234`)
-
----
-
 ## Документация
 **[→ Полная документация в Wiki](https://github.com/e2ret/NOEMA-RNSGate-Lite/wiki)**
 
