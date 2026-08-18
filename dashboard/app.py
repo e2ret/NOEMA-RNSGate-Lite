@@ -832,29 +832,44 @@ def _chat_on_receive(message):
         # Extract file attachment from LXMF fields
         try:
             fields = message.fields or {}
-            # LXMF field 0x06 = image, 0x05 = file attachments
-            att_data = fields.get(0x05)  # FILE_ATTACHMENTS field [[name, data], ...]
+            fname = None
+            fdata = None
+
+            # LXMF field 0x05 = file attachments [[name, data], ...]
+            att_data = fields.get(0x05)
             if att_data and isinstance(att_data, list) and len(att_data) > 0:
                 att = att_data[0]
                 if isinstance(att, list) and len(att) >= 2:
                     fname = str(att[0]) if att[0] else "file"
                     fdata = att[1] if isinstance(att[1], bytes) else None
-                    if fdata:
-                        fid = str(_uid.uuid4())
-                        fpath = os.path.join(CHAT_FILES_DIR, fid)
-                        open(fpath, "wb").write(fdata)
-                        # Detect mime from data signature
-                        mime = _mt.guess_type(fname)[0] or "application/octet-stream"
-                        if fdata[:8] == b"\x89PNG\r\n\x1a\n": mime = "image/png"
-                        elif fdata[:3] == b"\xff\xd8\xff": mime = "image/jpeg"
-                        elif fdata[:6] in (b"GIF87a", b"GIF89a"): mime = "image/gif"
-                        meta = _files_get_meta()
-                        meta.append({"id": fid, "name": fname, "size": len(fdata), "mime": mime, "ts": ts})
-                        _files_save_meta(meta)
-                        msg["file_id"] = fid
-                        msg["file_name"] = fname
-                        msg["file_size"] = len(fdata)
-                        msg["file_mime"] = mime
+
+            # LXMF field 0x06 = image container [format, data] — used by some clients (e.g. Columba)
+            if fdata is None:
+                img_data = fields.get(0x06)
+                if img_data and isinstance(img_data, list) and len(img_data) >= 2:
+                    img_fmt = str(img_data[0]) if img_data[0] else "webp"
+                    img_bytes = img_data[1] if isinstance(img_data[1], bytes) else None
+                    if img_bytes:
+                        fname = f"image.{img_fmt}"
+                        fdata = img_bytes
+
+            if fdata:
+                fid = str(_uid.uuid4())
+                fpath = os.path.join(CHAT_FILES_DIR, fid)
+                open(fpath, "wb").write(fdata)
+                # Detect mime from data signature
+                mime = _mt.guess_type(fname)[0] or "application/octet-stream"
+                if fdata[:8] == b"\x89PNG\r\n\x1a\n": mime = "image/png"
+                elif fdata[:3] == b"\xff\xd8\xff": mime = "image/jpeg"
+                elif fdata[:6] in (b"GIF87a", b"GIF89a"): mime = "image/gif"
+                elif fdata[:4] == b"RIFF" and fdata[8:12] == b"WEBP": mime = "image/webp"
+                meta = _files_get_meta()
+                meta.append({"id": fid, "name": fname, "size": len(fdata), "mime": mime, "ts": ts})
+                _files_save_meta(meta)
+                msg["file_id"] = fid
+                msg["file_name"] = fname
+                msg["file_size"] = len(fdata)
+                msg["file_mime"] = mime
         except: pass
 
         _save_chat_msg(src, msg)
