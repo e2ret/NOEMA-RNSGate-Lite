@@ -53,6 +53,41 @@ def _is_allowed(sender_hash):
         return True
     return sender_hash in ACCESS_WHITELIST
 
+# ─── Deduplication ───────────────────────────────────────────────────────────
+# LXMF can deliver the same message more than once (multiple TCP paths,
+# retransmits). Track recently-seen message hashes for DEDUP_TTL seconds
+# and drop repeats before they reach MQTT/Telegram.
+
+DEDUP_TTL = 3600  # 1 hour
+_dedup_lock = threading.Lock()
+_seen_messages = {}  # message_id_hex -> first_seen_timestamp
+
+def _is_duplicate(message, sender=None):
+    """Returns True if this message was already processed within DEDUP_TTL."""
+    msg_id = None
+    try:
+        if hasattr(message, "hash") and message.hash:
+            msg_id = message.hash.hex() if isinstance(message.hash, (bytes, bytearray)) else str(message.hash)
+    except Exception:
+        msg_id = None
+    if not msg_id:
+        # Fallback: derive a stable id from sender+content+timestamp
+        try:
+            import hashlib
+            raw = f"{sender}|{message.content}|{message.timestamp}".encode("utf-8", errors="replace")
+            msg_id = hashlib.sha256(raw).hexdigest()
+        except Exception:
+            return False
+    now = time.time()
+    with _dedup_lock:
+        expired = [k for k, t in _seen_messages.items() if now - t > DEDUP_TTL]
+        for k in expired:
+            del _seen_messages[k]
+        if msg_id in _seen_messages:
+            return True
+        _seen_messages[msg_id] = now
+        return False
+
 # ─── Telegram ────────────────────────────────────────────────────────────────
 
 TG_TOKEN       = cfg("telegram", "bot_token",  "")
@@ -187,6 +222,9 @@ def welcome(sender, message):
 def forward_to_mqtt(sender, message):
     if not _is_allowed(sender):
         print(f"[ACCESS] Blocked message from {sender} (not whitelisted)")
+        return True
+    if _is_duplicate(message, sender):
+        print(f"[DEDUP] Dropped duplicate message from {sender}")
         return True
     try:
         content = message.content.decode("utf-8", errors="replace").strip()
