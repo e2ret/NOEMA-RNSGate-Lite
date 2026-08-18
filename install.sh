@@ -42,6 +42,7 @@ if [ ! -f /etc/logrotate.d/noema_tcp_watchdog ]; then
     notifempty
     compress
     delaycompress
+    su root root
 }
 LOGROTATEEOF
     echo "      Configured logrotate for tcp_watchdog log."
