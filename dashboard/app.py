@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-__version__ = "1.4.4"
+__version__ = "1.4.7"
 import subprocess, threading, os
 from collections import deque
 from flask import Flask, jsonify, request, send_from_directory
@@ -274,13 +274,13 @@ def nodes_monitor():
 
 @app.route("/api/nodes_monitor", methods=["POST"])
 def nodes_monitor_save():
-    nodes = request.json or []
+    nodes = request.get_json(silent=True) or []
     save_nodes_list(nodes)
     return jsonify({"ok": True})
 
 @app.route("/api/rnprobe", methods=["POST"])
 def rnprobe():
-    addr = (request.json or {}).get("addr","").strip()
+    addr = (request.get_json(silent=True) or {}).get("addr","").strip()
     if not addr: return jsonify({"error":"no address"}), 400
     out, rc = sh(f"{_RNS_BIN}/rnprobe lxmf.delivery {addr} -n 3 -t 10 2>&1")
     return jsonify({"output": out, "rc": rc})
@@ -363,10 +363,10 @@ def get_configs():
 def save_config(name):
     if name not in CONFIGS:
         return jsonify({"error": "unknown config"}), 400
-    content = (request.json or {}).get("content", "")
+    content = (request.get_json(silent=True) or {}).get("content", "")
     try:
         open(CONFIGS[name], "w").write(content)
-        if name == "noema_lxmf_bridge":
+        if name == "LXMF Bridge":
             sh("sudo systemctl restart noema_lxmf_bridge")
         elif name == "reticulum":
             sh("sudo systemctl restart rnsd")
@@ -396,9 +396,9 @@ def get_log(name):
 
 @app.route("/api/chat/settings", methods=["POST"])
 def chat_settings():
-    data = request.json or {}
+    data = request.get_json(silent=True) or {}
     max_msgs = int(data.get("max_msgs", 200))
-    max_files_mb = int(data.get("max_files_mb", 50))
+    max_files_mb = int(data.get("max_files_mb", CHAT_FILES_MAX_MB))
     # Apply message limit
     with _chat_lock:
         try:
@@ -416,7 +416,7 @@ def chat_settings():
 @app.route("/api/chat/cleanup", methods=["POST"])
 def chat_cleanup():
     import glob as _g
-    max_mb = int((request.json or {}).get("max_files_mb", 50))
+    max_mb = int((request.get_json(silent=True) or {}).get("max_files_mb", CHAT_FILES_MAX_MB))
     before = sum(os.path.getsize(f) for f in _g.glob(os.path.join(CHAT_FILES_DIR, "*")) if os.path.isfile(f))
     try:
         _chat_cleanup_files(max_mb=max_mb)
@@ -427,7 +427,7 @@ def chat_cleanup():
 @app.route("/api/chat/history/clear", methods=["POST"])
 def chat_history_clear():
     import time as _t
-    days = (request.json or {}).get("days", 0)
+    days = (request.get_json(silent=True) or {}).get("days", 0)
     cutoff = int(_t.time()) - days * 86400 if days > 0 else 0
     with _chat_lock:
         try:
@@ -474,7 +474,6 @@ def backup_download():
         "configs/reticulum.cfg":       f"{_HOME}/.reticulum/config",
         "configs/noema_bridge.cfg":    "/etc/noema/bridge.cfg",
         "configs/nomadnet.cfg":        f"{_HOME}/.nomadnetwork/config",
-        "identity/lxmf_identity":      f"{_HOME}/lxmf-tools/identity",
         "identity/reticulum_identity": f"{_HOME}/.reticulum/storage/identity",
         "identity/i2p_keys":           "/var/lib/i2pd/router.keys",
         "data/monitored_nodes.json":   f"{_HOME}/dashboard/monitored_nodes.json",
@@ -522,6 +521,20 @@ def backup_download():
         if os.path.exists(nn_addr):
             try: zf.write(nn_addr, "identity/nomadnet_node_address")
             except: pass
+
+        # LXMF Bridge identity (lxmfy framework storage)
+        lxmf_address_file = os.path.join(_HOME, "lxmf-tools/lxmf_address")
+        if os.path.exists(lxmf_address_file):
+            try: zf.write(lxmf_address_file, "identity/lxmf_bridge/lxmf_address")
+            except: pass
+        for storage_name in ["lxmfy_data", "lxmfy_config"]:
+            storage_dir = os.path.join(_HOME, "lxmf-tools", storage_name)
+            for p in _g.glob(f"{storage_dir}/**/*", recursive=True):
+                try:
+                    if os.path.isfile(p):
+                        rel = os.path.relpath(p, storage_dir)
+                        zf.write(p, f"identity/lxmf_bridge/{storage_name}/{rel}")
+                except: pass
 
         # Chat LXMF identity directory
         chat_lxmf_dir = os.path.join(_HOME, "dashboard/chat_lxmf")
@@ -573,7 +586,6 @@ def backup_restore():
         "configs/reticulum.cfg":       f"{_HOME}/.reticulum/config",
         "configs/noema_bridge.cfg":    "/etc/noema/bridge.cfg",
         "configs/nomadnet.cfg":        f"{_HOME}/.nomadnetwork/config",
-        "identity/lxmf_identity":      f"{_HOME}/lxmf-tools/identity",
         "identity/reticulum_identity": f"{_HOME}/.reticulum/storage/identity",
         "data/monitored_nodes.json":   f"{_HOME}/dashboard/monitored_nodes.json",
         "data/nomadnet_hashes":        NOMADNET_ADDR_FILE,
@@ -635,6 +647,18 @@ def backup_restore():
                             _sp_nn.run([_venv, _script], timeout=30, capture_output=True)
                     except: pass
 
+            # LXMF Bridge identity (lxmfy framework storage)
+            lxmf_bridge_dir = os.path.join(_HOME, "lxmf-tools")
+            bridge_restored = False
+            for n in names:
+                if n.startswith("identity/lxmf_bridge/"):
+                    fname = n[len("identity/lxmf_bridge/"):]
+                    if fname:
+                        p = os.path.join(lxmf_bridge_dir, fname)
+                        os.makedirs(os.path.dirname(p), exist_ok=True)
+                        open(p, "wb").write(zf.read(n))
+                        bridge_restored = True
+
             # Chat LXMF identity
             chat_lxmf_dir = os.path.join(_HOME, "dashboard/chat_lxmf")
             for n in names:
@@ -646,9 +670,11 @@ def backup_restore():
                         open(p, "wb").write(zf.read(n))
 
             # I2P tunnel key — stop i2pd first to prevent key regeneration
+            i2pd_was_stopped = False
             if "identity/i2p_tunnel.dat" in names:
                 import subprocess as _sp_i2p
                 _sp_i2p.run("systemctl stop i2pd", shell=True, capture_output=True)
+                i2pd_was_stopped = True
                 import time as _t_i2p; _t_i2p.sleep(1)
                 for dest in ["/var/lib/i2pd/reticulum.dat", "/etc/i2pd/tunnels.d/reticulum.dat"]:
                     try:
@@ -676,6 +702,14 @@ def backup_restore():
                     fname = os.path.basename(n)
                     if fname:
                         open(os.path.join(chat_files_dir, fname), "wb").write(zf.read(n))
+
+        if i2pd_was_stopped:
+            import subprocess as _sp_i2p2
+            _sp_i2p2.Popen("sleep 1 && systemctl start i2pd", shell=True)
+
+        if bridge_restored:
+            import subprocess as _sp_bridge
+            _sp_bridge.Popen("sleep 1 && systemctl restart noema_lxmf_bridge", shell=True)
 
         return jsonify({"ok": True})
     except Exception as e:
@@ -904,9 +938,9 @@ def _save_chat_msg(addr, msg):
             data[addr] = data[addr][-200:]
             _chat_json.dump(data, open(CHAT_FILE, "w", encoding="utf-8"), ensure_ascii=False)
         except: pass
-    # Cleanup chat files if folder exceeds 50MB
+    # Cleanup chat files if folder exceeds configured limit
     try:
-        _chat_cleanup_files(max_mb=50)
+        _chat_cleanup_files(max_mb=CHAT_FILES_MAX_MB)
     except: pass
 
 def _chat_cleanup_files(max_mb=50):
@@ -988,7 +1022,7 @@ def chat_contacts():
 
 @app.route("/api/chat/contacts", methods=["POST"])
 def chat_contacts_save():
-    contacts = request.json or []
+    contacts = request.get_json(silent=True) or []
     _save_contacts(contacts)
     return jsonify({"ok": True})
 
@@ -1030,7 +1064,7 @@ def chat_send():
                 _glob.glob(f"{_HOME}/NOEMA-RNSGate-Lite/.venv/lib/python*/site-packages")
     if _sp_paths: _sys.path.insert(0, _sp_paths[0])
     import RNS, LXMF, time as _t
-    data = request.json or {}
+    data = request.get_json(silent=True) or {}
     dest_addr = data.get("to", "").strip().replace("<","").replace(">","")
     text = data.get("text", "").strip()
     file_id = data.get("file_id")
@@ -1049,8 +1083,12 @@ def chat_send():
         identity = RNS.Identity.recall(dest_hash)
         if not identity:
             RNS.Transport.request_path(dest_hash)
-            import time; time.sleep(3)
-            identity = RNS.Identity.recall(dest_hash)
+            import time
+            for _ in range(8):
+                time.sleep(1)
+                identity = RNS.Identity.recall(dest_hash)
+                if identity:
+                    break
         if not identity:
             return jsonify({"error": "destination unknown, requesting path..."}), 404
         dest = RNS.Destination(identity, RNS.Destination.OUT, RNS.Destination.SINGLE, "lxmf", "delivery")
@@ -1195,7 +1233,7 @@ def chat_files_clear():
 @app.route("/api/chat/files/settings", methods=["POST"])
 def chat_files_settings():
     global CHAT_FILES_MAX_MB
-    data = request.json or {}
+    data = request.get_json(silent=True) or {}
     if "max_mb" in data:
         CHAT_FILES_MAX_MB = int(data["max_mb"])
     return jsonify({"ok": True, "max_mb": CHAT_FILES_MAX_MB})
@@ -1227,7 +1265,7 @@ def telegram_settings():
     parser = _cp.ConfigParser()
     parser.read(cfg_path)
     if request.method == "POST":
-        data = request.json or {}
+        data = request.get_json(silent=True) or {}
         if not parser.has_section("telegram"):
             parser.add_section("telegram")
         # Don't overwrite token/chat_id if not provided
@@ -1295,7 +1333,7 @@ def run_command():
             "df -h /"
         ),
     }
-    cmd_id = (request.json or {}).get("cmd", "")
+    cmd_id = (request.get_json(silent=True) or {}).get("cmd", "")
     if cmd_id not in allowed:
         return jsonify({"error": "unknown command"}), 400
     if cmd_id == "restart_dash":
@@ -1331,7 +1369,7 @@ def i2p_status():
 @app.route("/api/i2p/action", methods=["POST"])
 def i2p_action():
     import time as _t
-    action = (request.json or {}).get("action","")
+    action = (request.get_json(silent=True) or {}).get("action","")
     allowed = ["install","start","stop","restart","setup_tunnel"]
     if action not in allowed:
         return jsonify({"ok":False,"error":"unknown action"}), 400
@@ -1387,8 +1425,8 @@ keys = reticulum.dat
 
 @app.route("/api/i2p/add_interface", methods=["POST"])
 def i2p_add_interface():
-    addr = (request.json or {}).get("addr","").strip()
-    name = (request.json or {}).get("name","I2P-Node").strip()
+    addr = (request.get_json(silent=True) or {}).get("addr","").strip()
+    name = (request.get_json(silent=True) or {}).get("name","I2P-Node").strip()
     if not addr or ".b32.i2p" not in addr:
         return jsonify({"ok":False,"error":"invalid b32 address"})
     try:
@@ -1449,7 +1487,7 @@ def nomadnet_page_get():
 
 @app.route("/api/nomadnet/page", methods=["POST"])
 def nomadnet_page_save():
-    content = (request.json or {}).get("content", "")
+    content = (request.get_json(silent=True) or {}).get("content", "")
     try:
         os.makedirs(os.path.dirname(NOMADNET_PAGE), exist_ok=True)
         open(NOMADNET_PAGE, "w").write(content)
@@ -1482,7 +1520,7 @@ def nomadnet_page_read(name):
 def nomadnet_page_save_named(name):
     if not name.endswith(".mu") or "/" in name:
         return jsonify({"ok": False, "error": "Invalid name"})
-    content = (request.json or {}).get("content", "")
+    content = (request.get_json(silent=True) or {}).get("content", "")
     path = os.path.join(NOMADNET_PAGES_DIR, name)
     try:
         os.makedirs(NOMADNET_PAGES_DIR, exist_ok=True)
@@ -1527,7 +1565,7 @@ def script_read(name):
 def script_save(name):
     if not name.endswith(".py") or "/" in name:
         return jsonify({"ok": False, "error": "Invalid name"})
-    content = (request.json or {}).get("content", "")
+    content = (request.get_json(silent=True) or {}).get("content", "")
     path = os.path.join(SCRIPTS_DIR, name)
     try:
         os.makedirs(SCRIPTS_DIR, exist_ok=True)
@@ -1583,7 +1621,7 @@ def script_cron_set(name):
     if not name.endswith(".py") or "/" in name:
         return jsonify({"ok": False, "error": "Invalid name"})
     path = os.path.join(SCRIPTS_DIR, name)
-    data = request.json or {}
+    data = request.get_json(silent=True) or {}
     schedule = data.get("schedule")  # None = disable
     try:
         venv_python = f"{_HOME}/NOEMA-RNSGate-Lite/.venv/bin/python3"
@@ -1643,7 +1681,7 @@ def rns_config_parsed():
 @app.route("/api/rns_config_save", methods=["POST"])
 def rns_config_save():
     import re
-    data = request.get_json()
+    data = request.get_json(silent=True)
     if not data:
         return jsonify({"error": "no data"}), 400
     path = f"{_HOME}/.reticulum/config"
@@ -1717,7 +1755,7 @@ def rns_update_check():
 
 @app.route("/api/rns_update", methods=["POST"])
 def rns_update():
-    pkg = (request.json or {}).get("package", "rns")
+    pkg = (request.get_json(silent=True) or {}).get("package", "rns")
     allowed = ["rns","lxmf","lxmfy","nomadnet","paho-mqtt","flask","waitress"]
     if pkg not in allowed:
         return jsonify({"ok": False, "error": "not allowed"})
@@ -1744,10 +1782,14 @@ def reset_identity():
         rns_storage = os.path.join(_HOME, ".reticulum/storage")
         if os.path.exists(rns_storage):
             shutil.rmtree(rns_storage)
-        # Remove lxmf-tools identity
-        for f in ["lxmf-tools/identity", "lxmf-tools/lxmf_address"]:
+        # Remove LXMF Bridge identity (lxmfy framework storage)
+        for f in ["lxmf-tools/identity", "lxmf-tools/lxmf_address",
+                  "lxmf-tools/lxmfy_data", "lxmf-tools/lxmfy_config"]:
             p = os.path.join(_HOME, f)
-            if os.path.exists(p): os.remove(p)
+            if os.path.isdir(p):
+                shutil.rmtree(p)
+            elif os.path.exists(p):
+                os.remove(p)
         # Remove group chat identity
 
         # Remove Nomadnet identity (keep pages)

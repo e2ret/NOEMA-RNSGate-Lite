@@ -1005,11 +1005,54 @@ function chatShowMessages(){
         <span id="cron-watchdog-status" style="font-size:11px;color:var(--mu)"></span>
       </div>
 
+      <div style="margin-bottom:20px">
+        <div style="font-size:13px;color:var(--tx);margin-bottom:6px">Dashboard polling frequency</div>
+        <div style="font-size:11px;color:var(--mu);margin-bottom:8px">Lower frequency reduces CPU load on weak hardware (e.g. Orange Pi Zero)</div>
+        <select id="polling-mode" onchange="setPollingMode(this.value)" style="background:var(--bg);border:1px solid var(--bd);border-radius:12px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:6px 10px">
+          <option value="fast">Fast (default)</option>
+          <option value="normal">Normal (2x slower)</option>
+          <option value="slow">Slow / Low-power (4x slower)</option>
+        </select>
+      </div>
+
       <div class="section-lbl">System</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px">
         <button class="sys-btn am" onclick="svcAction('dashboard','restart')">Restart Dashboard</button>
         <button class="sys-btn rd" onclick="showRebootModal()">Reboot</button>
         <button class="sys-btn rd" onclick="showResetModal()">Reset All Identity</button>
+      </div>
+
+      <div class="section-lbl">Backup &amp; Restore</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px">
+        <button class="sys-btn teal" onclick="showBackupModal()">Download Backup</button>
+        <button class="sys-btn am" onclick="showRestoreModal()">Restore</button>
+      </div>
+
+      <div class="section-lbl">Versions</div>
+      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:20px">
+        <table style="width:100%;border-collapse:collapse;font-family:var(--fn);font-size:12px">
+          <thead>
+            <tr style="border-bottom:1px solid var(--bd)">
+              <th style="text-align:left;color:var(--mu);font-weight:400;padding:4px 8px 8px 0">Component</th>
+              <th style="text-align:left;color:var(--mu);font-weight:400;padding:4px 8px 8px">Installed</th>
+              <th style="text-align:left;color:var(--mu);font-weight:400;padding:4px 8px 8px">Latest</th>
+              <th style="text-align:right;color:var(--mu);font-weight:400;padding:4px 0 8px 8px"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="color:var(--mu);padding:6px 8px 6px 0">Python</td>
+              <td id="ver-python" style="color:var(--tx);padding:6px 8px">—</td>
+              <td style="color:var(--mu);padding:6px 8px">—</td>
+              <td></td>
+            </tr>
+          </tbody>
+          <tbody id="ver-table"></tbody>
+        </table>
+        <div id="rns-update-status" style="font-size:11px;color:var(--teal);margin-top:8px;display:none"></div>
+        <span id="rns-cur-ver" style="display:none"></span>
+        <span id="rns-latest-ver" style="display:none"></span>
+        <button id="rns-update-btn" style="display:none" onclick="rnsUpdate()"></button>
       </div>
 
       </div>
@@ -1136,39 +1179,6 @@ function chatShowMessages(){
         </div>
       </div>
 
-      <div class="section-lbl">Backup & Restore</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px">
-        <button class="sys-btn teal" onclick="showBackupModal()">Download Backup</button>
-        <button class="sys-btn am" onclick="showRestoreModal()">Restore</button>
-      </div>
-
-      <div class="section-lbl">Versions</div>
-      <div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:20px">
-        <table style="width:100%;border-collapse:collapse;font-family:var(--fn);font-size:12px">
-          <thead>
-            <tr style="border-bottom:1px solid var(--bd)">
-              <th style="text-align:left;color:var(--mu);font-weight:400;padding:4px 8px 8px 0">Component</th>
-              <th style="text-align:left;color:var(--mu);font-weight:400;padding:4px 8px 8px">Installed</th>
-              <th style="text-align:left;color:var(--mu);font-weight:400;padding:4px 8px 8px">Latest</th>
-              <th style="text-align:right;color:var(--mu);font-weight:400;padding:4px 0 8px 8px"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td style="color:var(--mu);padding:6px 8px 6px 0">Python</td>
-              <td id="ver-python" style="color:var(--tx);padding:6px 8px">—</td>
-              <td style="color:var(--mu);padding:6px 8px">—</td>
-              <td></td>
-            </tr>
-          </tbody>
-          <tbody id="ver-table"></tbody>
-        </table>
-        <div id="rns-update-status" style="font-size:11px;color:var(--teal);margin-top:8px;display:none"></div>
-        <span id="rns-cur-ver" style="display:none"></span>
-        <span id="rns-latest-ver" style="display:none"></span>
-        <button id="rns-update-btn" style="display:none" onclick="rnsUpdate()"></button>
-      </div>
-
       </div>
       </div>
     </div>
@@ -1274,7 +1284,7 @@ function nav(id,el){
 
   if(id==="rnode") loadRnodePanel();
   if(id==="i2p") loadI2pStatus();
-  if(id==="system"){ loadSystem(); loadSystemFiles(); loadTgSettings(); loadCronRnsd(); loadCronWatchdog(); loadAccessSettings(); loadChatAccessSettings(); }
+  if(id==="system"){ loadSystem(); loadSystemFiles(); loadTgSettings(); loadCronRnsd(); loadCronWatchdog(); loadAccessSettings(); loadChatAccessSettings(); const pm=document.getElementById("polling-mode"); if(pm) pm.value = localStorage.getItem("noema_polling_mode") || "fast"; }
 }
 
 function toast(msg,ok=true){
@@ -1750,7 +1760,7 @@ function clearLogView(){
 }
 function toggleLogAuto(){
   const on=document.getElementById("log-auto").checked;
-  if(on){ _logAutoTimer=setInterval(loadLogs,3000); }
+  if(on){ _logAutoTimer=setInterval(loadLogs,3000 * _pollMul); }
   else{ clearInterval(_logAutoTimer); _logAutoTimer=null; }
 }
 
@@ -3002,13 +3012,22 @@ setInterval(()=>{
   });
 },250);
 
-setInterval(loadSystem,10000);
-setInterval(loadServices,15000);
-setInterval(checkMqttStatus,10000);
-setInterval(pollLxmf,3000);
-setInterval(updateTopology,10000);
+const POLLING_MULTIPLIERS = {fast: 1, normal: 2, slow: 4};
+const _pollingMode = localStorage.getItem("noema_polling_mode") || "fast";
+const _pollMul = POLLING_MULTIPLIERS[_pollingMode] || 1;
+
+function setPollingMode(mode){
+  localStorage.setItem("noema_polling_mode", mode);
+  location.reload();
+}
+
+setInterval(loadSystem, 10000 * _pollMul);
+setInterval(loadServices, 15000 * _pollMul);
+setInterval(checkMqttStatus, 10000 * _pollMul);
+setInterval(pollLxmf, 3000 * _pollMul);
+setInterval(updateTopology, 10000 * _pollMul);
 updateTopology();
-setInterval(pollChatIncoming,5000);
+setInterval(pollChatIncoming, 5000 * _pollMul);
 if("Notification" in window && Notification.permission === "default"){ Notification.requestPermission(); }
 // Load contacts and initialize chatLastTs from history at startup
 fetch(API+"/api/chat/contacts").then(r=>r.json()).then(async d=>{
