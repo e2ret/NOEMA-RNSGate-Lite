@@ -1,4 +1,5 @@
 # NOEMA RNSGate Lite
+![NOEMA RNSGate Lite](https://img3.teletype.in/files/6e/97/6e97ea8b-5179-4012-a61a-136689de9c1c.png)
 
 [🇷🇺 Русский](#русский) | [🇬🇧 English](#english)
 
