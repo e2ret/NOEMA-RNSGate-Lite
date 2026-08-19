@@ -1,11 +1,16 @@
 # NOEMA RNSGate Lite
 
-🇷🇺 Русский | [🇬🇧 English](README.md)
+[🇷🇺 Русский](#русский) | [🇬🇧 English](#english)
 
 ![RNS](https://img.shields.io/badge/RNS-1.4.2-teal) ![License](https://img.shields.io/badge/license-MIT-green) ![Platform](https://img.shields.io/badge/platform-Debian%20%7C%20Ubuntu-blue)
-**Reticulum Mesh Gateway** — шлюз для сети Reticulum, объединяющий радиосвязь LoRa, LXMF мессенджер, MQTT-интеграцию с Home Assistant, анонимную сеть I2P, Nomadnet и современный веб-интерфейс управления.
+
 ---
-## Возможности
+
+## Русский
+
+**Reticulum Mesh Gateway** — шлюз для сети Reticulum, объединяющий радиосвязь LoRa, LXMF мессенджер, MQTT-интеграцию с Home Assistant, анонимную сеть I2P, Nomadnet и современный веб-интерфейс управления.
+
+### Возможности
 - Reticulum Mesh (TCP/IP + LoRa через RNode)
 - LXMF Bridge → MQTT → Home Assistant
 - Встроенный P2P чат (LXMF) с уведомлениями и вложениями
@@ -17,19 +22,20 @@
 - Современный веб-дашборд (светлая/тёмная тема): мониторинг, управление сервисами, редактор конфигов без SSH
 - Backup & Restore всех идентификаторов и данных
 - Обновление из GitHub в один клик прямо из дашборда
----
-## ⚠️ Важно
+
+### ⚠️ Важно
 Проект создан в личных целях и распространяется **как есть**, без гарантий работоспособности. Требуется понимание основ: Linux, TCP/IP, MQTT, базовое администрирование.
----
-## Установка
+
+### Установка
 Требования: Debian/Ubuntu, Python 3.10+, root.
 ```bash
 git clone https://github.com/e2ret/NOEMA-RNSGate-Lite.git && cd NOEMA-RNSGate-Lite && sudo bash install.sh
 ```
 Скрипт автоматически устанавливает все зависимости, спрашивает параметры MQTT брокера и запускает systemd сервисы.
+
 > **Примечание:** в процессе установки дважды потребуется нажать Enter — для инициализации Nomadnet и настройки cron-задач.
----
-## На чём запускать
+
+### На чём запускать
 
 Проект **не привязан к Orange Pi** — это просто пример устройства, на котором тестировался. Реально нужен любой Linux (Debian/Ubuntu) с Python 3.10+:
 
@@ -41,13 +47,14 @@ git clone https://github.com/e2ret/NOEMA-RNSGate-Lite.git && cd NOEMA-RNSGate-Li
 Для LoRa нужен RNode — он подключается либо по USB, либо по Wi-Fi (для ESP32-моделей с сетевым интерфейсом). Физический USB-порт нужен только для USB-варианта. Остальной функционал (TCP/Wi-Fi/Ethernet mesh, I2P, MQTT, чат) работает на любой VM без физического доступа к железу.
 
 Минимальные требования: ~256 МБ RAM, ~2 ГБ диска для установки всех компонентов.
----
-## Документация
+
+### Документация
 **[→ Полная документация в Wiki](https://github.com/e2ret/NOEMA-RNSGate-Lite/wiki)**
-## Обсуждение
+
+### Обсуждение
 [→ Telegram](https://t.me/reticulum_belgorod/70)
----
-## Используемые компоненты
+
+### Используемые компоненты
 - [Reticulum (RNS)](https://github.com/markqvist/Reticulum) — Mark Qvist, MIT
 - [LXMF](https://github.com/markqvist/LXMF) — Mark Qvist, MIT
 - [Nomadnet](https://github.com/markqvist/NomadNet) — Mark Qvist, GPL-3.0
@@ -56,7 +63,73 @@ git clone https://github.com/e2ret/NOEMA-RNSGate-Lite.git && cd NOEMA-RNSGate-Li
 - [paho-mqtt](https://github.com/eclipse/paho.mqtt.python) — Eclipse, EPL/EDL
 - [rBrowser](https://github.com/fr33n0w/rBrowser) — fr33n0w, MIT
 - [i2pd](https://github.com/PurpleI2P/i2pd) — PurpleI2P, BSD
----
-## Благодарности
+
+### Благодарности
 **Mark Qvist** — Reticulum, LXMF, Nomadnet · **fr33n0w** — rBrowser · **PurpleI2P Team** — i2pd
+
 Спасибо всем разработчикам, благодаря которым экосистема Reticulum продолжает развиваться.
+
+---
+
+## English
+
+**Reticulum Mesh Gateway** — a gateway for the Reticulum network, combining LoRa radio, the LXMF messenger, MQTT integration with Home Assistant, the anonymous I2P network, Nomadnet, and a modern web management interface.
+
+### Features
+- Reticulum Mesh (TCP/IP + LoRa via RNode)
+- LXMF Bridge → MQTT → Home Assistant
+- Built-in P2P chat (LXMF) with notifications and attachments
+- Access Control: LXMF address whitelisting and rate limiting against spam
+- Telegram notifications for incoming messages
+- Anonymous I2P network (connect gateways without a public IP)
+- Nomadnet Node + page editor + IRC-style chat
+- rBrowser — built-in Nomadnet browser
+- Modern web dashboard (light/dark theme): monitoring, service management, config editor without SSH
+- Backup & Restore for all identities and data
+- One-click update from GitHub right in the dashboard
+
+### ⚠️ Important
+This project was built for personal use and is distributed **as-is**, with no guarantee of functionality. Basic knowledge required: Linux, TCP/IP, MQTT, general system administration.
+
+### Installation
+Requirements: Debian/Ubuntu, Python 3.10+, root.
+```bash
+git clone https://github.com/e2ret/NOEMA-RNSGate-Lite.git && cd NOEMA-RNSGate-Lite && sudo bash install.sh
+```
+The script automatically installs all dependencies, asks for MQTT broker settings, and starts the systemd services.
+
+> **Note:** during installation you'll need to press Enter twice — for Nomadnet initialization and cron setup.
+
+### On what hardware
+
+The project **is not tied to Orange Pi** — that's just the device it was tested on. All you really need is any Linux (Debian/Ubuntu) with Python 3.10+:
+
+- **Single-board computers**: Orange Pi Zero/Zero 2/Zero 3, Raspberry Pi (any model with Ubuntu/Debian)
+- **VM/LXC on Proxmox**: any Debian/Ubuntu container or VM — this is how the author runs it
+- **Old laptop / mini-PC**: x86_64 with Ubuntu Server
+- **VPS**: if you need a public TCP node without a home network
+
+RNode connects either via USB or Wi-Fi (for ESP32-based models with a network interface) — a physical USB port is only required for the USB variant. Everything else (TCP/Wi-Fi/Ethernet mesh, I2P, MQTT, chat) runs on any VM with no physical hardware access at all.
+
+Minimum requirements: ~256 MB RAM, ~2 GB disk for a full install.
+
+### Documentation
+**[→ Full documentation in the Wiki](https://github.com/e2ret/NOEMA-RNSGate-Lite/wiki)**
+
+### Discussion
+[→ Telegram](https://t.me/reticulum_belgorod/70)
+
+### Components used
+- [Reticulum (RNS)](https://github.com/markqvist/Reticulum) — Mark Qvist, MIT
+- [LXMF](https://github.com/markqvist/LXMF) — Mark Qvist, MIT
+- [Nomadnet](https://github.com/markqvist/NomadNet) — Mark Qvist, GPL-3.0
+- [lxmfy](https://github.com/lxmfy/lxmfy) — lxmfy, MIT
+- [Flask](https://flask.palletsprojects.com/) — Pallets, BSD
+- [paho-mqtt](https://github.com/eclipse/paho.mqtt.python) — Eclipse, EPL/EDL
+- [rBrowser](https://github.com/fr33n0w/rBrowser) — fr33n0w, MIT
+- [i2pd](https://github.com/PurpleI2P/i2pd) — PurpleI2P, BSD
+
+### Acknowledgements
+**Mark Qvist** — Reticulum, LXMF, Nomadnet · **fr33n0w** — rBrowser · **PurpleI2P Team** — i2pd
+
+Thanks to all the developers who keep the Reticulum ecosystem growing.
