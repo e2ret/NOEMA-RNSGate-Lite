@@ -425,6 +425,7 @@ function chatShowMessages(){
         <svg class="i-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
         <svg class="i-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
       </button>
+      <button class="theme-toggle" onclick="toggleLang()" id="lang-toggle" title="Switch language" aria-label="Switch language" style="font-family:var(--fn);font-size:11px;font-weight:700;width:auto;padding:0 8px">EN</button>
       <div class="pill" style="display:inline-flex"><div class="dot" id="dot"></div><span class="skel" id="ip-lbl">—</span></div>
     </div>
   </div>
@@ -445,23 +446,23 @@ function chatShowMessages(){
 <div class="body">
   <div class="hub-shell">
     <div class="hub-col left">
-      <div class="hub-pill active" onclick="nav('home',this)"><div class="hub-pill-ic" style="color:var(--teal)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div><span>Services</span></div>
-      <div class="hub-pill" onclick="nav('configs',this)"><div class="hub-pill-ic" style="color:var(--bl)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="4" x2="5" y2="20"/><circle cx="5" cy="10" r="2.2"/><line x1="12" y1="4" x2="12" y2="20"/><circle cx="12" cy="16" r="2.2"/><line x1="19" y1="4" x2="19" y2="20"/><circle cx="19" cy="7" r="2.2"/></svg></div><span>Configs</span></div>
-      <div class="hub-pill" onclick="nav('addresses',this);loadAddressesPanel();"><div class="hub-pill-ic" style="color:var(--purple)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M16 12v1.5a2.5 2.5 0 0 0 5 0V12a9 9 0 1 0-4 7.5"/></svg></div><span>Addresses</span></div>
-      <div class="hub-pill" onclick="nav('monitor',this)"><div class="hub-pill-ic" style="color:var(--gr)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2.5-7 4 14L16 12h5"/></svg></div><span>Monitor</span></div>
-      <div class="hub-pill" onclick="nav('rnode',this)"><div class="hub-pill-ic" style="color:var(--am)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M8.5 8.5a5 5 0 0 0 0 7"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M5.5 5.5a9 9 0 0 0 0 13"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></div><span>RNode</span></div>
+      <div class="hub-pill active" onclick="nav('home',this)"><div class="hub-pill-ic" style="color:var(--teal)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div><span data-i18n="nav_services">Services</span></div>
+      <div class="hub-pill" onclick="nav('configs',this)"><div class="hub-pill-ic" style="color:var(--bl)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="4" x2="5" y2="20"/><circle cx="5" cy="10" r="2.2"/><line x1="12" y1="4" x2="12" y2="20"/><circle cx="12" cy="16" r="2.2"/><line x1="19" y1="4" x2="19" y2="20"/><circle cx="19" cy="7" r="2.2"/></svg></div><span data-i18n="nav_configs">Configs</span></div>
+      <div class="hub-pill" onclick="nav('addresses',this);loadAddressesPanel();"><div class="hub-pill-ic" style="color:var(--purple)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M16 12v1.5a2.5 2.5 0 0 0 5 0V12a9 9 0 1 0-4 7.5"/></svg></div><span data-i18n="nav_addresses">Addresses</span></div>
+      <div class="hub-pill" onclick="nav('monitor',this)"><div class="hub-pill-ic" style="color:var(--gr)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2.5-7 4 14L16 12h5"/></svg></div><span data-i18n="nav_monitor">Monitor</span></div>
+      <div class="hub-pill" onclick="nav('rnode',this)"><div class="hub-pill-ic" style="color:var(--am)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M8.5 8.5a5 5 0 0 0 0 7"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M5.5 5.5a9 9 0 0 0 0 13"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></div><span data-i18n="nav_rnode">RNode</span></div>
     </div>
     <div class="main">
 
     <!-- HOME / SERVICES -->
     <div class="panel active" id="panel-home">
       <div style="flex:1">
-      <div class="section-lbl" style="margin-bottom:10px">System architecture — live</div>
+      <div class="section-lbl" style="margin-bottom:10px" data-i18n="sec_arch_live">System architecture — live</div>
       <div class="svc-arch-grid">
         <div class="svc-arch-col">
           <div id="svc-list-left"></div>
           <div class="brow">
-            <button class="sys-btn am" onclick="restartAll()">restart all</button>
+            <button class="sys-btn am" onclick="restartAll()" data-i18n="btn_restart_all">restart all</button>
           </div>
         </div>
         <div class="svc-arch-diagram">
@@ -569,7 +570,7 @@ function chatShowMessages(){
       <div class="svc-mobile-only">
         <div id="svc-list-mobile"></div>
         <div class="brow">
-          <button class="sys-btn am" onclick="restartAll()">restart all</button>
+          <button class="sys-btn am" onclick="restartAll()" data-i18n="btn_restart_all">restart all</button>
         </div>
       </div>
       <div style="display:none">
@@ -585,15 +586,15 @@ function chatShowMessages(){
       <div class="two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;flex:1;min-height:0">
         <div style="display:flex;flex-direction:column;background:var(--s1);border:1px solid var(--bd);border-radius:12px;overflow:hidden">
           <div style="padding:8px 12px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between">
-            <div class="section-lbl" style="margin:0">LXMF Messages</div>
-            <button class="sys-btn" onclick="clearLxmf()">CLEAR</button>
+            <div class="section-lbl" style="margin:0" data-i18n="sec_lxmf_messages">LXMF Messages</div>
+            <button class="sys-btn" onclick="clearLxmf()" data-i18n="btn_clear">CLEAR</button>
           </div>
           <div class="lxmf-box" id="lxmf-box" style="flex:1;height:auto;border-radius:0;border:none"></div>
         </div>
         <div style="display:flex;flex-direction:column;background:var(--s1);border:1px solid var(--bd);border-radius:12px;overflow:hidden">
           <div style="padding:8px 12px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between">
-            <div class="section-lbl" style="margin:0">RNS interfaces</div>
-            <button class="sys-btn teal" onclick="loadRns()">REFRESH</button>
+            <div class="section-lbl" style="margin:0" data-i18n="sec_rns_interfaces">RNS interfaces</div>
+            <button class="sys-btn teal" onclick="loadRns()" data-i18n="btn_refresh">REFRESH</button>
           </div>
           <div id="rns-list" style="font-size:12px;line-height:2;padding:10px 12px;overflow-y:auto;flex:1"></div>
         </div>
@@ -603,49 +604,49 @@ function chatShowMessages(){
     <!-- I2P -->
     <div class="panel" id="panel-i2p">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-        <div class="section-lbl" style="margin:0">I2P Integration</div>
-        <button class="sys-btn teal" onclick="loadI2pStatus()">REFRESH</button>
+        <div class="section-lbl" style="margin:0" data-i18n="sec_i2p_integration">I2P Integration</div>
+        <button class="sys-btn teal" onclick="loadI2pStatus()" data-i18n="btn_refresh">REFRESH</button>
       </div>
 
       <!-- Status -->
       <div id="i2p-status-block" style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:12px 14px;margin-bottom:12px">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
           <div id="i2p-dot" class="dot" style="width:10px;height:10px;background:var(--mu)"></div>
-          <div style="font-size:13px;font-weight:700;color:var(--tx)">i2pd daemon</div>
+          <div style="font-size:13px;font-weight:700;color:var(--tx)" data-i18n="txt_i2pd_daemon">i2pd daemon</div>
           <div id="i2p-status-lbl" style="font-size:11px;color:var(--mu)">unknown</div>
         </div>
         <div id="i2p-addr-block" style="display:none">
-          <div style="font-size:10px;color:var(--mu);margin-bottom:4px;text-transform:uppercase;letter-spacing:.07em">I2P Tunnel Address (Reticulum)</div>
+          <div style="font-size:10px;color:var(--mu);margin-bottom:4px;text-transform:uppercase;letter-spacing:.07em" data-i18n="txt_i2p_tunnel_addr">I2P Tunnel Address (Reticulum)</div>
           <div id="i2p-addr" style="font-family:var(--fn);font-size:11px;color:var(--teal);word-break:break-all"></div>
         </div>
       </div>
 
       <!-- Install / Control -->
-      <div class="section-lbl" style="margin-bottom:8px">Daemon Control</div>
+      <div class="section-lbl" style="margin-bottom:8px" data-i18n="sec_daemon_control">Daemon Control</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
-        <button class="sys-btn teal" onclick="i2pAction('install')">INSTALL I2PD</button>
-        <button class="sys-btn teal" onclick="i2pAction('start')">START</button>
-        <button class="sys-btn am" onclick="i2pAction('stop')">STOP</button>
-        <button class="sys-btn am" onclick="i2pAction('restart')">RESTART</button>
+        <button class="sys-btn teal" onclick="i2pAction('install')" data-i18n="btn_install_i2pd">INSTALL I2PD</button>
+        <button class="sys-btn teal" onclick="i2pAction('start')" data-i18n="btn_start_caps">START</button>
+        <button class="sys-btn am" onclick="i2pAction('stop')" data-i18n="btn_stop_caps">STOP</button>
+        <button class="sys-btn am" onclick="i2pAction('restart')" data-i18n="btn_restart_caps">RESTART</button>
       </div>
 
       <!-- Reticulum integration -->
-      <div class="section-lbl" style="margin-bottom:8px">Reticulum Interface</div>
+      <div class="section-lbl" style="margin-bottom:8px" data-i18n="sec_reticulum_interface">Reticulum Interface</div>
       <div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:12px 14px;margin-bottom:12px">
-        <div style="font-size:11px;color:var(--mu);margin-bottom:8px">Add I2P interface to Reticulum config pointing to a remote node:</div>
+        <div style="font-size:11px;color:var(--mu);margin-bottom:8px" data-i18n="txt_i2p_add_iface_desc">Add I2P interface to Reticulum config pointing to a remote node:</div>
         <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
           <input id="i2p-peer-addr" placeholder="xxxxx.b32.i2p" style="flex:1;min-width:200px;background:var(--bg);border:1px solid var(--bd);border-radius:12px;padding:6px 10px;color:var(--tx);font-size:12px;font-family:var(--fn)">
           <input id="i2p-peer-name" placeholder="Interface name" value="I2P-Node" style="width:120px;background:var(--bg);border:1px solid var(--bd);border-radius:12px;padding:6px 10px;color:var(--tx);font-size:12px">
-          <button class="sys-btn teal" onclick="i2pAddInterface()">ADD TO CONFIG</button>
+          <button class="sys-btn teal" onclick="i2pAddInterface()" data-i18n="btn_add_to_config">ADD TO CONFIG</button>
         </div>
         <div id="i2p-rns-status" style="font-size:11px;color:var(--mu)"></div>
       </div>
 
       <!-- Setup tunnel -->
-      <div class="section-lbl" style="margin-bottom:8px">Local Tunnel Setup</div>
+      <div class="section-lbl" style="margin-bottom:8px" data-i18n="sec_local_tunnel">Local Tunnel Setup</div>
       <div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:12px 14px;margin-bottom:12px">
-        <div style="font-size:11px;color:var(--mu);margin-bottom:8px">Create incoming I2P tunnel for this MeshGate (so others can connect anonymously):</div>
-        <button class="sys-btn teal" onclick="i2pAction('setup_tunnel')">SETUP I2P TUNNEL</button>
+        <div style="font-size:11px;color:var(--mu);margin-bottom:8px" data-i18n="txt_i2p_setup_tunnel_desc">Create incoming I2P tunnel for this MeshGate (so others can connect anonymously):</div>
+        <button class="sys-btn teal" onclick="i2pAction('setup_tunnel')" data-i18n="btn_setup_i2p_tunnel">SETUP I2P TUNNEL</button>
         <div id="i2p-tunnel-result" style="margin-top:8px;font-size:11px;color:var(--teal);font-family:var(--fn)"></div>
       </div>
 
@@ -660,12 +661,12 @@ function chatShowMessages(){
         <!-- Top buttons -->
         <div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0;flex-wrap:wrap;gap:6px">
           <div style="display:flex;gap:4px">
-            <button class="sys-btn teal" id="nn-tab-pages" onclick="nnTab('pages')">PAGES</button>
-            <button class="sys-btn" id="nn-tab-scripts" onclick="nnTab('scripts')">SCRIPTS</button>
+            <button class="sys-btn teal" id="nn-tab-pages" onclick="nnTab('pages')" data-i18n="btn_pages">PAGES</button>
+            <button class="sys-btn" id="nn-tab-scripts" onclick="nnTab('scripts')" data-i18n="btn_scripts">SCRIPTS</button>
           </div>
           <div style="display:flex;gap:6px">
-            <a id="nn-rbrowser-link" href="#" target="_blank" class="sys-btn teal" style="text-decoration:none">OPEN RBROWSER</a>
-            <a id="nn-chat-link" href="#" target="_blank" class="sys-btn" style="text-decoration:none">NOMADNET CHAT</a>
+            <a id="nn-rbrowser-link" href="#" target="_blank" class="sys-btn teal" style="text-decoration:none" data-i18n="btn_open_rbrowser">OPEN RBROWSER</a>
+            <a id="nn-chat-link" href="#" target="_blank" class="sys-btn" style="text-decoration:none" data-i18n="btn_nomadnet_chat">NOMADNET CHAT</a>
           </div>
           <script>
             document.getElementById("nn-rbrowser-link").href="http://"+window.location.hostname+":5000";
@@ -686,27 +687,27 @@ function chatShowMessages(){
 
         <!-- Action buttons -->
         <div style="display:flex;gap:8px;align-items:center;flex-shrink:0;flex-wrap:wrap">
-          <button class="sys-btn teal" onclick="nnSave()">SAVE</button>
-          <button class="sys-btn rd" id="nn-delete-btn" onclick="nnDelete()" style="display:none">DELETE</button>
-          <button class="sys-btn am" id="nn-run-btn" onclick="nnRun()" style="display:none">RUN</button>
-          <button class="sys-btn" onclick="nnNewFile()">+ NEW</button>
+          <button class="sys-btn teal" onclick="nnSave()" data-i18n="btn_save_caps">SAVE</button>
+          <button class="sys-btn rd" id="nn-delete-btn" onclick="nnDelete()" style="display:none" data-i18n="btn_delete">DELETE</button>
+          <button class="sys-btn am" id="nn-run-btn" onclick="nnRun()" style="display:none" data-i18n="btn_run">RUN</button>
+          <button class="sys-btn" onclick="nnNewFile()" data-i18n="btn_new">+ NEW</button>
           <a id="nn-micron-btn" href="https://fr33n0w.github.io/micron-composer/" target="_blank" class="sys-btn" style="text-decoration:none">MICRON COMPOSER</a>
         </div>
 
         <!-- Cron block (scripts only) -->
         <div id="nn-cron-block" style="display:none;background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:10px 14px;flex-shrink:0">
           <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-            <span style="font-size:13px;color:var(--mu);text-transform:uppercase;letter-spacing:.06em">Schedule</span>
+            <span style="font-size:13px;color:var(--mu);text-transform:uppercase;letter-spacing:.06em" data-i18n="txt_schedule">Schedule</span>
             <select id="nn-cron-select" style="font-family:var(--fn);font-size:13px;padding:5px 10px;border-radius:12px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);cursor:pointer">
-              <option value="">— disabled —</option>
-              <option value="*/5 * * * *">Every 5 min</option>
-              <option value="*/15 * * * *">Every 15 min</option>
-              <option value="*/30 * * * *">Every 30 min</option>
-              <option value="0 * * * *">Every hour</option>
-              <option value="0 */6 * * *">Every 6 hours</option>
-              <option value="0 0 * * *">Every day</option>
+              <option value="" data-i18n="opt_disabled">— disabled —</option>
+              <option value="*/5 * * * *" data-i18n="opt_every_5min">Every 5 min</option>
+              <option value="*/15 * * * *" data-i18n="opt_every_15min">Every 15 min</option>
+              <option value="*/30 * * * *" data-i18n="opt_every_30min">Every 30 min</option>
+              <option value="0 * * * *" data-i18n="opt_every_hour">Every hour</option>
+              <option value="0 */6 * * *" data-i18n="opt_every_6h">Every 6 hours</option>
+              <option value="0 0 * * *" data-i18n="opt_every_day">Every day</option>
             </select>
-            <button class="sys-btn teal" onclick="nnCronSave()">APPLY</button>
+            <button class="sys-btn teal" onclick="nnCronSave()" data-i18n="btn_apply">APPLY</button>
             <span id="nn-cron-status" style="font-size:12px;color:var(--mu)"></span>
           </div>
         </div>
@@ -717,53 +718,53 @@ function chatShowMessages(){
 
     <!-- ADDRESSES -->
     <div class="panel" id="panel-addresses">
-      <div class="section-lbl" style="margin-bottom:16px">Gateway Addresses</div>
+      <div class="section-lbl" style="margin-bottom:16px" data-i18n="sec_gateway_addresses">Gateway Addresses</div>
       <div class="two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
 
       <!-- LXMF Bridge -->
       <div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:14px 16px">
-        <div style="font-size:11px;color:var(--mu);margin-bottom:4px">🔹 LXMF Bridge</div>
-        <div style="font-size:10px;color:var(--mu);margin-bottom:6px">For receiving commands from Reticulum to MQTT / Home Assistant. Add to Sideband as a contact.</div>
+        <div style="font-size:11px;color:var(--mu);margin-bottom:4px">🔹 <span data-i18n="txt_lxmf_bridge">LXMF Bridge</span></div>
+        <div style="font-size:10px;color:var(--mu);margin-bottom:6px" data-i18n="txt_addr_bridge_desc">For receiving commands from Reticulum to MQTT / Home Assistant. Add to Sideband as a contact.</div>
         <div id="ap-lxmf-bridge" style="font-family:var(--fn);font-size:12px;color:var(--teal);word-break:break-all;margin-bottom:8px">—</div>
-        <button class="sys-btn teal" onclick="apCopy('ap-lxmf-bridge')">COPY</button>
+        <button class="sys-btn teal" onclick="apCopy('ap-lxmf-bridge')" data-i18n="btn_copy">COPY</button>
       </div>
 
 
 
       <!-- I2P -->
       <div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:14px 16px">
-        <div style="font-size:11px;color:var(--mu);margin-bottom:4px">🔹 I2P Address (b32)</div>
-        <div style="font-size:10px;color:var(--mu);margin-bottom:6px">Anonymous connection without public IP. Share with another gateway.</div>
+        <div style="font-size:11px;color:var(--mu);margin-bottom:4px">🔹 <span data-i18n="txt_i2p_address">I2P Address (b32)</span></div>
+        <div style="font-size:10px;color:var(--mu);margin-bottom:6px" data-i18n="txt_addr_i2p_desc">Anonymous connection without public IP. Share with another gateway.</div>
         <div id="ap-i2p" style="font-family:var(--fn);font-size:12px;color:var(--teal);word-break:break-all;margin-bottom:8px">—</div>
-        <button class="sys-btn teal" onclick="apCopy('ap-i2p')">COPY</button>
+        <button class="sys-btn teal" onclick="apCopy('ap-i2p')" data-i18n="btn_copy">COPY</button>
       </div>
 
       <!-- Nomadnet Node -->
       <div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:14px 16px">
-        <div style="font-size:11px;color:var(--mu);margin-bottom:4px">🌐 Nomadnet Node</div>
-        <div style="font-size:10px;color:var(--mu);margin-bottom:6px">Gateway info page in the Reticulum network.</div>
+        <div style="font-size:11px;color:var(--mu);margin-bottom:4px">🌐 <span data-i18n="txt_nn_node">Nomadnet Node</span></div>
+        <div style="font-size:10px;color:var(--mu);margin-bottom:6px" data-i18n="txt_addr_nn_node_desc">Gateway info page in the Reticulum network.</div>
         <div id="ap-nn-node" style="font-family:var(--fn);font-size:12px;color:var(--teal);word-break:break-all;margin-bottom:8px">—</div>
-        <button class="sys-btn teal" onclick="apCopy('ap-nn-node')">COPY</button>
+        <button class="sys-btn teal" onclick="apCopy('ap-nn-node')" data-i18n="btn_copy">COPY</button>
       </div>
 
       <!-- Nomadnet Chat -->
       <div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:14px 16px">
-        <div style="font-size:11px;color:var(--mu);margin-bottom:4px">💬 Nomadnet Chat</div>
-        <div style="font-size:10px;color:var(--mu);margin-bottom:6px">IRC-style chat in the Nomadnet network. Open in Nomadnet browser.</div>
+        <div style="font-size:11px;color:var(--mu);margin-bottom:4px">💬 <span data-i18n="txt_nn_chat">Nomadnet Chat</span></div>
+        <div style="font-size:10px;color:var(--mu);margin-bottom:6px" data-i18n="txt_addr_nn_chat_desc">IRC-style chat in the Nomadnet network. Open in Nomadnet browser.</div>
         <div id="ap-nn-chat" style="font-family:var(--fn);font-size:12px;color:var(--teal);word-break:break-all;margin-bottom:8px">—</div>
-        <button class="sys-btn teal" onclick="apCopy('ap-nn-chat')">COPY</button>
+        <button class="sys-btn teal" onclick="apCopy('ap-nn-chat')" data-i18n="btn_copy">COPY</button>
       </div>
 
       <!-- NOEMA Chat -->
       <div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:14px 16px">
-        <div style="font-size:11px;color:var(--mu);margin-bottom:4px">💬 NOEMA Chat</div>
-        <div style="font-size:10px;color:var(--mu);margin-bottom:6px">LXMF address of the gateway chat. Add to Sideband or CrossTalk to message the gateway directly.</div>
+        <div style="font-size:11px;color:var(--mu);margin-bottom:4px">💬 <span data-i18n="txt_noema_chat">NOEMA Chat</span></div>
+        <div style="font-size:10px;color:var(--mu);margin-bottom:6px" data-i18n="txt_addr_noema_chat_desc">LXMF address of the gateway chat. Add to Sideband or CrossTalk to message the gateway directly.</div>
         <div id="ap-chat-addr" style="font-family:var(--fn);font-size:12px;color:var(--teal);word-break:break-all;margin-bottom:8px">—</div>
-        <button class="sys-btn teal" onclick="apCopy('ap-chat-addr')">COPY</button>
+        <button class="sys-btn teal" onclick="apCopy('ap-chat-addr')" data-i18n="btn_copy">COPY</button>
       </div>
 
       </div>
-      <div id="ap-toast" style="display:none;color:var(--gr);font-size:12px;margin-top:8px">✓ Copied</div>
+      <div id="ap-toast" style="display:none;color:var(--gr);font-size:12px;margin-top:8px"><span data-i18n="txt_copied">✓ Copied</span></div>
     </div>
 
     <!-- RBROWSER -->
@@ -786,7 +787,7 @@ function chatShowMessages(){
         <!-- Contacts list -->
         <div id="chat-contacts-pane" style="border-right:1px solid var(--bd);display:flex;flex-direction:column">
           <div style="padding:10px 12px;border-bottom:1px solid var(--bd);display:flex;gap:6px;align-items:center">
-            <input id="chat-new-addr" placeholder="LXMF address..." style="flex:1;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:11px;padding:5px 8px">
+            <input id="chat-new-addr" placeholder="LXMF address..." data-i18n-placeholder="ph_lxmf_address" style="flex:1;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:11px;padding:5px 8px">
             <button class="sys-btn teal" style="padding:4px 8px;font-size:11px" onclick="chatAddContact()">+</button>
           </div>
           <div id="chat-contacts-list" style="flex:1;overflow-y:auto"></div>
@@ -803,10 +804,10 @@ function chatShowMessages(){
               </div>
               <div id="chat-peer-addr" style="font-size:10px;color:var(--mu);font-family:var(--fn)"></div>
             </div>
-            <button id="chat-remove-btn" class="sys-btn rd" style="display:none;padding:2px 8px;font-size:11px" onclick="chatRemoveContact()">Remove</button>
+            <button id="chat-remove-btn" class="sys-btn rd" style="display:none;padding:2px 8px;font-size:11px" onclick="chatRemoveContact()" data-i18n="btn_remove">Remove</button>
           </div>
           <div id="chat-messages" style="flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:6px" ondragover="event.preventDefault();this.style.outline='2px dashed var(--teal)'" ondragleave="this.style.outline=''" ondrop="this.style.outline='';if(event.dataTransfer.files[0]){const fi=document.getElementById('chat-file-input');const dt=new DataTransfer();dt.items.add(event.dataTransfer.files[0]);fi.files=dt.files;uploadChatFile(fi);}">
-            <div style="color:var(--mu);font-size:12px;text-align:center;margin-top:40px">Select a contact</div>
+            <div style="color:var(--mu);font-size:12px;text-align:center;margin-top:40px" data-i18n="txt_select_contact">Select a contact</div>
           </div>
           <div id="chat-file-preview" style="display:none;padding:6px 12px;background:var(--s3);border-top:1px solid var(--bd);align-items:center;gap:8px">
             <span id="chat-file-preview-name" style="font-size:11px;color:var(--teal);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
@@ -814,9 +815,9 @@ function chatShowMessages(){
           </div>
           <div style="padding:10px 12px;border-top:1px solid var(--bd);display:flex;gap:6px;align-items:center">
             <input type="file" id="chat-file-input" style="display:none" onchange="uploadChatFile(this)">
-            <button class="sys-btn" onclick="document.getElementById('chat-file-input').click()" title="Attach file" style="padding:5px 9px;font-size:14px">📎</button>
-            <input id="chat-input" placeholder="Message..." style="flex:1;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:6px 10px" onkeydown="if(event.key==='Enter')sendChatMsg()">
-            <button class="sys-btn teal" onclick="sendChatMsg()">Send</button>
+            <button class="sys-btn" onclick="document.getElementById('chat-file-input').click()" title="Attach file" data-i18n-title="ph_attach_file" style="padding:5px 9px;font-size:14px">📎</button>
+            <input id="chat-input" placeholder="Message..." data-i18n-placeholder="ph_message" style="flex:1;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:6px 10px" onkeydown="if(event.key==='Enter')sendChatMsg()">
+            <button class="sys-btn teal" onclick="sendChatMsg()" data-i18n="btn_send">Send</button>
           </div>
         </div>
       </div>
@@ -832,11 +833,11 @@ function chatShowMessages(){
           <option value="dashboard">dashboard</option>
           <option value="rbrowser">rbrowser</option>
         </select>
-        <button class="sys-btn" onclick="loadLogs()">↻ Refresh</button>
+        <button class="sys-btn" onclick="loadLogs()" data-i18n="btn_log_refresh">↻ Refresh</button>
         <label style="font-size:11px;color:var(--mu);display:flex;align-items:center;gap:4px">
-          <input type="checkbox" id="log-auto" onchange="toggleLogAuto()"> Auto
+          <input type="checkbox" id="log-auto" onchange="toggleLogAuto()"> <span data-i18n="txt_auto">Auto</span>
         </label>
-        <button class="sys-btn rd" onclick="clearLogView()">Clear view</button>
+        <button class="sys-btn rd" onclick="clearLogView()" data-i18n="btn_clear_view">Clear view</button>
       </div>
       <div class="log-box" id="log-box"></div>
     </div>
@@ -844,8 +845,8 @@ function chatShowMessages(){
     <!-- CONFIGS -->
     <div class="panel" id="panel-configs">
       <div style="display:flex;gap:6px;margin-bottom:10px;border-bottom:1px solid var(--bd);padding-bottom:8px">
-        <button class="sys-btn teal" id="cfg-mode-text" onclick="cfgMode('text')">TEXT</button>
-        <button class="sys-btn" id="cfg-mode-form" onclick="cfgMode('form')">RETICULUM FORM</button>
+        <button class="sys-btn teal" id="cfg-mode-text" onclick="cfgMode('text')" data-i18n="btn_cfg_text">TEXT</button>
+        <button class="sys-btn" id="cfg-mode-form" onclick="cfgMode('form')" data-i18n="btn_cfg_form">RETICULUM FORM</button>
       </div>
 
       <!-- Text editor -->
@@ -854,21 +855,21 @@ function chatShowMessages(){
         <div class="cfg-path" id="cfg-path"></div>
         <textarea id="cfg-area" spellcheck="false"></textarea>
         <div class="brow">
-          <button class="sys-btn teal" onclick="saveConfig()">Save</button>
+          <button class="sys-btn teal" onclick="saveConfig()" data-i18n="btn_save">Save</button>
         </div>
       </div>
 
       <!-- Reticulum form -->
       <div id="cfg-form-panel" style="display:none">
         <div style="display:flex;gap:6px;margin-bottom:14px;align-items:center;flex-wrap:wrap">
-          <button class="sys-btn teal" onclick="loadRnsConfig()">↻ LOAD</button>
-          <button class="sys-btn teal" onclick="saveRnsConfig()">SAVE & RESTART</button>
-          <button class="sys-btn" onclick="showAddIfaceModal()">+ ADD INTERFACE</button>
+          <button class="sys-btn teal" onclick="loadRnsConfig()" data-i18n="btn_load">↻ LOAD</button>
+          <button class="sys-btn teal" onclick="saveRnsConfig()" data-i18n="btn_save_restart">SAVE & RESTART</button>
+          <button class="sys-btn" onclick="showAddIfaceModal()" data-i18n="btn_add_interface">+ ADD INTERFACE</button>
           <div id="rns-cfg-status" style="margin-left:8px;font-size:12px;color:var(--teal);display:none"></div>
         </div>
 
         <!-- [reticulum] section -->
-        <div class="section-lbl">Reticulum</div>
+        <div class="section-lbl" data-i18n="sec_reticulum">Reticulum</div>
         <div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:12px;margin-bottom:16px">
           <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">
             <div>
@@ -901,11 +902,11 @@ function chatShowMessages(){
         </div>
 
         <!-- Interfaces -->
-        <div class="section-lbl" style="margin-bottom:8px">Interfaces</div>
+        <div class="section-lbl" style="margin-bottom:8px" data-i18n="sec_interfaces">Interfaces</div>
         <div id="rns-cfg-ifaces" style="border:1px solid var(--bd);border-radius:12px;overflow:hidden;min-height:200px">
           <div style="display:grid;grid-template-columns:200px 1fr" id="rns-ifaces-split">
             <div id="rns-iface-list" style="border-right:1px solid var(--bd);overflow-y:auto"></div>
-            <div id="rns-iface-detail" style="padding:16px;overflow-y:auto"><div style="color:var(--mu);font-size:12px;margin-top:40px;text-align:center">Select an interface</div></div>
+            <div id="rns-iface-detail" style="padding:16px;overflow-y:auto"><div style="color:var(--mu);font-size:12px;margin-top:40px;text-align:center" data-i18n="txt_select_interface">Select an interface</div></div>
           </div>
         </div>
         <style>
@@ -920,13 +921,13 @@ function chatShowMessages(){
       <!-- Add Interface Modal -->
       <div id="add-iface-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center">
         <div style="background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:20px;width:90%;max-width:400px;max-height:85vh;overflow-y:auto">
-          <div style="font-size:14px;font-weight:600;margin-bottom:16px">Add Interface</div>
+          <div style="font-size:14px;font-weight:600;margin-bottom:16px" data-i18n="txt_add_interface_title">Add Interface</div>
           <div style="margin-bottom:12px">
-            <div style="font-size:11px;color:var(--mu);margin-bottom:4px">Interface Name</div>
+            <div style="font-size:11px;color:var(--mu);margin-bottom:4px" data-i18n="txt_interface_name">Interface Name</div>
             <input id="new-iface-name" placeholder="My Interface" style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--bd);border-radius:12px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:6px 10px">
           </div>
           <div style="margin-bottom:16px">
-            <div style="font-size:11px;color:var(--mu);margin-bottom:4px">Type</div>
+            <div style="font-size:11px;color:var(--mu);margin-bottom:4px" data-i18n="txt_type">Type</div>
             <select id="new-iface-type" onchange="renderNewIfaceFields()" style="width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:12px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:6px 10px">
               <option value="AutoInterface">AutoInterface — local LAN/WiFi discovery</option>
               <option value="TCPClientInterface">TCPClientInterface — connect to TCP server</option>
@@ -941,8 +942,8 @@ function chatShowMessages(){
           <div id="new-iface-hint" style="font-size:11px;color:var(--mu);margin-bottom:16px;padding:8px;background:var(--bg);border-radius:12px"></div>
           <div id="new-iface-fields"></div>
           <div style="display:flex;gap:8px;margin-top:8px">
-            <button class="sys-btn teal" onclick="confirmAddIface()">ADD</button>
-            <button class="sys-btn" onclick="hideAddIfaceModal()">CANCEL</button>
+            <button class="sys-btn teal" onclick="confirmAddIface()" data-i18n="btn_add">ADD</button>
+            <button class="sys-btn" onclick="hideAddIfaceModal()" data-i18n="btn_cancel">CANCEL</button>
           </div>
         </div>
       </div>
@@ -952,17 +953,17 @@ function chatShowMessages(){
     <div class="panel" id="panel-rnode">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
         <div class="section-lbl" style="margin:0">RNode</div>
-        <button class="sys-btn teal" onclick="loadRnodePanel()">REFRESH</button>
+        <button class="sys-btn teal" onclick="loadRnodePanel()" data-i18n="btn_refresh">REFRESH</button>
       </div>
       <div id="rnode-status" style="margin-bottom:12px"></div>
       <div id="rnode-metrics" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:16px"></div>
       <div class="two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
         <div style="background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:10px 12px;min-width:0;overflow:hidden">
-          <div class="section-lbl" style="margin-bottom:8px">Airtime % (15s)</div>
+          <div class="section-lbl" style="margin-bottom:8px" data-i18n="sec_airtime">Airtime % (15s)</div>
           <div style="position:relative;height:160px"><canvas id="rnode-chart-airtime"></canvas></div>
         </div>
         <div style="background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:10px 12px;min-width:0;overflow:hidden">
-          <div class="section-lbl" style="margin-bottom:8px">Noise dBm</div>
+          <div class="section-lbl" style="margin-bottom:8px" data-i18n="sec_noise">Noise dBm</div>
           <div style="position:relative;height:160px"><canvas id="rnode-chart-noise"></canvas></div>
         </div>
       </div>
@@ -974,68 +975,68 @@ function chatShowMessages(){
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start" id="system-cols">
       <div id="system-col-left">
 
-      <div class="section-lbl">Quick Commands</div>
+      <div class="section-lbl" data-i18n="sec_quick_commands">Quick Commands</div>
       <div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:10px 14px;margin-bottom:20px">
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
-          <button class="sys-btn" onclick="runCmd('find_ports')">Ports</button>
-          <button class="sys-btn" onclick="runCmd('rnstatus')">RNStatus</button>
-          <button class="sys-btn am" onclick="runCmd('restart_rnsd')">Restart RNSD</button>
-          <button class="sys-btn am" onclick="runCmd('restart_lxmf')">Restart LXMF</button>
-          <button class="sys-btn" onclick="runCmd('free_mem')">Memory</button>
-          <button class="sys-btn" onclick="runCmd('uptime')">Uptime</button>
+          <button class="sys-btn" onclick="runCmd('find_ports')" data-i18n="btn_ports">Ports</button>
+          <button class="sys-btn" onclick="runCmd('rnstatus')" data-i18n="btn_rnstatus">RNStatus</button>
+          <button class="sys-btn am" onclick="runCmd('restart_rnsd')" data-i18n="btn_restart_rnsd">Restart RNSD</button>
+          <button class="sys-btn am" onclick="runCmd('restart_lxmf')" data-i18n="btn_restart_lxmf">Restart LXMF</button>
+          <button class="sys-btn" onclick="runCmd('free_mem')" data-i18n="btn_memory">Memory</button>
+          <button class="sys-btn" onclick="runCmd('uptime')" data-i18n="btn_uptime">Uptime</button>
           <button class="sys-btn rd" onclick="runCmd('log_cleanup')">🗑 Clean Logs</button>
           <button class="sys-btn teal" onclick="if(confirm('Update NOEMA from GitHub and restart services?')) runCmd('noema_update')">⬆ Update NOEMA</button>
         </div>
         <div id="cmd-output" style="font-family:var(--fn);font-size:11px;color:var(--teal);background:var(--bg);border-radius:12px;padding:8px 10px;min-height:32px;white-space:pre-wrap;display:none"></div>
       </div>
 
-      <div class="section-lbl">Maintenance</div>
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--tx)">
-          <input type="checkbox" id="cron-rnsd-toggle" onchange="setCronRnsd(this.checked)" style="width:16px;height:16px;cursor:pointer">
-          Restart rnsd every night at 04:00 (frees memory)
+      <div class="section-lbl" data-i18n="sec_maintenance">Maintenance</div>
+      <div style="margin-bottom:12px">
+        <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;font-size:13px;color:var(--tx)">
+          <input type="checkbox" id="cron-rnsd-toggle" onchange="setCronRnsd(this.checked)" style="width:16px;height:16px;cursor:pointer;flex-shrink:0;margin-top:1px">
+          <span style="flex:1" data-i18n="txt_restart_rnsd_night">Restart rnsd every night at 04:00 (frees memory)</span>
         </label>
-        <span id="cron-rnsd-status" style="font-size:11px;color:var(--mu)"></span>
+        <div id="cron-rnsd-status" style="font-size:11px;color:var(--mu);margin-left:24px;margin-top:2px"></div>
       </div>
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--tx)">
-          <input type="checkbox" id="cron-watchdog-toggle" onchange="setCronWatchdog(this.checked)" style="width:16px;height:16px;cursor:pointer">
-          TCP watchdog: auto-restart rnsd on dropped TCP interfaces (every 5 min)
+      <div style="margin-bottom:20px">
+        <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;font-size:13px;color:var(--tx)">
+          <input type="checkbox" id="cron-watchdog-toggle" onchange="setCronWatchdog(this.checked)" style="width:16px;height:16px;cursor:pointer;flex-shrink:0;margin-top:1px">
+          <span style="flex:1" data-i18n="txt_tcp_watchdog">TCP watchdog: auto-restart rnsd on dropped TCP interfaces (every 5 min)</span>
         </label>
-        <span id="cron-watchdog-status" style="font-size:11px;color:var(--mu)"></span>
+        <div id="cron-watchdog-status" style="font-size:11px;color:var(--mu);margin-left:24px;margin-top:2px"></div>
       </div>
 
       <div style="margin-bottom:20px">
-        <div style="font-size:13px;color:var(--tx);margin-bottom:6px">Dashboard polling frequency</div>
-        <div style="font-size:11px;color:var(--mu);margin-bottom:8px">Lower frequency reduces CPU load on weak hardware (e.g. Orange Pi Zero)</div>
+        <div style="font-size:13px;color:var(--tx);margin-bottom:6px" data-i18n="txt_polling_freq">Dashboard polling frequency</div>
+        <div style="font-size:11px;color:var(--mu);margin-bottom:8px" data-i18n="txt_polling_desc">Lower frequency reduces CPU load on weak hardware (e.g. Orange Pi Zero)</div>
         <select id="polling-mode" onchange="setPollingMode(this.value)" style="background:var(--bg);border:1px solid var(--bd);border-radius:12px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:6px 10px">
-          <option value="fast">Fast (default)</option>
-          <option value="normal">Normal (2x slower)</option>
-          <option value="slow">Slow / Low-power (4x slower)</option>
+          <option value="fast" data-i18n="opt_fast">Fast (default)</option>
+          <option value="normal" data-i18n="opt_normal">Normal (2x slower)</option>
+          <option value="slow" data-i18n="opt_slow">Slow / Low-power (4x slower)</option>
         </select>
       </div>
 
-      <div class="section-lbl">System</div>
+      <div class="section-lbl" data-i18n="sec_system">System</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px">
-        <button class="sys-btn am" onclick="svcAction('dashboard','restart')">Restart Dashboard</button>
-        <button class="sys-btn rd" onclick="showRebootModal()">Reboot</button>
-        <button class="sys-btn rd" onclick="showResetModal()">Reset All Identity</button>
+        <button class="sys-btn am" onclick="svcAction('dashboard','restart')" data-i18n="btn_restart_dash">Restart Dashboard</button>
+        <button class="sys-btn rd" onclick="showRebootModal()" data-i18n="btn_reboot">Reboot</button>
+        <button class="sys-btn rd" onclick="showResetModal()" data-i18n="btn_reset_identity">Reset All Identity</button>
       </div>
 
-      <div class="section-lbl">Backup &amp; Restore</div>
+      <div class="section-lbl" data-i18n="sec_backup_restore">Backup &amp; Restore</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px">
-        <button class="sys-btn teal" onclick="showBackupModal()">Download Backup</button>
-        <button class="sys-btn am" onclick="showRestoreModal()">Restore</button>
+        <button class="sys-btn teal" onclick="showBackupModal()" data-i18n="btn_download_backup">Download Backup</button>
+        <button class="sys-btn am" onclick="showRestoreModal()" data-i18n="btn_restore">Restore</button>
       </div>
 
-      <div class="section-lbl">Versions</div>
+      <div class="section-lbl" data-i18n="sec_versions">Versions</div>
       <div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:20px">
         <table style="width:100%;border-collapse:collapse;font-family:var(--fn);font-size:12px">
           <thead>
             <tr style="border-bottom:1px solid var(--bd)">
-              <th style="text-align:left;color:var(--mu);font-weight:400;padding:4px 8px 8px 0">Component</th>
-              <th style="text-align:left;color:var(--mu);font-weight:400;padding:4px 8px 8px">Installed</th>
-              <th style="text-align:left;color:var(--mu);font-weight:400;padding:4px 8px 8px">Latest</th>
+              <th style="text-align:left;color:var(--mu);font-weight:400;padding:4px 8px 8px 0" data-i18n="th_component">Component</th>
+              <th style="text-align:left;color:var(--mu);font-weight:400;padding:4px 8px 8px" data-i18n="th_installed">Installed</th>
+              <th style="text-align:left;color:var(--mu);font-weight:400;padding:4px 8px 8px" data-i18n="th_latest">Latest</th>
               <th style="text-align:right;color:var(--mu);font-weight:400;padding:4px 0 8px 8px"></th>
             </tr>
           </thead>
@@ -1058,26 +1059,26 @@ function chatShowMessages(){
       </div>
       <div id="system-col-right">
 
-      <div class="section-lbl">Chat Settings</div>
+      <div class="section-lbl" data-i18n="sec_chat_settings">Chat Settings</div>
       <div style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:14px;margin-bottom:20px">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
           <div>
-            <div style="font-size:11px;color:var(--mu);margin-bottom:4px">Max messages per contact</div>
+            <div style="font-size:11px;color:var(--mu);margin-bottom:4px" data-i18n="txt_max_msgs">Max messages per contact</div>
             <input id="chat-limit-msgs" type="number" value="200" min="10" max="2000" style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px">
           </div>
           <div>
-            <div style="font-size:11px;color:var(--mu);margin-bottom:4px">Max files folder size (MB)</div>
+            <div style="font-size:11px;color:var(--mu);margin-bottom:4px" data-i18n="txt_max_files_mb">Max files folder size (MB)</div>
             <input id="chat-limit-files" type="number" value="50" min="10" max="500" style="width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px">
           </div>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="sys-btn teal" onclick="saveChatSettings()">Save limits</button>
-          <button class="sys-btn am" onclick="chatCleanupFiles()">Clean files now</button>
-          <button class="sys-btn rd" onclick="chatClearAll()">Clear all history</button>
+          <button class="sys-btn teal" onclick="saveChatSettings()" data-i18n="btn_save_limits">Save limits</button>
+          <button class="sys-btn am" onclick="chatCleanupFiles()" data-i18n="btn_clean_files">Clean files now</button>
+          <button class="sys-btn rd" onclick="chatClearAll()" data-i18n="btn_clear_history">Clear all history</button>
         </div>
         <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;align-items:end">
           <div>
-            <div style="font-size:11px;color:var(--mu);margin-bottom:4px">Notification sound</div>
+            <div style="font-size:11px;color:var(--mu);margin-bottom:4px" data-i18n="txt_notif_sound">Notification sound</div>
             <select id="chat-sound-type" onchange="chatPreviewSound();localStorage.setItem('noema_sound_type',this.value)" style="width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px">
               <option value="default">Default (ping)</option>
               <option value="double">Double beep</option>
@@ -1088,29 +1089,29 @@ function chatShowMessages(){
             </select>
           </div>
           <div>
-            <div style="font-size:11px;color:var(--mu);margin-bottom:4px">Volume</div>
+            <div style="font-size:11px;color:var(--mu);margin-bottom:4px" data-i18n="txt_volume">Volume</div>
             <input id="chat-sound-vol" type="range" min="0" max="1" step="0.05" value="0.35" oninput="document.getElementById('chat-sound-pct').textContent=Math.round(this.value*100)+'%';localStorage.setItem('noema_sound_vol',this.value)" style="width:100%;accent-color:var(--teal)">
             <span id="chat-sound-pct" style="font-size:10px;color:var(--mu)">35%</span>
           </div>
           <div>
-            <button class="sys-btn" onclick="chatPreviewSound()" style="width:100%">&#9654; Test</button>
+            <button class="sys-btn" onclick="chatPreviewSound()" style="width:100%">&#9654;&nbsp;<span data-i18n="btn_test">Test</span></button>
           </div>
         </div>
         <div id="chat-settings-status" style="margin-top:8px;font-size:11px;color:var(--teal);display:none"></div>
       </div>
 
-      <div class="section-lbl">Bridge Access Control</div>
+      <div class="section-lbl" data-i18n="sec_bridge_access">Bridge Access Control</div>
       <div style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:14px;margin-bottom:20px">
         <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--tx);margin-bottom:12px">
           <input type="checkbox" id="access-enabled-toggle" style="width:16px;height:16px;cursor:pointer">
-          Only allow messages from whitelisted addresses
+          <span data-i18n="txt_bridge_whitelist_only">Only allow messages from whitelisted addresses</span>
         </label>
 
-        <div style="font-size:11px;color:var(--mu);margin-bottom:6px">Allowed LXMF addresses</div>
+        <div style="font-size:11px;color:var(--mu);margin-bottom:6px" data-i18n="txt_allowed_lxmf">Allowed LXMF addresses</div>
         <div id="access-whitelist" style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px"></div>
         <div style="display:flex;gap:8px;margin-bottom:16px">
-          <input id="access-new-addr" type="text" placeholder="hex LXMF address" style="flex:1;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px;box-sizing:border-box">
-          <button class="sys-btn" onclick="accessAddAddr()">Add</button>
+          <input id="access-new-addr" type="text" placeholder="hex LXMF address" data-i18n-placeholder="ph_hex_lxmf" style="flex:1;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px;box-sizing:border-box">
+          <button class="sys-btn" onclick="accessAddAddr()" data-i18n="btn_add_lc">Add</button>
         </div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
@@ -1125,56 +1126,56 @@ function chatShowMessages(){
         </div>
 
         <div style="display:flex;gap:8px;align-items:center">
-          <button class="sys-btn teal" onclick="saveAccessSettings()">Save</button>
+          <button class="sys-btn teal" onclick="saveAccessSettings()" data-i18n="btn_save">Save</button>
           <span id="access-status" style="font-size:11px;color:var(--teal);display:none"></span>
         </div>
-        <div style="font-size:10px;color:var(--mu);margin-top:8px">Changes automatically restart the LXMF Bridge.</div>
+        <div style="font-size:10px;color:var(--mu);margin-top:8px" data-i18n="txt_bridge_restart_note">Changes automatically restart the LXMF Bridge.</div>
       </div>
 
-      <div class="section-lbl">Chat Access Control</div>
+      <div class="section-lbl" data-i18n="sec_chat_access">Chat Access Control</div>
       <div style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:14px;margin-bottom:20px">
         <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--tx);margin-bottom:12px">
           <input type="checkbox" id="chat-access-enabled-toggle" style="width:16px;height:16px;cursor:pointer">
-          Only allow chat messages from whitelisted addresses
+          <span data-i18n="txt_chat_whitelist_only">Only allow chat messages from whitelisted addresses</span>
         </label>
 
-        <div style="font-size:11px;color:var(--mu);margin-bottom:6px">Allowed LXMF addresses</div>
+        <div style="font-size:11px;color:var(--mu);margin-bottom:6px" data-i18n="txt_allowed_lxmf">Allowed LXMF addresses</div>
         <div id="chat-access-whitelist" style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px"></div>
         <div style="display:flex;gap:8px;margin-bottom:16px">
-          <input id="chat-access-new-addr" type="text" placeholder="hex LXMF address" style="flex:1;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px;box-sizing:border-box">
-          <button class="sys-btn" onclick="chatAccessAddAddr()">Add</button>
+          <input id="chat-access-new-addr" type="text" placeholder="hex LXMF address" data-i18n-placeholder="ph_hex_lxmf" style="flex:1;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px;box-sizing:border-box">
+          <button class="sys-btn" onclick="chatAccessAddAddr()" data-i18n="btn_add_lc">Add</button>
         </div>
 
         <div style="display:flex;gap:8px;align-items:center">
-          <button class="sys-btn teal" onclick="saveChatAccessSettings()">Save</button>
+          <button class="sys-btn teal" onclick="saveChatAccessSettings()" data-i18n="btn_save">Save</button>
           <span id="chat-access-status" style="font-size:11px;color:var(--teal);display:none"></span>
         </div>
-        <div style="font-size:10px;color:var(--mu);margin-top:8px">Applies immediately, no restart needed.</div>
+        <div style="font-size:10px;color:var(--mu);margin-top:8px" data-i18n="txt_chat_applies_note">Applies immediately, no restart needed.</div>
       </div>
 
-      <div class="section-lbl">Telegram Notifications</div>
+      <div class="section-lbl" data-i18n="sec_telegram">Telegram Notifications</div>
       <div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:20px">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
           <div>
-            <div style="font-size:11px;color:var(--mu);margin-bottom:4px">Bot Token</div>
+            <div style="font-size:11px;color:var(--mu);margin-bottom:4px" data-i18n="txt_bot_token">Bot Token</div>
             <input id="tg-token" type="text" placeholder="123456:ABC-..." autocomplete="off" style="width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px;box-sizing:border-box">
           </div>
           <div>
-            <div style="font-size:11px;color:var(--mu);margin-bottom:4px">Chat ID</div>
+            <div style="font-size:11px;color:var(--mu);margin-bottom:4px" data-i18n="txt_chat_id">Chat ID</div>
             <input id="tg-chatid" placeholder="-100123456789" style="width:100%;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px;box-sizing:border-box">
           </div>
         </div>
         <div style="display:flex;gap:16px;margin-bottom:10px;flex-wrap:wrap">
           <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--tx);cursor:pointer">
-            <input type="checkbox" id="tg-notify-bridge" checked> LXMF Bridge messages
+            <input type="checkbox" id="tg-notify-bridge" checked> <span data-i18n="txt_tg_bridge_msgs">LXMF Bridge messages</span>
           </label>
           <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--tx);cursor:pointer">
-            <input type="checkbox" id="tg-notify-chat" checked> Chat messages
+            <input type="checkbox" id="tg-notify-chat" checked> <span data-i18n="txt_tg_chat_msgs">Chat messages</span>
           </label>
         </div>
         <div style="display:flex;gap:8px;align-items:center">
-          <button class="sys-btn teal" onclick="saveTgSettings()">Save</button>
-          <button class="sys-btn" onclick="testTgNotify()">Test</button>
+          <button class="sys-btn teal" onclick="saveTgSettings()" data-i18n="btn_save">Save</button>
+          <button class="sys-btn" onclick="testTgNotify()" data-i18n="btn_test">Test</button>
           <span id="tg-status" style="font-size:11px;color:var(--teal);display:none"></span>
         </div>
       </div>
@@ -1189,11 +1190,11 @@ function chatShowMessages(){
 
   </div>
     <div class="hub-col right">
-      <div class="hub-pill" onclick="nav('i2p',this)"><div class="hub-pill-ic" style="color:var(--i2ptl)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6l7-3Z"/></svg></div><span>I2P</span></div>
-      <div class="hub-pill" onclick="nav('nomadnet',this);loadNomadnet();"><div class="hub-pill-ic" style="color:var(--sky)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15 9l-2 6-6 2 2-6 6-2Z"/></svg></div><span>Nomadnet</span></div>
-      <div class="hub-pill" onclick="nav('chat',this);loadChatPanel();"><div class="hub-pill-ic" style="color:var(--pink)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><span>Chat</span><span id="chat-badge" style="display:none;background:#f87171;color:#fff;border-radius:8px;padding:1px 5px;font-size:9px;font-weight:700;margin-left:auto;flex-shrink:0"></span></div>
-      <div class="hub-pill" onclick="nav('logs',this)"><div class="hub-pill-ic" style="color:var(--slate)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9l3 3-3 3"/><line x1="12" y1="15" x2="17" y2="15"/></svg></div><span>Logs</span></div>
-      <div class="hub-pill" onclick="nav('system',this)"><div class="hub-pill-ic" style="color:var(--slate2)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/><rect x="10" y="10" width="4" height="4"/><line x1="9" y1="2" x2="9" y2="6"/><line x1="15" y1="2" x2="15" y2="6"/><line x1="9" y1="18" x2="9" y2="22"/><line x1="15" y1="18" x2="15" y2="22"/><line x1="2" y1="9" x2="6" y2="9"/><line x1="2" y1="15" x2="6" y2="15"/><line x1="18" y1="9" x2="22" y2="9"/><line x1="18" y1="15" x2="22" y2="15"/></svg></div><span>System</span><span id="update-badge" style="display:none;position:absolute;top:-4px;right:-4px;background:var(--am);color:#fff;border-radius:8px;padding:1px 5px;font-size:9px;font-weight:700"></span></div>
+      <div class="hub-pill" onclick="nav('i2p',this)"><div class="hub-pill-ic" style="color:var(--i2ptl)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6l7-3Z"/></svg></div><span data-i18n="nav_i2p">I2P</span></div>
+      <div class="hub-pill" onclick="nav('nomadnet',this);loadNomadnet();"><div class="hub-pill-ic" style="color:var(--sky)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15 9l-2 6-6 2 2-6 6-2Z"/></svg></div><span data-i18n="nav_nomadnet">Nomadnet</span></div>
+      <div class="hub-pill" onclick="nav('chat',this);loadChatPanel();"><div class="hub-pill-ic" style="color:var(--pink)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><span data-i18n="nav_chat">Chat</span><span id="chat-badge" style="display:none;background:#f87171;color:#fff;border-radius:8px;padding:1px 5px;font-size:9px;font-weight:700;margin-left:auto;flex-shrink:0"></span></div>
+      <div class="hub-pill" onclick="nav('logs',this)"><div class="hub-pill-ic" style="color:var(--slate)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9l3 3-3 3"/><line x1="12" y1="15" x2="17" y2="15"/></svg></div><span data-i18n="nav_logs">Logs</span></div>
+      <div class="hub-pill" onclick="nav('system',this)"><div class="hub-pill-ic" style="color:var(--slate2)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/><rect x="10" y="10" width="4" height="4"/><line x1="9" y1="2" x2="9" y2="6"/><line x1="15" y1="2" x2="15" y2="6"/><line x1="9" y1="18" x2="9" y2="22"/><line x1="15" y1="18" x2="15" y2="22"/><line x1="2" y1="9" x2="6" y2="9"/><line x1="2" y1="15" x2="6" y2="15"/><line x1="18" y1="9" x2="22" y2="9"/><line x1="18" y1="15" x2="22" y2="15"/></svg></div><span data-i18n="nav_system">System</span><span id="update-badge" style="display:none;position:absolute;top:-4px;right:-4px;background:var(--am);color:#fff;border-radius:8px;padding:1px 5px;font-size:9px;font-weight:700"></span></div>
     </div>
   </div>
 </div>
@@ -1205,18 +1206,11 @@ function chatShowMessages(){
 <!-- Backup Modal -->
 <div id="backup-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center">
   <div style="background:var(--s1);border:1px solid var(--bd);border-radius:3px;padding:28px 32px;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.5)">
-    <div style="font-size:15px;font-weight:700;color:var(--tx);margin-bottom:8px">⬇ Download backup</div>
-    <div style="font-size:12px;color:var(--mu);margin-bottom:20px;line-height:1.8">
-      Will be saved:<br>
-      • configs: reticulum, noema_bridge, nomadnet, i2p tunnels<br>
-      • identity: lxmf, reticulum, i2p keys, rns destinations<br>
-      • pages: all .mu files<br>
-      • scripts: all .py and .sh<br>
-      • data: monitored_nodes, nomadnet hashes
-    </div>
+    <div style="font-size:15px;font-weight:700;color:var(--tx);margin-bottom:8px" data-i18n="txt_download_backup_title">⬇ Download backup</div>
+    <div style="font-size:12px;color:var(--mu);margin-bottom:20px;line-height:1.8" data-i18n-html="txt_backup_contents"></div>
     <div style="display:flex;gap:10px;justify-content:flex-end">
-      <button class="sys-btn" onclick="closeModal('backup-modal')">Cancel</button>
-      <button class="sys-btn teal" onclick="doBackupDownload()">⬇ Download</button>
+      <button class="sys-btn" onclick="closeModal('backup-modal')" data-i18n="btn_cancel_lc">Cancel</button>
+      <button class="sys-btn teal" onclick="doBackupDownload()" data-i18n="btn_download">⬇ Download</button>
     </div>
   </div>
 </div>
@@ -1224,12 +1218,12 @@ function chatShowMessages(){
 <!-- Restore Modal -->
 <div id="restore-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center">
   <div style="background:var(--s1);border:1px solid var(--bd);border-radius:3px;padding:28px 32px;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.5)">
-    <div style="font-size:15px;font-weight:700;color:var(--tx);margin-bottom:8px">↑ Restore from backup</div>
-    <div style="font-size:12px;color:var(--mu);margin-bottom:16px;line-height:1.8">Select ZIP-file backup:</div>
+    <div style="font-size:15px;font-weight:700;color:var(--tx);margin-bottom:8px" data-i18n="txt_restore_title">↑ Restore from backup</div>
+    <div style="font-size:12px;color:var(--mu);margin-bottom:16px;line-height:1.8" data-i18n="txt_select_zip">Select ZIP-file backup:</div>
     <input type="file" id="restore-file" accept=".zip" style="font-size:12px;color:var(--tx);margin-bottom:16px;width:100%">
     <div style="display:flex;gap:10px;justify-content:flex-end">
-      <button class="sys-btn" onclick="closeModal('restore-modal')">Cancel</button>
-      <button class="sys-btn teal" onclick="doRestore()">↑ Restore</button>
+      <button class="sys-btn" onclick="closeModal('restore-modal')" data-i18n="btn_cancel_lc">Cancel</button>
+      <button class="sys-btn teal" onclick="doRestore()" data-i18n="btn_restore_arrow">↑ Restore</button>
     </div>
   </div>
 </div>
@@ -1237,22 +1231,22 @@ function chatShowMessages(){
 <!-- Reboot Modal -->
 <div id="reset-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:1000;align-items:center;justify-content:center">
   <div style="background:var(--s2);border:1px solid var(--rd);border-radius:12px;padding:24px;max-width:420px;text-align:center">
-    <div style="font-size:16px;font-weight:700;color:var(--rd);margin-bottom:12px">⚠ Reset Identity</div>
-    <div style="font-size:13px;color:var(--mu);margin-bottom:20px">Reset: LXMF adress, I2P tonnel, Reticulum identity, chat history.<br><br></div>
+    <div style="font-size:16px;font-weight:700;color:var(--rd);margin-bottom:12px" data-i18n="txt_reset_identity_title">⚠ Reset Identity</div>
+    <div style="font-size:13px;color:var(--mu);margin-bottom:20px" data-i18n="txt_reset_identity_desc">Reset: LXMF address, I2P tunnel, Reticulum identity, chat history.</div>
     <div style="display:flex;gap:8px;justify-content:center">
-      <button class="sys-btn" onclick="closeModal('reset-modal')">Cancel</button>
-      <button class="sys-btn rd" onclick="doResetIdentity()">Reset</button>
+      <button class="sys-btn" onclick="closeModal('reset-modal')" data-i18n="btn_cancel_lc">Cancel</button>
+      <button class="sys-btn rd" onclick="doResetIdentity()" data-i18n="btn_reset">Reset</button>
     </div>
     <div id="reset-status" style="margin-top:12px;font-size:12px;color:var(--mu)"></div>
   </div>
 </div>
 <div id="reboot-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center">
   <div style="background:var(--s1);border:1px solid var(--bd);border-radius:3px;padding:28px 32px;max-width:380px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.5)">
-    <div style="font-size:15px;font-weight:700;color:var(--rd);margin-bottom:8px">⏻ Rebooting</div>
-    <div style="font-size:12px;color:var(--mu);margin-bottom:20px">Server will reboot. All services will temporarily stop.</div>
+    <div style="font-size:15px;font-weight:700;color:var(--rd);margin-bottom:8px" data-i18n="txt_rebooting_title">⏻ Rebooting</div>
+    <div style="font-size:12px;color:var(--mu);margin-bottom:20px" data-i18n="txt_reboot_desc">Server will reboot. All services will temporarily stop.</div>
     <div style="display:flex;gap:10px;justify-content:flex-end">
-      <button class="sys-btn" onclick="closeModal('reboot-modal')">Cancel</button>
-      <button class="sys-btn rd" onclick="doReboot()">⏻ Reboot</button>
+      <button class="sys-btn" onclick="closeModal('reboot-modal')" data-i18n="btn_cancel_lc">Cancel</button>
+      <button class="sys-btn rd" onclick="doReboot()" data-i18n="btn_reboot_icon">⏻ Reboot</button>
     </div>
   </div>
 </div>
@@ -1302,6 +1296,214 @@ function toggleTheme(){
   const next = cur==="dark"?"light":"dark";
   document.documentElement.setAttribute("data-theme", next);
   try{ localStorage.setItem("noema-theme", next); }catch(e){}
+}
+
+// ─── i18n ────────────────────────────────────────────────────────────────
+const I18N = {
+  en: {
+    nav_services: "Services", nav_configs: "Configs", nav_addresses: "Addresses",
+    nav_monitor: "Monitor", nav_rnode: "RNode", nav_i2p: "I2P", nav_nomadnet: "Nomadnet",
+    nav_chat: "Chat", nav_logs: "Logs", nav_system: "System",
+    sec_quick_commands: "Quick Commands", sec_maintenance: "Maintenance", sec_system: "System",
+    sec_backup_restore: "Backup & Restore", sec_versions: "Versions", sec_chat_settings: "Chat Settings",
+    sec_bridge_access: "Bridge Access Control", sec_chat_access: "Chat Access Control",
+    sec_telegram: "Telegram Notifications",
+    btn_ports: "Ports", btn_rnstatus: "RNStatus", btn_restart_rnsd: "Restart RNSD",
+    btn_restart_lxmf: "Restart LXMF", btn_memory: "Memory", btn_uptime: "Uptime",
+    btn_restart_dash: "Restart Dashboard", btn_reboot: "Reboot", btn_reset_identity: "Reset All Identity",
+    btn_download_backup: "Download Backup", btn_restore: "Restore",
+    btn_save_limits: "Save limits", btn_clean_files: "Clean files now", btn_clear_history: "Clear all history",
+    txt_restart_rnsd_night: "Restart rnsd every night at 04:00 (frees memory)",
+    txt_tcp_watchdog: "TCP watchdog: auto-restart rnsd on dropped TCP interfaces (every 5 min)",
+    txt_bridge_whitelist_only: "Only allow messages from whitelisted addresses",
+    txt_chat_whitelist_only: "Only allow chat messages from whitelisted addresses",
+    txt_bridge_restart_note: "Changes automatically restart the LXMF Bridge.",
+    txt_chat_applies_note: "Applies immediately, no restart needed.",
+    txt_max_msgs: "Max messages per contact", txt_max_files_mb: "Max files folder size (MB)",
+    sec_arch_live: "System architecture — live", btn_restart_all: "restart all",
+    btn_start: "start", btn_stop: "stop", btn_restart: "restart",
+    btn_cfg_text: "TEXT", btn_cfg_form: "RETICULUM FORM", btn_save: "Save",
+    btn_load: "↻ LOAD", btn_save_restart: "SAVE & RESTART", btn_add_interface: "+ ADD INTERFACE",
+    sec_reticulum: "Reticulum", sec_interfaces: "Interfaces", txt_select_interface: "Select an interface",
+    txt_add_interface_title: "Add Interface", txt_interface_name: "Interface Name", txt_type: "Type",
+    btn_add: "ADD", btn_cancel: "CANCEL",
+    sec_gateway_addresses: "Gateway Addresses",
+    txt_lxmf_bridge: "LXMF Bridge", txt_i2p_address: "I2P Address (b32)",
+    txt_nn_node: "Nomadnet Node", txt_nn_chat: "Nomadnet Chat", txt_noema_chat: "NOEMA Chat",
+    txt_addr_bridge_desc: "For receiving commands from Reticulum to MQTT / Home Assistant. Add to Sideband as a contact.",
+    txt_addr_i2p_desc: "Anonymous connection without public IP. Share with another gateway.",
+    txt_addr_nn_node_desc: "Gateway info page in the Reticulum network.",
+    txt_addr_nn_chat_desc: "IRC-style chat in the Nomadnet network. Open in Nomadnet browser.",
+    txt_addr_noema_chat_desc: "LXMF address of the gateway chat. Add to Sideband or CrossTalk to message the gateway directly.",
+    txt_copied: "✓ Copied", btn_copy: "COPY",
+    sec_lxmf_messages: "LXMF Messages", btn_clear: "CLEAR",
+    sec_rns_interfaces: "RNS interfaces", btn_refresh: "REFRESH",
+    sec_airtime: "Airtime % (15s)", sec_noise: "Noise dBm",
+    sec_i2p_integration: "I2P Integration", txt_i2pd_daemon: "i2pd daemon",
+    txt_i2p_tunnel_addr: "I2P Tunnel Address (Reticulum)", sec_daemon_control: "Daemon Control",
+    btn_install_i2pd: "INSTALL I2PD", btn_start_caps: "START", btn_stop_caps: "STOP", btn_restart_caps: "RESTART",
+    sec_reticulum_interface: "Reticulum Interface",
+    txt_i2p_add_iface_desc: "Add I2P interface to Reticulum config pointing to a remote node:",
+    btn_add_to_config: "ADD TO CONFIG", sec_local_tunnel: "Local Tunnel Setup",
+    txt_i2p_setup_tunnel_desc: "Create incoming I2P tunnel for this MeshGate (so others can connect anonymously):",
+    btn_setup_i2p_tunnel: "SETUP I2P TUNNEL",
+    btn_pages: "PAGES", btn_scripts: "SCRIPTS", btn_open_rbrowser: "OPEN RBROWSER",
+    btn_nomadnet_chat: "NOMADNET CHAT", btn_save_caps: "SAVE", btn_delete: "DELETE",
+    btn_run: "RUN", btn_new: "+ NEW", txt_schedule: "Schedule",
+    opt_disabled: "— disabled —", opt_every_5min: "Every 5 min", opt_every_15min: "Every 15 min",
+    opt_every_30min: "Every 30 min", opt_every_hour: "Every hour", opt_every_6h: "Every 6 hours",
+    opt_every_day: "Every day", btn_apply: "APPLY",
+    ph_lxmf_address: "LXMF address...", txt_select_contact: "Select a contact",
+    btn_remove: "Remove", ph_attach_file: "Attach file", ph_message: "Message...", btn_send: "Send",
+    btn_log_refresh: "↻ Refresh", txt_auto: "Auto", btn_clear_view: "Clear view",
+    txt_download_backup_title: "⬇ Download backup",
+    txt_backup_contents: "Will be saved:<br>• configs: reticulum, noema_bridge, nomadnet, i2p tunnels<br>• identity: lxmf, reticulum, i2p keys, rns destinations<br>• pages: all .mu files<br>• scripts: all .py and .sh<br>• data: monitored_nodes, nomadnet hashes",
+    btn_cancel_lc: "Cancel", btn_download: "⬇ Download",
+    txt_restore_title: "↑ Restore from backup", txt_select_zip: "Select ZIP-file backup:",
+    btn_restore_arrow: "↑ Restore",
+    txt_reset_identity_title: "⚠ Reset Identity",
+    txt_reset_identity_desc: "Reset: LXMF address, I2P tunnel, Reticulum identity, chat history.",
+    btn_reset: "Reset",
+    txt_rebooting_title: "⏻ Rebooting",
+    txt_reboot_desc: "Server will reboot. All services will temporarily stop.",
+    btn_reboot_icon: "⏻ Reboot",
+    toast_all_restarted: "All services restarted", toast_backup_error: "Backup error",
+    toast_backup_downloaded: "Backup downloaded", toast_select_file: "Select file",
+    toast_restored: "Restored! Restart services.", toast_rebooting: "Rebooting...",
+    toast_saved: "Saved", toast_upload_error: "Upload error",
+    toast_file_attached: "File attached — add text or send", toast_name_saved: "Name saved",
+    toast_deleted_n: "Deleted {n} messages", toast_history_cleared: "History cleared",
+    toast_all_files_deleted: "All files deleted",
+    txt_polling_freq: "Dashboard polling frequency",
+    txt_polling_desc: "Lower frequency reduces CPU load on weak hardware (e.g. Orange Pi Zero)",
+    opt_fast: "Fast (default)", opt_normal: "Normal (2x slower)", opt_slow: "Slow / Low-power (4x slower)",
+    th_component: "Component", th_installed: "Installed", th_latest: "Latest",
+    txt_allowed_lxmf: "Allowed LXMF addresses", ph_hex_lxmf: "hex LXMF address",
+    txt_bot_token: "Bot Token", txt_chat_id: "Chat ID",
+    txt_tg_bridge_msgs: "LXMF Bridge messages", txt_tg_chat_msgs: "Chat messages",
+    btn_test: "Test", txt_enabled: "Enabled",
+    txt_notif_sound: "Notification sound", txt_volume: "Volume", btn_add_lc: "Add",
+  },
+  ru: {
+    nav_services: "Сервисы", nav_configs: "Конфиги", nav_addresses: "Адреса",
+    nav_monitor: "Монитор", nav_rnode: "RNode", nav_i2p: "I2P", nav_nomadnet: "Nomadnet",
+    nav_chat: "Чат", nav_logs: "Логи", nav_system: "Система",
+    sec_quick_commands: "Быстрые команды", sec_maintenance: "Обслуживание", sec_system: "Система",
+    sec_backup_restore: "Резервная копия", sec_versions: "Версии", sec_chat_settings: "Настройки чата",
+    sec_bridge_access: "Доступ к мосту", sec_chat_access: "Доступ к чату",
+    sec_telegram: "Уведомления Telegram",
+    btn_ports: "Порты", btn_rnstatus: "RNStatus", btn_restart_rnsd: "Перезапуск RNSD",
+    btn_restart_lxmf: "Перезапуск LXMF", btn_memory: "Память", btn_uptime: "Аптайм",
+    btn_restart_dash: "Перезапуск дашборда", btn_reboot: "Перезагрузка", btn_reset_identity: "Сброс идентификаторов",
+    btn_download_backup: "Скачать бэкап", btn_restore: "Восстановить",
+    btn_save_limits: "Сохранить лимиты", btn_clean_files: "Очистить файлы", btn_clear_history: "Очистить историю",
+    txt_restart_rnsd_night: "Перезапускать rnsd каждую ночь в 04:00 (освобождает память)",
+    txt_tcp_watchdog: "TCP watchdog: авто-перезапуск rnsd при обрыве TCP-интерфейсов (каждые 5 мин)",
+    txt_bridge_whitelist_only: "Разрешать сообщения только с адресов из списка",
+    txt_chat_whitelist_only: "Разрешать сообщения в чат только с адресов из списка",
+    txt_bridge_restart_note: "Изменения автоматически перезапускают LXMF Bridge.",
+    txt_chat_applies_note: "Применяется сразу, без перезапуска.",
+    txt_max_msgs: "Макс. сообщений на контакт", txt_max_files_mb: "Макс. размер папки файлов (МБ)",
+    sec_arch_live: "Архитектура системы — live", btn_restart_all: "перезапустить все",
+    btn_start: "запуск", btn_stop: "стоп", btn_restart: "рестарт",
+    btn_cfg_text: "ТЕКСТ", btn_cfg_form: "ФОРМА RETICULUM", btn_save: "Сохранить",
+    btn_load: "↻ ЗАГРУЗИТЬ", btn_save_restart: "СОХРАНИТЬ И ПЕРЕЗАПУСТИТЬ", btn_add_interface: "+ ДОБАВИТЬ ИНТЕРФЕЙС",
+    sec_reticulum: "Reticulum", sec_interfaces: "Интерфейсы", txt_select_interface: "Выберите интерфейс",
+    txt_add_interface_title: "Добавить интерфейс", txt_interface_name: "Название интерфейса", txt_type: "Тип",
+    btn_add: "ДОБАВИТЬ", btn_cancel: "ОТМЕНА",
+    sec_gateway_addresses: "Адреса шлюза",
+    txt_lxmf_bridge: "LXMF Bridge", txt_i2p_address: "I2P адрес (b32)",
+    txt_nn_node: "Nomadnet Node", txt_nn_chat: "Nomadnet Chat", txt_noema_chat: "NOEMA Chat",
+    txt_addr_bridge_desc: "Для приёма команд из Reticulum в MQTT / Home Assistant. Добавьте как контакт в Sideband.",
+    txt_addr_i2p_desc: "Анонимное соединение без публичного IP. Поделитесь с другим шлюзом.",
+    txt_addr_nn_node_desc: "Информационная страница шлюза в сети Reticulum.",
+    txt_addr_nn_chat_desc: "IRC-чат в сети Nomadnet. Откройте в браузере Nomadnet.",
+    txt_addr_noema_chat_desc: "LXMF-адрес чата шлюза. Добавьте в Sideband или CrossTalk чтобы написать шлюзу напрямую.",
+    txt_copied: "✓ Скопировано", btn_copy: "КОПИРОВАТЬ",
+    sec_lxmf_messages: "Сообщения LXMF", btn_clear: "ОЧИСТИТЬ",
+    sec_rns_interfaces: "Интерфейсы RNS", btn_refresh: "ОБНОВИТЬ",
+    sec_airtime: "Airtime % (15с)", sec_noise: "Шум dBm",
+    sec_i2p_integration: "Интеграция I2P", txt_i2pd_daemon: "демон i2pd",
+    txt_i2p_tunnel_addr: "I2P туннель адрес (Reticulum)", sec_daemon_control: "Управление демоном",
+    btn_install_i2pd: "УСТАНОВИТЬ I2PD", btn_start_caps: "ЗАПУСК", btn_stop_caps: "СТОП", btn_restart_caps: "РЕСТАРТ",
+    sec_reticulum_interface: "Интерфейс Reticulum",
+    txt_i2p_add_iface_desc: "Добавить I2P интерфейс в конфиг Reticulum, указывающий на удалённый узел:",
+    btn_add_to_config: "ДОБАВИТЬ В КОНФИГ", sec_local_tunnel: "Настройка локального туннеля",
+    txt_i2p_setup_tunnel_desc: "Создать входящий I2P туннель для этого шлюза (чтобы другие могли подключаться анонимно):",
+    btn_setup_i2p_tunnel: "НАСТРОИТЬ I2P ТУННЕЛЬ",
+    btn_pages: "СТРАНИЦЫ", btn_scripts: "СКРИПТЫ", btn_open_rbrowser: "ОТКРЫТЬ RBROWSER",
+    btn_nomadnet_chat: "ЧАТ NOMADNET", btn_save_caps: "СОХРАНИТЬ", btn_delete: "УДАЛИТЬ",
+    btn_run: "ЗАПУСК", btn_new: "+ НОВЫЙ", txt_schedule: "Расписание",
+    opt_disabled: "— выключено —", opt_every_5min: "Каждые 5 мин", opt_every_15min: "Каждые 15 мин",
+    opt_every_30min: "Каждые 30 мин", opt_every_hour: "Каждый час", opt_every_6h: "Каждые 6 часов",
+    opt_every_day: "Каждый день", btn_apply: "ПРИМЕНИТЬ",
+    ph_lxmf_address: "LXMF адрес...", txt_select_contact: "Выберите контакт",
+    btn_remove: "Удалить", ph_attach_file: "Прикрепить файл", ph_message: "Сообщение...", btn_send: "Отправить",
+    btn_log_refresh: "↻ Обновить", txt_auto: "Авто", btn_clear_view: "Очистить вид",
+    txt_download_backup_title: "⬇ Скачать бэкап",
+    txt_backup_contents: "Будет сохранено:<br>• конфиги: reticulum, noema_bridge, nomadnet, i2p туннели<br>• идентификаторы: lxmf, reticulum, i2p ключи, rns адреса<br>• страницы: все .mu файлы<br>• скрипты: все .py и .sh<br>• данные: monitored_nodes, nomadnet hashes",
+    btn_cancel_lc: "Отмена", btn_download: "⬇ Скачать",
+    txt_restore_title: "↑ Восстановить из бэкапа", txt_select_zip: "Выберите ZIP-файл бэкапа:",
+    btn_restore_arrow: "↑ Восстановить",
+    txt_reset_identity_title: "⚠ Сброс идентификаторов",
+    txt_reset_identity_desc: "Будут сброшены: LXMF-адрес, I2P туннель, Reticulum identity, история чата.",
+    btn_reset: "Сбросить",
+    txt_rebooting_title: "⏻ Перезагрузка",
+    txt_reboot_desc: "Сервер будет перезагружен. Все сервисы временно остановятся.",
+    btn_reboot_icon: "⏻ Перезагрузить",
+    toast_all_restarted: "Все сервисы перезапущены", toast_backup_error: "Ошибка бэкапа",
+    toast_backup_downloaded: "Бэкап скачан", toast_select_file: "Выберите файл",
+    toast_restored: "Восстановлено! Перезапустите сервисы.", toast_rebooting: "Перезагрузка...",
+    toast_saved: "Сохранено", toast_upload_error: "Ошибка загрузки",
+    toast_file_attached: "Файл прикреплён — добавьте текст или отправьте", toast_name_saved: "Имя сохранено",
+    toast_deleted_n: "Удалено сообщений: {n}", toast_history_cleared: "История очищена",
+    toast_all_files_deleted: "Все файлы удалены",
+    txt_polling_freq: "Частота опроса дашборда",
+    txt_polling_desc: "Меньшая частота снижает нагрузку CPU на слабом железе (напр. Orange Pi Zero)",
+    opt_fast: "Быстро (по умолчанию)", opt_normal: "Обычно (в 2 раза медленнее)", opt_slow: "Медленно / энергосбережение (в 4 раза медленнее)",
+    th_component: "Компонент", th_installed: "Установлено", th_latest: "Последняя",
+    txt_allowed_lxmf: "Разрешённые LXMF-адреса", ph_hex_lxmf: "hex LXMF адрес",
+    txt_bot_token: "Bot Token", txt_chat_id: "Chat ID",
+    txt_tg_bridge_msgs: "Сообщения LXMF Bridge", txt_tg_chat_msgs: "Сообщения чата",
+    btn_test: "Тест", txt_enabled: "Включено",
+    txt_notif_sound: "Звук уведомления", txt_volume: "Громкость", btn_add_lc: "Добавить",
+  }
+};
+
+function t(key){
+  const lang = localStorage.getItem("noema-lang") || "en";
+  const dict = I18N[lang] || I18N.en;
+  return dict[key] || I18N.en[key] || key;
+}
+
+function applyLang(){
+  const lang = localStorage.getItem("noema-lang") || "en";
+  document.getElementById("lang-toggle").textContent = lang === "en" ? "EN" : "RU";
+  const dict = I18N[lang] || I18N.en;
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const key = el.getAttribute("data-i18n");
+    if(dict[key]) el.textContent = dict[key];
+  });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+    const key = el.getAttribute("data-i18n-placeholder");
+    if(dict[key]) el.setAttribute("placeholder", dict[key]);
+  });
+  document.querySelectorAll("[data-i18n-title]").forEach(el => {
+    const key = el.getAttribute("data-i18n-title");
+    if(dict[key]) el.setAttribute("title", dict[key]);
+  });
+  document.querySelectorAll("[data-i18n-html]").forEach(el => {
+    const key = el.getAttribute("data-i18n-html");
+    if(dict[key]) el.innerHTML = dict[key];
+  });
+}
+
+function toggleLang(){
+  const cur = localStorage.getItem("noema-lang") || "en";
+  const next = cur === "en" ? "ru" : "en";
+  localStorage.setItem("noema-lang", next);
+  applyLang();
+  if(typeof loadServices === "function") loadServices();
 }
 
 // Clock
@@ -1356,6 +1558,7 @@ async function checkMqttStatus(){
 async function loadServices(){
   const r=await fetch(API+"/api/services");
   const data=await r.json();
+  const _d = I18N[localStorage.getItem("noema-lang")||"en"] || I18N.en;
   if(window.meshSetStatus) data.forEach(s=>window.meshSetStatus(s.name,s.status==="active"));
   const left=document.getElementById("svc-list-left");
   const right=document.getElementById("svc-list-right");
@@ -1370,9 +1573,9 @@ async function loadServices(){
   if(right) right.innerHTML=data.map(s=>`
     <div class="svc" style="justify-content:flex-end">
       <div class="svc-btns">
-        <button class="sys-btn teal" onclick="svcAction('${s.name}','start')">▶ start</button>
-        <button class="sys-btn rd" onclick="svcAction('${s.name}','stop')">■ stop</button>
-        <button class="sys-btn am" onclick="svcAction('${s.name}','restart')">↺ restart</button>
+        <button class="sys-btn teal" onclick="svcAction('${s.name}','start')">▶ ${_d.btn_start}</button>
+        <button class="sys-btn rd" onclick="svcAction('${s.name}','stop')">■ ${_d.btn_stop}</button>
+        <button class="sys-btn am" onclick="svcAction('${s.name}','restart')">↺ ${_d.btn_restart}</button>
       </div>
     </div>`).join("");
   const mobile=document.getElementById("svc-list-mobile");
@@ -1384,9 +1587,9 @@ async function loadServices(){
         <span class="badge ${s.status}">${esc(s.status)}</span>
       </div>
       <div class="svc-btns">
-        <button class="sys-btn teal" onclick="svcAction('${s.name}','start')">▶ start</button>
-        <button class="sys-btn rd" onclick="svcAction('${s.name}','stop')">■ stop</button>
-        <button class="sys-btn am" onclick="svcAction('${s.name}','restart')">↺ restart</button>
+        <button class="sys-btn teal" onclick="svcAction('${s.name}','start')">▶ ${_d.btn_start}</button>
+        <button class="sys-btn rd" onclick="svcAction('${s.name}','stop')">■ ${_d.btn_stop}</button>
+        <button class="sys-btn am" onclick="svcAction('${s.name}','restart')">↺ ${_d.btn_restart}</button>
       </div>
     </div>`).join("");
 }
@@ -1401,7 +1604,7 @@ async function restartAll(){
   for(const s of ["rnsd","noema_lxmf_bridge"]){
     await fetch(API+`/api/services/${s}/restart`,{method:"POST"});
   }
-  toast("All services restarted");
+  toast(t("toast_all_restarted"));
   loadServices();
 }
 
@@ -1541,7 +1744,7 @@ async function doBackupDownload(){
   closeModal("backup-modal");
   try{
     const r=await fetch(API+"/api/backup/download");
-    if(!r.ok){toast("Backup error",false);return;}
+    if(!r.ok){toast(t("toast_backup_error"),false);return;}
     const blob=await r.blob();
     const url=URL.createObjectURL(blob);
     const a=document.createElement("a");
@@ -1550,20 +1753,20 @@ async function doBackupDownload(){
     a.download="meshgate_backup_"+ts+".zip";
     a.click();
     URL.revokeObjectURL(url);
-    toast("Backup downloaded");
+    toast(t("toast_backup_downloaded"));
   }catch(e){toast("Error: "+e,false);}
 }
 
 async function doRestore(){
   const file=document.getElementById("restore-file").files[0];
-  if(!file){toast("Select file",false);return;}
+  if(!file){toast(t("toast_select_file"),false);return;}
   closeModal("restore-modal");
   const fd=new FormData();
   fd.append("file",file);
   try{
     const r=await fetch(API+"/api/backup/restore",{method:"POST",body:fd});
     const d=await r.json();
-    if(d.ok) toast("Restored! Restart services.");
+    if(d.ok) toast(t("toast_restored"));
     else toast("Error: "+d.error,false);
   }catch(e){toast("Error: "+e,false);}
 }
@@ -1571,7 +1774,7 @@ async function doRestore(){
 async function doReboot(){
   closeModal("reboot-modal");
   await fetch(API+"/api/reboot",{method:"POST"});
-  toast("Rebooting...");
+  toast(t("toast_rebooting"));
 }
 
 // LXMF
@@ -1788,7 +1991,7 @@ async function saveConfig(){
   const r=await fetch(API+"/api/configs/"+curCfg,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({content})});
   const d=await r.json();
   if(d.ok){
-    toast("Saved");
+    toast(t("toast_saved"));
     const svcMap={"noema_lxmf_bridge":"noema_lxmf_bridge","nomadnet":"nomadnet","reticulum":"rnsd"};
     const svc=svcMap[curCfg];
     if(svc){
@@ -1901,7 +2104,8 @@ async function chatRemoveContact(){
   document.getElementById("chat-peer-addr").textContent = "";
   document.getElementById("chat-remove-btn").style.display = "none";
   document.getElementById("chat-rename-btn").style.display = "none";
-  document.getElementById("chat-messages").innerHTML = '<div style="color:var(--mu);font-size:12px;text-align:center;margin-top:40px">Select a contact</div>';
+  document.getElementById("chat-messages").innerHTML = '<div style="color:var(--mu);font-size:12px;text-align:center;margin-top:40px" data-i18n="txt_select_contact">Select a contact</div>';
+  applyLang();
   renderChatContacts();
 }
 
@@ -2145,7 +2349,7 @@ async function loadTgSettings(){
     if(document.getElementById("tg-notify-bridge")) document.getElementById("tg-notify-bridge").checked = d.notify_bridge !== false;
     if(document.getElementById("tg-notify-chat"))   document.getElementById("tg-notify-chat").checked   = d.notify_chat   !== false;
     const st = document.getElementById("tg-status");
-    if(d.enabled){ st.textContent="✅ Enabled"; st.style.display="inline"; }
+    if(d.enabled){ st.textContent="✅ "+t("txt_enabled"); st.style.display="inline"; }
   }catch(e){}
 }
 
@@ -2289,13 +2493,13 @@ async function uploadChatFile(input){
   try{
     const r = await fetch(API+"/api/chat/files/upload", {method:"POST", body:fd});
     const d = await r.json();
-    if(!d.ok){ toast("Upload error",false); return; }
+    if(!d.ok){ toast(t("toast_upload_error"),false); return; }
     chatPendingFile = d;
     const prev = document.getElementById("chat-file-preview");
     const prevName = document.getElementById("chat-file-preview-name");
     if(prev && prevName){ prevName.textContent = "📎 " + d.name; prev.style.display="flex"; }
     document.getElementById("chat-input").focus();
-    toast("File attached — add text or send");
+    toast(t("toast_file_attached"));
   }catch(e){ toast("Error: "+e, false); }
 }
 
@@ -2322,7 +2526,7 @@ async function renameChatContact(){
   await fetch(API+"/api/chat/contacts",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(chatContacts)});
   document.getElementById("chat-peer-name").textContent = name;
   renderChatContacts();
-  toast("Name saved");
+  toast(t("toast_name_saved"));
 }
 
 async function sendChatMsg(){
@@ -2395,7 +2599,7 @@ async function doClearChat(){
     const r = await fetch(API+"/api/chat/history/clear",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({days})});
     const d = await r.json();
     if(d.error){ toast("Error: "+d.error); return; }
-    toast(d.deleted ? `Deleted ${d.deleted} messages` : "History cleared");
+    toast(d.deleted ? t("toast_deleted_n").replace("{n}", d.deleted) : t("toast_history_cleared"));
     if(chatCurrentAddr){
       const r2 = await fetch(API+"/api/chat/history/"+chatCurrentAddr);
       renderChatMsgs(await r2.json());
@@ -2459,7 +2663,7 @@ function showClearFilesModal(){
 async function doClearFiles(){
   closeModal("clear-files-modal");
   await fetch(API+"/api/chat/files/clear",{method:"POST"});
-  toast("All files deleted");
+  toast(t("toast_all_files_deleted"));
   loadSystemFiles();
 }
 
@@ -2992,6 +3196,7 @@ async function nnAction(action){
 }
 
 // Init
+applyLang();
 loadSystem();
 chatSoundRestore();
 if(document.getElementById("tg-token")) loadTgSettings();
