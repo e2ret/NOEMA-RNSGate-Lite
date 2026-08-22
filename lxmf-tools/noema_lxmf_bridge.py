@@ -105,6 +105,35 @@ def tg_notify(text):
     except Exception as e:
         print(f"[TG] Error: {e}")
 
+# ─── Local LLM (llama.cpp / Ollama-compatible) ───────────────────────────────
+
+LLM_ENABLED    = cfg("llm", "enabled", "0") == "1"
+LLM_URL        = cfg("llm", "url", "http://127.0.0.1:8090/completion")
+LLM_MAX_TOKENS = int(cfg("llm", "max_tokens", "256") or "256")
+LLM_TIMEOUT    = int(cfg("llm", "timeout", "60") or "60")
+LLM_SYSTEM     = cfg("llm", "system_prompt", "You are a helpful assistant reachable over a Reticulum mesh. Keep answers short — this may be relayed over LoRa.")
+
+def llm_ask(prompt):
+    """Query the local llama.cpp server (llama-server, OpenAI-style /completion endpoint)."""
+    try:
+        import urllib.request
+        full_prompt = f"{LLM_SYSTEM}\n\nUser: {prompt}\nAssistant:"
+        body = json.dumps({
+            "prompt": full_prompt,
+            "n_predict": LLM_MAX_TOKENS,
+            "stop": ["User:", "\n\n"],
+        }).encode("utf-8")
+        req = urllib.request.Request(
+            LLM_URL, data=body,
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        with urllib.request.urlopen(req, timeout=LLM_TIMEOUT) as r:
+            result = json.loads(r.read().decode("utf-8"))
+        return (result.get("content") or "").strip() or "(empty response)"
+    except Exception as e:
+        return f"⚠️ LLM error: {e}"
+
 # ─── MQTT ────────────────────────────────────────────────────────────────────
 
 _mqtt = None
@@ -213,7 +242,7 @@ def welcome(sender, message):
         return True
     bot.send(sender,
         "👋 NOEMA LXMF Bridge\n\n"
-        "Commands: /status /ping /info\n"
+        "Commands: /status /ping /info" + (" /ask" if LLM_ENABLED else "") + "\n"
         "Messages are forwarded to Home Assistant via MQTT."
     )
     return False
@@ -256,6 +285,26 @@ def cmd_ping(ctx):
 @bot.command(name="info", description="Bridge info")
 def cmd_info(ctx):
     ctx.reply(f"🔌 NOEMA RNSGate Lite\nLXMF ↔ MQTT\nBroker: {MQTT_HOST}:{MQTT_PORT}")
+
+@bot.command(name="ask", description="Ask the local AI (offline, no internet needed)")
+def cmd_ask(ctx):
+    if not LLM_ENABLED:
+        ctx.reply("🤖 Local AI is not enabled on this gateway.")
+        return
+    raw_args = ctx.args
+    if isinstance(raw_args, (list, tuple)):
+        question = " ".join(str(a) for a in raw_args).strip()
+    else:
+        question = (raw_args or "").strip()
+    if not question:
+        ctx.reply("Usage: /ask <your question>")
+        return
+    sender = ctx.sender
+    ctx.reply("🤖 Thinking…")
+    def _worker():
+        answer = llm_ask(question)
+        bot.send(sender, answer, title="AI")
+    threading.Thread(target=_worker, daemon=True).start()
 
 # ─── Main ────────────────────────────────────────────────────────────────────
 
