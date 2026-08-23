@@ -32,7 +32,10 @@
 ```bash
 git clone https://github.com/e2ret/NOEMA-RNSGate-Lite.git && cd NOEMA-RNSGate-Lite && sudo bash install.sh
 ```
-Скрипт автоматически устанавливает все зависимости, спрашивает параметры MQTT брокера и запускает systemd сервисы.
+Скрипт автоматически устанавливает все зависимости и запускает systemd сервисы. В процессе установки задаются два вопроса:
+
+- **MQTT брокер** — IP/хост, порт, логин и пароль (для LXMF Bridge → Home Assistant). Если брокера пока нет — можно нажать Enter и оставить значения по умолчанию (`localhost`), настроить позже через [[Configs]] в дашборде.
+- **Имя узла Nomadnet** — как ваш шлюз будет отображаться другим узлам сети в анонсах. По умолчанию подставляется `NOEMA RNSGate (hostname)` — этого достаточно, если у вас один шлюз; если планируете несколько, стоит сразу задать понятные имена (например `NOEMA Дом`, `NOEMA Дача`), чтобы отличать их в сети. Позже это тоже можно поменять в дашборде, вкладка [[Nomadnet]].
 
 > **Примечание:** в процессе установки дважды потребуется нажать Enter — для инициализации Nomadnet и настройки cron-задач.
 
@@ -107,7 +110,10 @@ Requirements: Debian/Ubuntu, Python 3.10+, root.
 ```bash
 git clone https://github.com/e2ret/NOEMA-RNSGate-Lite.git && cd NOEMA-RNSGate-Lite && sudo bash install.sh
 ```
-The script automatically installs all dependencies, asks for MQTT broker settings, and starts the systemd services.
+The script automatically installs all dependencies and starts the systemd services. During installation you'll be asked two things:
+
+- **MQTT broker** — host/IP, port, username, and password (for LXMF Bridge → Home Assistant). If you don't have a broker yet, just press Enter to keep the defaults (`localhost`) and configure it later via [[Configs]] in the dashboard.
+- **Nomadnet node name** — how your gateway will appear to other nodes in the network's announces. Defaults to `NOEMA RNSGate (hostname)` — fine if you're only running one gateway; if you're planning to run several, it's worth picking clear names right away (e.g. `NOEMA Home`, `NOEMA Cabin`) to tell them apart on the network. This can also be changed later in the dashboard, under [[Nomadnet]].
 
 > **Note:** during installation you'll need to press Enter twice — for Nomadnet initialization and cron setup.
 
