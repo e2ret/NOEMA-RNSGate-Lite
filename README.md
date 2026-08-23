@@ -36,6 +36,16 @@ git clone https://github.com/e2ret/NOEMA-RNSGate-Lite.git && cd NOEMA-RNSGate-Li
 
 > **Примечание:** в процессе установки дважды потребуется нажать Enter — для инициализации Nomadnet и настройки cron-задач.
 
+### Первый вход
+
+После установки дашборд доступен в браузере на **порту 8081**:
+
+```
+http://IP_ШЛЮЗА:8081
+```
+
+IP-адрес устройства можно посмотреть в списке клиентов роутера, или через `hostname -I` по SSH на самом шлюзе. По умолчанию авторизация не требуется — дашборд открыт для всех в локальной сети.
+
 ### На чём запускать
 
 Проект **не привязан к Orange Pi** — это просто пример устройства, на котором тестировался. Реально нужен любой Linux (Debian/Ubuntu) с Python 3.10+:
@@ -100,6 +110,16 @@ git clone https://github.com/e2ret/NOEMA-RNSGate-Lite.git && cd NOEMA-RNSGate-Li
 The script automatically installs all dependencies, asks for MQTT broker settings, and starts the systemd services.
 
 > **Note:** during installation you'll need to press Enter twice — for Nomadnet initialization and cron setup.
+
+### First login
+
+Once installed, the dashboard is available in your browser on **port 8081**:
+
+```
+http://GATEWAY_IP:8081
+```
+
+Find the device's IP in your router's client list, or via `hostname -I` over SSH on the gateway itself. No authentication is required by default — the dashboard is open to anyone on the local network.
 
 ### On what hardware
 
