@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-__version__ = "1.6.0"
+__version__ = "1.6.1"
 import subprocess, threading, os
 from collections import deque
 from flask import Flask, jsonify, request, send_from_directory
@@ -1538,6 +1538,58 @@ def nomadnet_page_delete(name):
     try:
         os.remove(path)
         return jsonify({"ok": True})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)})
+
+@app.route("/api/nomadnet/node_name")
+def nomadnet_node_name_get():
+    """Read the current [node] node_name value from ~/.nomadnetwork/config."""
+    import re as _re
+    path = CONFIGS["nomadnet"]
+    try:
+        text = open(path).read()
+    except Exception:
+        return jsonify({"node_name": ""})
+    m = _re.search(r'(?ms)^\[node\].*?^node_name\s*=\s*(.*?)\s*$', text)
+    if not m:
+        return jsonify({"node_name": ""})
+    value = m.group(1).strip()
+    if value in ("None", ""):
+        value = ""
+    return jsonify({"node_name": value})
+
+@app.route("/api/nomadnet/node_name", methods=["POST"])
+def nomadnet_node_name_save():
+    """
+    Set [node] node_name in ~/.nomadnetwork/config without touching the
+    rest of the file. Empty string is written back as `None` (NomadNet's
+    own convention for "no custom name, just show the address hash").
+    Restarts the nomadnet service to apply the new announce name.
+    """
+    import re as _re
+    new_name = (request.get_json(silent=True) or {}).get("node_name", "").strip()
+    path = CONFIGS["nomadnet"]
+    try:
+        text = open(path).read()
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)})
+
+    written_value = new_name if new_name else "None"
+    pattern = _re.compile(r'(?ms)(^\[node\].*?^node_name\s*=\s*).*?$')
+
+    if pattern.search(text):
+        text = pattern.sub(lambda m: m.group(1) + written_value, text, count=1)
+    else:
+        # No [node] section / no node_name line yet — nothing to safely patch,
+        # bail out rather than guessing where to insert it.
+        return jsonify({"ok": False, "error": "[node] section or node_name key not found in config"})
+
+    try:
+        open(path, "w").write(text)
+        sh("sudo systemctl restart nomadnet")
+        return jsonify({"ok": True})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)})
     except Exception as e:
         return jsonify({"ok": False, "error": str(e)})
 

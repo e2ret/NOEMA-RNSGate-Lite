@@ -676,6 +676,19 @@ function chatShowMessages(){
           </script>
         </div>
 
+        <!-- Node display name -->
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap;background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:8px 12px">
+          <span style="font-size:11px;color:var(--mu);white-space:nowrap" data-i18n="txt_nn_display_name">Node name</span>
+          <input id="nn-node-name" type="text" placeholder="NOEMA RNSGate" data-i18n-placeholder="ph_nn_node_name" style="flex:1;min-width:140px;background:var(--bg);border:1px solid var(--bd);border-radius:5px;color:var(--tx);font-family:var(--fn);font-size:12px;padding:5px 8px;box-sizing:border-box">
+          <button class="sys-btn teal" onclick="nnSaveNodeName()" data-i18n="btn_save">Save</button>
+          <span style="font-size:10.5px;color:var(--mu)" data-i18n="txt_nn_node_name_hint">Visible to other peers in announces — helps tell multiple gateways apart</span>
+        </div>
+        <script>
+          fetch("/api/nomadnet/node_name").then(r=>r.json()).then(d=>{
+            document.getElementById("nn-node-name").value = d.node_name || "";
+          }).catch(()=>{});
+        </script>
+
         <!-- File tabs -->
         <div id="nn-file-tabs" style="display:flex;gap:4px;flex-wrap:wrap;flex-shrink:0"></div>
 
@@ -1330,6 +1343,9 @@ const I18N = {
     sec_gateway_addresses: "Gateway Addresses",
     txt_lxmf_bridge: "LXMF Bridge", txt_i2p_address: "I2P Address (b32)",
     txt_nn_node: "Nomadnet Node", txt_nn_chat: "Nomadnet Chat", txt_noema_chat: "NOEMA Chat",
+    txt_nn_display_name: "Node name", ph_nn_node_name: "NOEMA RNSGate",
+    txt_nn_node_name_hint: "Visible to other peers in announces — helps tell multiple gateways apart",
+    toast_nn_name_saved: "Node name saved", toast_nn_name_error: "Could not save node name",
     txt_addr_bridge_desc: "For receiving commands from Reticulum to MQTT / Home Assistant. Add to Sideband as a contact.",
     txt_addr_i2p_desc: "Anonymous connection without public IP. Share with another gateway.",
     txt_addr_nn_node_desc: "Gateway info page in the Reticulum network.",
@@ -1414,6 +1430,9 @@ const I18N = {
     sec_gateway_addresses: "Адреса шлюза",
     txt_lxmf_bridge: "LXMF Bridge", txt_i2p_address: "I2P адрес (b32)",
     txt_nn_node: "Nomadnet Node", txt_nn_chat: "Nomadnet Chat", txt_noema_chat: "NOEMA Chat",
+    txt_nn_display_name: "Имя узла", ph_nn_node_name: "NOEMA RNSGate",
+    txt_nn_node_name_hint: "Видно другим узлам в анонсах — помогает различать несколько шлюзов",
+    toast_nn_name_saved: "Имя узла сохранено", toast_nn_name_error: "Не удалось сохранить имя узла",
     txt_addr_bridge_desc: "Для приёма команд из Reticulum в MQTT / Home Assistant. Добавьте как контакт в Sideband.",
     txt_addr_i2p_desc: "Анонимное соединение без публичного IP. Поделитесь с другим шлюзом.",
     txt_addr_nn_node_desc: "Информационная страница шлюза в сети Reticulum.",
@@ -3148,6 +3167,15 @@ async function nnSave(){
     out.textContent = d.ok ? "✓ Saved" : ("Error: "+d.error);
     setTimeout(()=>out.style.display="none",3000);
   }catch(e){ out.style.display="block"; out.textContent="Error: "+e; }
+}
+
+async function nnSaveNodeName(){
+  const node_name = document.getElementById("nn-node-name").value.trim();
+  try{
+    const d = await fetch(API+"/api/nomadnet/node_name",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({node_name})}).then(r=>r.json());
+    if(d.ok) toast(t("toast_nn_name_saved"));
+    else toast(t("toast_nn_name_error")+": "+d.error,false);
+  }catch(e){ toast(t("toast_nn_name_error")+": "+e,false); }
 }
 
 async function nnDelete(){
