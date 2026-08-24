@@ -237,6 +237,24 @@ echo ""
 echo "      MQTT: $MQTT_USER@$MQTT_HOST:$MQTT_PORT"
 echo ""
 
+# --- Nomadnet node name ---
+echo ""
+echo "========================================"
+echo "  Nomadnet Node Name"
+echo "========================================"
+echo ""
+echo "  This name is visible to other peers on the network"
+echo "  and included in announces. If you run several gateways,"
+echo "  give each one a distinct name so they're easy to tell apart."
+echo ""
+HOSTNAME_SHORT=$(hostname -s 2>/dev/null || echo "gateway")
+read -rp "  Node name [NOEMA RNSGate ($HOSTNAME_SHORT)]: " NN_NODE_NAME
+NN_NODE_NAME="${NN_NODE_NAME:-NOEMA RNSGate ($HOSTNAME_SHORT)}"
+echo "      Node name: $NN_NODE_NAME"
+echo ""
+# Escape characters that are special inside a sed replacement (delimiter |, & and \)
+NN_NODE_NAME_ESCAPED=$(printf '%s' "$NN_NODE_NAME" | sed 's/[\&|]/\\&/g')
+
 # --- lxmf-tools ---
 echo "[5/7] Setting up lxmf-tools..."
 mkdir -p "$LXMF_TOOLS_DIR"
@@ -396,7 +414,7 @@ if [ ! -f "$NOMADNET_CONFIG" ]; then
 fi
 if [ -f "$NOMADNET_CONFIG" ]; then
     sed -i "s/^enable_node = no/enable_node = yes/" "$NOMADNET_CONFIG"
-    sed -i "s/^node_name = None/node_name = NOEMA RNSGate/" "$NOMADNET_CONFIG"
+    sed -i "s|^node_name = None|node_name = ${NN_NODE_NAME_ESCAPED}|" "$NOMADNET_CONFIG"
     echo "      Nomadnet node enabled in config."
 fi
 
