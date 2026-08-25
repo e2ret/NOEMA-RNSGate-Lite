@@ -117,7 +117,7 @@ body{
 @keyframes skel-shimmer{0%{background-position:100% 50%}100%{background-position:0 50%}}
 @media(prefers-reduced-motion:reduce){.skel{animation:none;opacity:.5}}
 
-.shell{display:grid;grid-template-rows:auto auto auto 1fr;height:100vh}
+.shell{display:grid;grid-template-rows:auto auto 1fr;height:100vh}
 
 .topbar{
   display:flex;align-items:center;justify-content:space-between;
@@ -255,13 +255,17 @@ body{
 
 .brow{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
 
-.svc{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--bd)}
+.svc{display:flex;align-items:center;justify-content:space-between;height:58px;padding:14px 0;border-bottom:1px solid var(--bd)}
+@media(max-width:768px){
+  .svc{height:auto}
+}
 .svc:last-child{border-bottom:none}
 .svc>div:first-child{flex:1}
 .svc-btns{flex:1;text-align:right}
 .svc-n{font-size:14px;font-weight:600;font-family:var(--mono);color:var(--tx);min-width:190px}
 
-.svc-arch-grid{display:grid;grid-template-columns:1fr minmax(220px,340px) 1fr;gap:16px;align-items:center;background:var(--s1);border:1px solid var(--bd);border-radius:16px;padding:18px;box-shadow:var(--shadow)}
+.svc-arch-grid{display:grid;grid-template-columns:1fr minmax(260px,460px) 1fr;gap:16px;align-items:center;background:var(--s1);border:1px solid var(--bd);border-radius:16px;padding:18px;box-shadow:var(--shadow)}
+.svc-arch-col{align-self:start}
 .svc-arch-diagram{min-width:0}
 .svc-mobile-only{display:none}
 @media(max-width:1300px){
@@ -344,26 +348,22 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 1px var(--
   align-items:center;justify-content:center;flex-direction:column;gap:16px
 }
 
-.hero{position:relative;border-bottom:1px solid var(--bd);background:var(--bg)}
-.mesh-canvas{display:block;width:100%;height:108px}
-.mesh-caption{position:absolute;top:6px;left:24px;font-size:9px;letter-spacing:.18em;color:var(--mu);font-family:var(--mono);text-transform:uppercase;pointer-events:none}
-@media(max-width:768px){.mesh-canvas{height:64px}.mesh-caption{display:none}}
-
-/* ===== Hub shell: persistent pill menu either side, content in the middle ===== */
+/* ===== Hub shell: horizontal icon bar on top, content below ===== */
 .hub-shell{
-  display:flex;flex:1;min-height:0;gap:14px;
+  display:flex;flex-direction:column;flex:1;min-height:0;gap:10px;
   padding:14px;background:transparent
 }
 .hub-col{
-  display:flex;flex-direction:column;gap:8px;
-  width:216px;flex-shrink:0;overflow-y:auto;overflow-x:visible
+  display:flex;flex-direction:row;flex-wrap:wrap;gap:8px;
+  justify-content:center;
+  flex-shrink:0;overflow-x:visible;overflow-y:visible
 }
 .hub-pill{
-  position:relative;display:flex;align-items:center;gap:10px;
-  padding:8px 14px 8px 8px;flex-shrink:0;
+  position:relative;display:flex;align-items:center;
+  padding:8px;flex-shrink:0;
   background:var(--s1);border:1px solid var(--bd);border-radius:999px;
   box-shadow:var(--shadow);cursor:pointer;
-  transition:border-color .15s var(--ease),box-shadow .15s var(--ease),background-color .15s var(--ease)
+  transition:border-color .15s var(--ease),box-shadow .15s var(--ease),background-color .15s var(--ease),padding .2s var(--ease)
 }
 .hub-pill:hover{border-color:var(--bd-hi);box-shadow:var(--shadow-lg)}
 .hub-pill.active{border-color:var(--teal);background:var(--s3);box-shadow:var(--glow)}
@@ -372,16 +372,23 @@ textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 1px var(--
   display:flex;align-items:center;justify-content:center;
   background:var(--s2)
 }
-.hub-pill span{font-size:11.5px;font-weight:700;font-family:var(--mono);text-transform:uppercase;letter-spacing:.07em;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hub-pill span{
+  font-size:11.5px;font-weight:700;font-family:var(--mono);text-transform:uppercase;letter-spacing:.07em;color:var(--tx);
+  white-space:nowrap;overflow:hidden;display:inline-block;
+  max-width:0;opacity:0;margin-left:0;
+  transition:max-width .25s var(--ease),opacity .2s var(--ease),margin-left .25s var(--ease)
+}
+.hub-pill:hover span,.hub-pill.active span,.hub-pill:focus-visible span{
+  max-width:140px;opacity:1;margin-left:8px
+}
+.hub-pill:hover,.hub-pill.active,.hub-pill:focus-visible{padding-right:14px}
+@media(hover:none){
+  .hub-pill span{max-width:none;opacity:1;margin-left:8px}
+  .hub-pill{padding-right:14px}
+}
 @media(max-width:900px){
   .body{overflow-y:auto}
-  .hub-shell{flex-direction:column;flex:none;padding:10px}
-  .hub-col{width:auto;flex-direction:row;flex-wrap:wrap;overflow:visible;flex:none}
-  .hub-pill{flex:1 1 calc(50% - 4px)}
   .main{flex:none;overflow-y:visible}
-}
-@media(max-width:480px){
-  .hub-pill{flex:1 1 100%}
 }
 </style>
 
@@ -430,10 +437,6 @@ function chatShowMessages(){
     </div>
   </div>
 </div>
-<div class="hero">
-  <canvas id="mesh-canvas" class="mesh-canvas"></canvas>
-  <div class="mesh-caption">Mesh topology — live</div>
-</div>
 <div class="metrics">
   <div class="mc"><div class="mc-inner"><div class="lb">CPU</div><div class="vl a skel" id="m-cpu">—</div></div><div class="pb"><div class="pbf a" id="pb-cpu" style="width:0%"></div></div></div>
   <div class="mc"><div class="mc-inner"><div class="lb">RAM</div><div class="vl skel" id="m-ram">—</div></div><div class="pb"><div class="pbf" id="pb-ram" style="width:0%"></div></div></div>
@@ -445,12 +448,17 @@ function chatShowMessages(){
 </div>
 <div class="body">
   <div class="hub-shell">
-    <div class="hub-col left">
+    <div class="hub-col">
       <div class="hub-pill active" onclick="nav('home',this)"><div class="hub-pill-ic" style="color:var(--teal)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div><span data-i18n="nav_services">Services</span></div>
-      <div class="hub-pill" onclick="nav('configs',this)"><div class="hub-pill-ic" style="color:var(--bl)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="4" x2="5" y2="20"/><circle cx="5" cy="10" r="2.2"/><line x1="12" y1="4" x2="12" y2="20"/><circle cx="12" cy="16" r="2.2"/><line x1="19" y1="4" x2="19" y2="20"/><circle cx="19" cy="7" r="2.2"/></svg></div><span data-i18n="nav_configs">Configs</span></div>
       <div class="hub-pill" onclick="nav('addresses',this);loadAddressesPanel();"><div class="hub-pill-ic" style="color:var(--purple)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M16 12v1.5a2.5 2.5 0 0 0 5 0V12a9 9 0 1 0-4 7.5"/></svg></div><span data-i18n="nav_addresses">Addresses</span></div>
-      <div class="hub-pill" onclick="nav('monitor',this)"><div class="hub-pill-ic" style="color:var(--gr)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2.5-7 4 14L16 12h5"/></svg></div><span data-i18n="nav_monitor">Monitor</span></div>
       <div class="hub-pill" onclick="nav('rnode',this)"><div class="hub-pill-ic" style="color:var(--am)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M8.5 8.5a5 5 0 0 0 0 7"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M5.5 5.5a9 9 0 0 0 0 13"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg></div><span data-i18n="nav_rnode">RNode</span></div>
+      <div class="hub-pill" onclick="nav('i2p',this)"><div class="hub-pill-ic" style="color:var(--i2ptl)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6l7-3Z"/></svg></div><span data-i18n="nav_i2p">I2P</span></div>
+      <div class="hub-pill" onclick="nav('nomadnet',this);loadNomadnet();"><div class="hub-pill-ic" style="color:var(--sky)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15 9l-2 6-6 2 2-6 6-2Z"/></svg></div><span data-i18n="nav_nomadnet">Nomadnet</span></div>
+      <div class="hub-pill" onclick="nav('monitor',this)"><div class="hub-pill-ic" style="color:var(--gr)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2.5-7 4 14L16 12h5"/></svg></div><span data-i18n="nav_monitor">Monitor</span></div>
+      <div class="hub-pill" onclick="nav('logs',this)"><div class="hub-pill-ic" style="color:var(--slate)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9l3 3-3 3"/><line x1="12" y1="15" x2="17" y2="15"/></svg></div><span data-i18n="nav_logs">Logs</span></div>
+      <div class="hub-pill" onclick="nav('chat',this);loadChatPanel();"><div class="hub-pill-ic" style="color:var(--pink)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><span data-i18n="nav_chat">Chat</span><span id="chat-badge" style="display:none;background:#f87171;color:#fff;border-radius:8px;padding:1px 5px;font-size:9px;font-weight:700"></span></div>
+      <div class="hub-pill" onclick="nav('configs',this)"><div class="hub-pill-ic" style="color:var(--bl)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="4" x2="5" y2="20"/><circle cx="5" cy="10" r="2.2"/><line x1="12" y1="4" x2="12" y2="20"/><circle cx="12" cy="16" r="2.2"/><line x1="19" y1="4" x2="19" y2="20"/><circle cx="19" cy="7" r="2.2"/></svg></div><span data-i18n="nav_configs">Configs</span></div>
+      <div class="hub-pill" onclick="nav('system',this)"><div class="hub-pill-ic" style="color:var(--slate2)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/><rect x="10" y="10" width="4" height="4"/><line x1="9" y1="2" x2="9" y2="6"/><line x1="15" y1="2" x2="15" y2="6"/><line x1="9" y1="18" x2="9" y2="22"/><line x1="15" y1="18" x2="15" y2="22"/><line x1="2" y1="9" x2="6" y2="9"/><line x1="2" y1="15" x2="6" y2="15"/><line x1="18" y1="9" x2="22" y2="9"/><line x1="18" y1="15" x2="22" y2="15"/></svg></div><span data-i18n="nav_system">System</span><span id="update-badge" style="display:none;position:absolute;top:-4px;right:-4px;background:var(--am);color:#fff;border-radius:8px;padding:1px 5px;font-size:9px;font-weight:700"></span></div>
     </div>
     <div class="main">
 
@@ -467,30 +475,99 @@ function chatShowMessages(){
         </div>
         <div class="svc-arch-diagram">
         <style>
-          @keyframes mg-flow { to { stroke-dashoffset: -24; } }
           @keyframes mg-ring { 0%,100%{r:26;opacity:.55} 50%{r:31;opacity:0} }
           @keyframes mg-ring-hub { 0%,100%{r:38;opacity:.5} 50%{r:45;opacity:0} }
-          .mg-flow { stroke-dasharray: 6 6; animation: mg-flow 1.4s linear infinite; }
-          .mg-flow.slow { animation-duration: 2.2s; }
-          .mg-flow.off { opacity: 0.18; stroke: var(--off) !important; animation: none; stroke-dasharray: 4 8; }
+          .mg-flow { opacity: .38; transition: opacity .3s; }
+          .mg-flow.off { opacity: 0.18; stroke: var(--off) !important; }
           .mg-nc { transition: opacity .3s, filter .3s; }
           .mg-nc.dim { opacity: .3; filter: grayscale(1); }
           .mg-ring { animation: mg-ring 2.4s ease-out infinite; }
+          .mg-wave { fill: none; stroke-linecap: round; transition: opacity .3s; }
+          line#mg-l-rnode.off ~ .mg-wave-rnode,
+          line#mg-l-rns.off ~ .mg-wave-rns, line#mg-l-mqtt.off ~ .mg-wave-mqtt,
+          line#mg-l-i2p.off ~ .mg-wave-i2p, line#mg-l-nn.off ~ .mg-wave-nn,
+          line#mg-l-rb.off ~ .mg-wave-rb { opacity: 0; }
+          @media (prefers-reduced-motion: reduce) { .mg-wave { display: none; } }
         </style>
         <svg viewBox="0 0 700 480" style="display:block;width:100%;height:auto;max-height:460px">
           <defs>
-            <marker id="mg-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-              <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </marker>
+            <linearGradient id="mg-wg-rnode" gradientUnits="userSpaceOnUse" x1="350" y1="202" x2="350" y2="101">
+              <stop offset="-0.35" stop-color="var(--am)" stop-opacity="0"><animate attributeName="offset" values="-0.35;1.65" dur="1.8s" begin="0s" repeatCount="indefinite"/></stop>
+              <stop offset="-0.15" stop-color="var(--am)" stop-opacity="1"><animate attributeName="offset" values="-0.15;1.85" dur="1.8s" begin="0s" repeatCount="indefinite"/></stop>
+              <stop offset="0.05" stop-color="var(--am)" stop-opacity="0"><animate attributeName="offset" values="0.05;2.05" dur="1.8s" begin="0s" repeatCount="indefinite"/></stop>
+            </linearGradient>
+            <linearGradient id="mg-wg-rns" gradientUnits="userSpaceOnUse" x1="317.1" y1="221" x2="229.5" y2="171">
+              <stop offset="-0.35" stop-color="var(--bl)" stop-opacity="0"><animate attributeName="offset" values="-0.35;1.65" dur="1.8s" begin=".2s" repeatCount="indefinite"/></stop>
+              <stop offset="-0.15" stop-color="var(--bl)" stop-opacity="1"><animate attributeName="offset" values="-0.15;1.85" dur="1.8s" begin=".2s" repeatCount="indefinite"/></stop>
+              <stop offset="0.05" stop-color="var(--bl)" stop-opacity="0"><animate attributeName="offset" values="0.05;2.05" dur="1.8s" begin=".2s" repeatCount="indefinite"/></stop>
+            </linearGradient>
+            <linearGradient id="mg-wg-mqtt" gradientUnits="userSpaceOnUse" x1="382.9" y1="221" x2="470.5" y2="171">
+              <stop offset="-0.35" stop-color="var(--purple)" stop-opacity="0"><animate attributeName="offset" values="-0.35;1.65" dur="1.8s" begin=".4s" repeatCount="indefinite"/></stop>
+              <stop offset="-0.15" stop-color="var(--purple)" stop-opacity="1"><animate attributeName="offset" values="-0.15;1.85" dur="1.8s" begin=".4s" repeatCount="indefinite"/></stop>
+              <stop offset="0.05" stop-color="var(--purple)" stop-opacity="0"><animate attributeName="offset" values="0.05;2.05" dur="1.8s" begin=".4s" repeatCount="indefinite"/></stop>
+            </linearGradient>
+            <linearGradient id="mg-wg-i2p" gradientUnits="userSpaceOnUse" x1="382.9" y1="259" x2="470.5" y2="310">
+              <stop offset="-0.35" stop-color="var(--gr)" stop-opacity="0"><animate attributeName="offset" values="-0.35;1.65" dur="1.8s" begin=".6s" repeatCount="indefinite"/></stop>
+              <stop offset="-0.15" stop-color="var(--gr)" stop-opacity="1"><animate attributeName="offset" values="-0.15;1.85" dur="1.8s" begin=".6s" repeatCount="indefinite"/></stop>
+              <stop offset="0.05" stop-color="var(--gr)" stop-opacity="0"><animate attributeName="offset" values="0.05;2.05" dur="1.8s" begin=".6s" repeatCount="indefinite"/></stop>
+            </linearGradient>
+            <linearGradient id="mg-wg-nn" gradientUnits="userSpaceOnUse" x1="317.1" y1="259" x2="229.5" y2="310">
+              <stop offset="-0.35" stop-color="var(--indigo)" stop-opacity="0"><animate attributeName="offset" values="-0.35;1.65" dur="1.8s" begin=".8s" repeatCount="indefinite"/></stop>
+              <stop offset="-0.15" stop-color="var(--indigo)" stop-opacity="1"><animate attributeName="offset" values="-0.15;1.85" dur="1.8s" begin=".8s" repeatCount="indefinite"/></stop>
+              <stop offset="0.05" stop-color="var(--indigo)" stop-opacity="0"><animate attributeName="offset" values="0.05;2.05" dur="1.8s" begin=".8s" repeatCount="indefinite"/></stop>
+            </linearGradient>
+            <linearGradient id="mg-wg-rb" gradientUnits="userSpaceOnUse" x1="350" y1="278" x2="350" y2="379">
+              <stop offset="-0.35" stop-color="var(--sky)" stop-opacity="0"><animate attributeName="offset" values="-0.35;1.65" dur="1.8s" begin="1s" repeatCount="indefinite"/></stop>
+              <stop offset="-0.15" stop-color="var(--sky)" stop-opacity="1"><animate attributeName="offset" values="-0.15;1.85" dur="1.8s" begin="1s" repeatCount="indefinite"/></stop>
+              <stop offset="0.05" stop-color="var(--sky)" stop-opacity="0"><animate attributeName="offset" values="0.05;2.05" dur="1.8s" begin="1s" repeatCount="indefinite"/></stop>
+            </linearGradient>
+            <linearGradient id="mg-wg-rns-r" gradientUnits="userSpaceOnUse" x1="229.5" y1="171" x2="317.1" y2="221">
+              <stop offset="-0.35" stop-color="var(--bl)" stop-opacity="0"><animate attributeName="offset" values="-0.35;1.65" dur="1.8s" begin="1.1s" repeatCount="indefinite"/></stop>
+              <stop offset="-0.15" stop-color="var(--bl)" stop-opacity="1"><animate attributeName="offset" values="-0.15;1.85" dur="1.8s" begin="1.1s" repeatCount="indefinite"/></stop>
+              <stop offset="0.05" stop-color="var(--bl)" stop-opacity="0"><animate attributeName="offset" values="0.05;2.05" dur="1.8s" begin="1.1s" repeatCount="indefinite"/></stop>
+            </linearGradient>
+            <linearGradient id="mg-wg-mqtt-r" gradientUnits="userSpaceOnUse" x1="470.5" y1="171" x2="382.9" y2="221">
+              <stop offset="-0.35" stop-color="var(--purple)" stop-opacity="0"><animate attributeName="offset" values="-0.35;1.65" dur="1.8s" begin="1.3s" repeatCount="indefinite"/></stop>
+              <stop offset="-0.15" stop-color="var(--purple)" stop-opacity="1"><animate attributeName="offset" values="-0.15;1.85" dur="1.8s" begin="1.3s" repeatCount="indefinite"/></stop>
+              <stop offset="0.05" stop-color="var(--purple)" stop-opacity="0"><animate attributeName="offset" values="0.05;2.05" dur="1.8s" begin="1.3s" repeatCount="indefinite"/></stop>
+            </linearGradient>
+            <linearGradient id="mg-wg-i2p-r" gradientUnits="userSpaceOnUse" x1="470.5" y1="310" x2="382.9" y2="259">
+              <stop offset="-0.35" stop-color="var(--gr)" stop-opacity="0"><animate attributeName="offset" values="-0.35;1.65" dur="1.8s" begin="1.5s" repeatCount="indefinite"/></stop>
+              <stop offset="-0.15" stop-color="var(--gr)" stop-opacity="1"><animate attributeName="offset" values="-0.15;1.85" dur="1.8s" begin="1.5s" repeatCount="indefinite"/></stop>
+              <stop offset="0.05" stop-color="var(--gr)" stop-opacity="0"><animate attributeName="offset" values="0.05;2.05" dur="1.8s" begin="1.5s" repeatCount="indefinite"/></stop>
+            </linearGradient>
+            <linearGradient id="mg-wg-nn-r" gradientUnits="userSpaceOnUse" x1="229.5" y1="310" x2="317.1" y2="259">
+              <stop offset="-0.35" stop-color="var(--indigo)" stop-opacity="0"><animate attributeName="offset" values="-0.35;1.65" dur="1.8s" begin="1.7s" repeatCount="indefinite"/></stop>
+              <stop offset="-0.15" stop-color="var(--indigo)" stop-opacity="1"><animate attributeName="offset" values="-0.15;1.85" dur="1.8s" begin="1.7s" repeatCount="indefinite"/></stop>
+              <stop offset="0.05" stop-color="var(--indigo)" stop-opacity="0"><animate attributeName="offset" values="0.05;2.05" dur="1.8s" begin="1.7s" repeatCount="indefinite"/></stop>
+            </linearGradient>
+            <linearGradient id="mg-wg-rb-r" gradientUnits="userSpaceOnUse" x1="350" y1="379" x2="350" y2="278">
+              <stop offset="-0.35" stop-color="var(--sky)" stop-opacity="0"><animate attributeName="offset" values="-0.35;1.65" dur="1.8s" begin="1.9s" repeatCount="indefinite"/></stop>
+              <stop offset="-0.15" stop-color="var(--sky)" stop-opacity="1"><animate attributeName="offset" values="-0.15;1.85" dur="1.8s" begin="1.9s" repeatCount="indefinite"/></stop>
+              <stop offset="0.05" stop-color="var(--sky)" stop-opacity="0"><animate attributeName="offset" values="0.05;2.05" dur="1.8s" begin="1.9s" repeatCount="indefinite"/></stop>
+            </linearGradient>
           </defs>
 
           <!-- Spokes: hub to each service -->
-          <line id="mg-l-rnode" x1="350" y1="202" x2="350" y2="101" class="mg-flow slow" stroke="var(--am)" stroke-width="1.5" marker-end="url(#mg-arr)"/>
-          <line id="mg-l-rns"   x1="317.1" y1="221" x2="229.5" y2="171" class="mg-flow" stroke="var(--bl)" stroke-width="2" marker-end="url(#mg-arr)" marker-start="url(#mg-arr)"/>
-          <line id="mg-l-mqtt"  x1="382.9" y1="221" x2="470.5" y2="171" class="mg-flow slow" stroke="var(--purple)" stroke-width="1.5" marker-end="url(#mg-arr)" marker-start="url(#mg-arr)"/>
-          <line id="mg-l-i2p"   x1="382.9" y1="259" x2="470.5" y2="310" class="mg-flow slow" stroke="var(--gr)" stroke-width="1.5" marker-end="url(#mg-arr)" marker-start="url(#mg-arr)"/>
-          <line id="mg-l-nn"    x1="317.1" y1="259" x2="229.5" y2="310" class="mg-flow slow" stroke="var(--indigo)" stroke-width="1.5" marker-end="url(#mg-arr)" marker-start="url(#mg-arr)"/>
-          <line id="mg-l-rb"    x1="350" y1="278" x2="350" y2="379" class="mg-flow slow" stroke="var(--sky)" stroke-width="1.5" marker-end="url(#mg-arr)" marker-start="url(#mg-arr)"/>
+          <line id="mg-l-rnode" x1="350" y1="202" x2="350" y2="101" class="mg-flow" stroke="var(--am)" stroke-width="1.5"/>
+          <line id="mg-l-rns"   x1="317.1" y1="221" x2="229.5" y2="171" class="mg-flow" stroke="var(--bl)" stroke-width="1.5"/>
+          <line id="mg-l-mqtt"  x1="382.9" y1="221" x2="470.5" y2="171" class="mg-flow" stroke="var(--purple)" stroke-width="1.5"/>
+          <line id="mg-l-i2p"   x1="382.9" y1="259" x2="470.5" y2="310" class="mg-flow" stroke="var(--gr)" stroke-width="1.5"/>
+          <line id="mg-l-nn"    x1="317.1" y1="259" x2="229.5" y2="310" class="mg-flow" stroke="var(--indigo)" stroke-width="1.5"/>
+          <line id="mg-l-rb"    x1="350" y1="278" x2="350" y2="379" class="mg-flow" stroke="var(--sky)" stroke-width="1.5"/>
+
+          <!-- Traveling waves -->
+          <line class="mg-wave mg-wave-rnode" x1="350" y1="202" x2="350" y2="101" stroke="url(#mg-wg-rnode)" stroke-width="3" style="filter:drop-shadow(0 0 4px var(--am))"/>
+          <line class="mg-wave mg-wave-rns"   x1="317.1" y1="221" x2="229.5" y2="171" stroke="url(#mg-wg-rns)" stroke-width="3" style="filter:drop-shadow(0 0 4px var(--bl))"/>
+          <line class="mg-wave mg-wave-rns"   x1="317.1" y1="221" x2="229.5" y2="171" stroke="url(#mg-wg-rns-r)" stroke-width="3" style="filter:drop-shadow(0 0 4px var(--bl))"/>
+          <line class="mg-wave mg-wave-mqtt"  x1="382.9" y1="221" x2="470.5" y2="171" stroke="url(#mg-wg-mqtt)" stroke-width="3" style="filter:drop-shadow(0 0 4px var(--purple))"/>
+          <line class="mg-wave mg-wave-mqtt"  x1="382.9" y1="221" x2="470.5" y2="171" stroke="url(#mg-wg-mqtt-r)" stroke-width="3" style="filter:drop-shadow(0 0 4px var(--purple))"/>
+          <line class="mg-wave mg-wave-i2p"   x1="382.9" y1="259" x2="470.5" y2="310" stroke="url(#mg-wg-i2p)" stroke-width="3" style="filter:drop-shadow(0 0 4px var(--gr))"/>
+          <line class="mg-wave mg-wave-i2p"   x1="382.9" y1="259" x2="470.5" y2="310" stroke="url(#mg-wg-i2p-r)" stroke-width="3" style="filter:drop-shadow(0 0 4px var(--gr))"/>
+          <line class="mg-wave mg-wave-nn"    x1="317.1" y1="259" x2="229.5" y2="310" stroke="url(#mg-wg-nn)" stroke-width="3" style="filter:drop-shadow(0 0 4px var(--indigo))"/>
+          <line class="mg-wave mg-wave-nn"    x1="317.1" y1="259" x2="229.5" y2="310" stroke="url(#mg-wg-nn-r)" stroke-width="3" style="filter:drop-shadow(0 0 4px var(--indigo))"/>
+          <line class="mg-wave mg-wave-rb"    x1="350" y1="278" x2="350" y2="379" stroke="url(#mg-wg-rb)" stroke-width="3" style="filter:drop-shadow(0 0 4px var(--sky))"/>
+          <line class="mg-wave mg-wave-rb"    x1="350" y1="278" x2="350" y2="379" stroke="url(#mg-wg-rb-r)" stroke-width="3" style="filter:drop-shadow(0 0 4px var(--sky))"/>
 
           <!-- Line labels -->
           <text x="366" y="150" font-family="'JetBrains Mono',monospace" font-size="10" fill="var(--am)" text-anchor="middle">LoRa</text>
@@ -1202,13 +1279,6 @@ function chatShowMessages(){
     </style>
 
   </div>
-    <div class="hub-col right">
-      <div class="hub-pill" onclick="nav('i2p',this)"><div class="hub-pill-ic" style="color:var(--i2ptl)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6l7-3Z"/></svg></div><span data-i18n="nav_i2p">I2P</span></div>
-      <div class="hub-pill" onclick="nav('nomadnet',this);loadNomadnet();"><div class="hub-pill-ic" style="color:var(--sky)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15 9l-2 6-6 2 2-6 6-2Z"/></svg></div><span data-i18n="nav_nomadnet">Nomadnet</span></div>
-      <div class="hub-pill" onclick="nav('chat',this);loadChatPanel();"><div class="hub-pill-ic" style="color:var(--pink)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><span data-i18n="nav_chat">Chat</span><span id="chat-badge" style="display:none;background:#f87171;color:#fff;border-radius:8px;padding:1px 5px;font-size:9px;font-weight:700;margin-left:auto;flex-shrink:0"></span></div>
-      <div class="hub-pill" onclick="nav('logs',this)"><div class="hub-pill-ic" style="color:var(--slate)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9l3 3-3 3"/><line x1="12" y1="15" x2="17" y2="15"/></svg></div><span data-i18n="nav_logs">Logs</span></div>
-      <div class="hub-pill" onclick="nav('system',this)"><div class="hub-pill-ic" style="color:var(--slate2)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/><rect x="10" y="10" width="4" height="4"/><line x1="9" y1="2" x2="9" y2="6"/><line x1="15" y1="2" x2="15" y2="6"/><line x1="9" y1="18" x2="9" y2="22"/><line x1="15" y1="18" x2="15" y2="22"/><line x1="2" y1="9" x2="6" y2="9"/><line x1="2" y1="15" x2="6" y2="15"/><line x1="18" y1="9" x2="22" y2="9"/><line x1="18" y1="15" x2="22" y2="15"/></svg></div><span data-i18n="nav_system">System</span><span id="update-badge" style="display:none;position:absolute;top:-4px;right:-4px;background:var(--am);color:#fff;border-radius:8px;padding:1px 5px;font-size:9px;font-weight:700"></span></div>
-    </div>
   </div>
 </div>
 </div>
@@ -1317,6 +1387,8 @@ const I18N = {
     nav_services: "Services", nav_configs: "Configs", nav_addresses: "Addresses",
     nav_monitor: "Monitor", nav_rnode: "RNode", nav_i2p: "I2P", nav_nomadnet: "Nomadnet",
     nav_chat: "Chat", nav_logs: "Logs", nav_system: "System",
+    nav_group_network: "Network", nav_group_monitoring: "Monitoring",
+    nav_group_apps: "Apps", nav_group_settings: "Settings",
     sec_quick_commands: "Quick Commands", sec_maintenance: "Maintenance", sec_system: "System",
     sec_backup_restore: "Backup & Restore", sec_versions: "Versions", sec_chat_settings: "Chat Settings",
     sec_bridge_access: "Bridge Access Control", sec_chat_access: "Chat Access Control",
@@ -1403,6 +1475,8 @@ const I18N = {
   ru: {
     nav_services: "Сервисы", nav_configs: "Конфиги", nav_addresses: "Адреса",
     nav_monitor: "Монитор", nav_rnode: "RNode", nav_i2p: "I2P", nav_nomadnet: "Nomadnet",
+    nav_group_network: "Сеть", nav_group_monitoring: "Мониторинг",
+    nav_group_apps: "Приложения", nav_group_settings: "Настройка",
     nav_chat: "Чат", nav_logs: "Логи", nav_system: "Система",
     sec_quick_commands: "Быстрые команды", sec_maintenance: "Обслуживание", sec_system: "Система",
     sec_backup_restore: "Резервная копия", sec_versions: "Версии", sec_chat_settings: "Настройки чата",
@@ -1578,7 +1652,6 @@ async function loadServices(){
   const r=await fetch(API+"/api/services");
   const data=await r.json();
   const _d = I18N[localStorage.getItem("noema-lang")||"en"] || I18N.en;
-  if(window.meshSetStatus) data.forEach(s=>window.meshSetStatus(s.name,s.status==="active"));
   const left=document.getElementById("svc-list-left");
   const right=document.getElementById("svc-list-right");
   if(left) left.innerHTML=data.map(s=>`
@@ -3297,107 +3370,6 @@ fetch(API+"/api/chat/contacts").then(r=>r.json()).then(async d=>{
   }
   window.addEventListener('resize',()=>{resize();init();draw();});
   resize();init();draw();
-})();
-
-// ---- Mesh topology hero canvas ----
-(function(){
-  const canvas=document.getElementById('mesh-canvas');
-  if(!canvas) return;
-  const ctx=canvas.getContext('2d');
-  let W,H,dpr=Math.max(1,window.devicePixelRatio||1);
-
-  const nodes=[
-    {id:'gw',   label:'GW',       x:0.5,  y:0.5,  r:11, core:true, status:'on'},
-    {id:'rnsd', label:'RETICULUM',x:0.10, y:0.42, r:7,  status:'unknown', svc:'rnsd'},
-    {id:'lxmf', label:'LXMF',     x:0.90, y:0.42, r:7,  status:'unknown', svc:'noema_lxmf_bridge'},
-    {id:'i2p',  label:'I2P',      x:0.88, y:0.88, r:7,  status:'unknown', svc:'i2pd'},
-    {id:'nomad',label:'NOMADNET', x:0.12, y:0.88, r:7,  status:'unknown', svc:'nomadnet'},
-    {id:'rb',   label:'RBROWSER', x:0.5,  y:0.10, r:6,  status:'unknown', svc:'rbrowser'}
-  ];
-  const edges=[['gw','rnsd'],['gw','lxmf'],['gw','i2p'],['gw','nomad'],['gw','rb']];
-  let pulses=[], spawnTimer=0;
-
-  function statusColor(s){
-    if(s==='on') return getComputedStyle(document.documentElement).getPropertyValue('--gr').trim();
-    if(s==='off') return getComputedStyle(document.documentElement).getPropertyValue('--rd').trim();
-    return getComputedStyle(document.documentElement).getPropertyValue('--mu').trim();
-  }
-
-  function resize(){
-    const rect=canvas.getBoundingClientRect();
-    W=rect.width; H=rect.height;
-    canvas.width=W*dpr; canvas.height=H*dpr;
-    ctx.setTransform(dpr,0,0,dpr,0,0);
-  }
-  window.addEventListener('resize',()=>{resize();draw();});
-  resize();
-
-  function px(n){return {x:n.x*W,y:n.y*H};}
-  function find(id){for(const n of nodes) if(n.id===id) return n;}
-
-  function spawnPulse(){
-    const e=edges[Math.floor(Math.random()*edges.length)];
-    const fwd=Math.random()>0.5;
-    pulses.push({from:fwd?e[0]:e[1],to:fwd?e[1]:e[0],t:0,speed:0.007+Math.random()*0.006});
-  }
-
-  function draw(){
-    ctx.clearRect(0,0,W,H);
-    const line=getComputedStyle(document.documentElement).getPropertyValue('--bd').trim();
-    const amber=getComputedStyle(document.documentElement).getPropertyValue('--teal').trim();
-    const gw=px(find('gw'));
-
-    ctx.save();
-    ctx.strokeStyle=line; ctx.globalAlpha=.6; ctx.setLineDash([2,4]);
-    [0.35,0.62].forEach(f=>{ctx.beginPath();ctx.arc(gw.x,gw.y,f*Math.min(W,H),0,Math.PI*2);ctx.stroke();});
-    ctx.restore();
-
-    edges.forEach(e=>{
-      const a=px(find(e[0])),b=px(find(e[1]));
-      ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);
-      ctx.strokeStyle=line;ctx.lineWidth=1;ctx.stroke();
-    });
-
-    pulses.forEach(p=>{
-      const a=px(find(p.from)),b=px(find(p.to));
-      const x=a.x+(b.x-a.x)*p.t, y=a.y+(b.y-a.y)*p.t;
-      ctx.beginPath();ctx.arc(x,y,2.4,0,Math.PI*2);
-      ctx.fillStyle=amber;ctx.shadowColor=amber;ctx.shadowBlur=7;ctx.fill();ctx.shadowBlur=0;
-    });
-
-    nodes.forEach(n=>{
-      const p=px(n);
-      const col=n.core?amber:statusColor(n.status);
-      ctx.beginPath();ctx.arc(p.x,p.y,n.r,0,Math.PI*2);
-      ctx.fillStyle=n.core?amber:'rgba(0,0,0,0)';
-      if(n.core){ctx.shadowColor=amber;ctx.shadowBlur=7;ctx.fill();ctx.shadowBlur=0;}
-      ctx.lineWidth=n.core?0:1.5;
-      if(!n.core){ctx.strokeStyle=col;ctx.stroke();}
-      ctx.fillStyle=n.core?'#0b0f0c':col;
-      ctx.textAlign='center';ctx.textBaseline='middle';
-      ctx.font=(n.core?'700 9px ':'700 8px ')+"'JetBrains Mono',monospace";
-      if(n.core) ctx.fillText(n.label,p.x,p.y);
-      else if(H>=80){
-        if(n.y>0.5) ctx.fillText(n.label,p.x,p.y-n.r-8);
-        else ctx.fillText(n.label,p.x,p.y+n.r+10);
-      }
-    });
-  }
-
-  function frame(){
-    spawnTimer++;
-    if(spawnTimer>32){spawnTimer=0; if(pulses.length<6) spawnPulse();}
-    pulses.forEach(p=>p.t+=p.speed);
-    pulses=pulses.filter(p=>p.t<1);
-    draw();
-    requestAnimationFrame(frame);
-  }
-  requestAnimationFrame(frame);
-
-  window.meshSetStatus=function(svcName,active){
-    const n=nodes.find(n=>n.svc===svcName);
-    if(n) n.status=active?'on':'off';
-  };
 })();
 
 // CONFIGS MODE

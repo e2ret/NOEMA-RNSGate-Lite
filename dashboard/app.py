@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-__version__ = "1.6.1"
+__version__ = "1.7.0"
 import subprocess, threading, os
 from collections import deque
 from flask import Flask, jsonify, request, send_from_directory
@@ -1375,11 +1375,31 @@ def i2p_action():
         return jsonify({"ok":False,"error":"unknown action"}), 400
 
     if action == "install":
-        install_cmd = (
-            "wget -q -O - https://repo.i2pd.xyz/.help/add_repo | sudo bash -s - 2>&1 && "
-            "sudo apt-get update -qq 2>&1 && "
-            "sudo apt-get install -y i2pd 2>&1"
-        )
+        # Debian ships i2pd natively in its own repos — install directly,
+        # no need for the third-party repo.i2pd.xyz repository (which as
+        # of writing has a broken/unsigned release file for trixie and
+        # will fail to add: "repository is not signed").
+        distro_id = "unknown"
+        try:
+            with open("/etc/os-release") as f:
+                for line in f:
+                    if line.startswith("ID="):
+                        distro_id = line.strip().split("=", 1)[1].strip('"')
+                        break
+        except Exception:
+            pass
+
+        if distro_id == "debian":
+            install_cmd = (
+                "sudo apt-get update -qq 2>&1 && "
+                "sudo apt-get install -y i2pd 2>&1"
+            )
+        else:
+            install_cmd = (
+                "wget -q -O - https://repo.i2pd.xyz/.help/add_repo | sudo bash -s - 2>&1 && "
+                "sudo apt-get update -qq 2>&1 && "
+                "sudo apt-get install -y i2pd 2>&1"
+            )
         out, rc = sh(install_cmd)
         if rc == 0:
             sh("sudo systemctl enable --now i2pd")
