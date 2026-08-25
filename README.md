@@ -9,7 +9,7 @@
 
 ## Русский
 
-**Reticulum Mesh Gateway** — шлюз для сети Reticulum, объединяющий радиосвязь LoRa, LXMF мессенджер, MQTT-интеграцию с Home Assistant, анонимную сеть I2P, Nomadnet и современный веб-интерфейс управления.
+**RNOEMA RNSGate Lite** — шлюз для сети Reticulum, объединяющий радиосвязь LoRa, LXMF мессенджер, MQTT-интеграцию с Home Assistant, анонимную сеть I2P, Nomadnet и современный веб-интерфейс управления.
 
 ### Возможности
 - Reticulum Mesh (TCP/IP + LoRa через RNode)
@@ -87,7 +87,7 @@ IP-адрес устройства можно посмотреть в списк
 
 ## English
 
-**Reticulum Mesh Gateway** — a gateway for the Reticulum network, combining LoRa radio, the LXMF messenger, MQTT integration with Home Assistant, the anonymous I2P network, Nomadnet, and a modern web management interface.
+**NOEMA RNSGate Lite** — a gateway for the Reticulum network, combining LoRa radio, the LXMF messenger, MQTT integration with Home Assistant, the anonymous I2P network, Nomadnet, and a modern web management interface.
 
 ### Features
 - Reticulum Mesh (TCP/IP + LoRa via RNode)
