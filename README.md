@@ -9,7 +9,7 @@
 
 ## Русский
 
-**RNOEMA RNSGate Lite** — шлюз для сети Reticulum, объединяющий радиосвязь LoRa, LXMF мессенджер, MQTT-интеграцию с Home Assistant, анонимную сеть I2P, Nomadnet и современный веб-интерфейс управления.
+**NOEMA RNSGate Lite** — шлюз для сети Reticulum, объединяющий радиосвязь LoRa, LXMF мессенджер, MQTT-интеграцию с Home Assistant, анонимную сеть I2P, Nomadnet и современный веб-интерфейс управления.
 
 ### Возможности
 - Reticulum Mesh (TCP/IP + LoRa через RNode)
