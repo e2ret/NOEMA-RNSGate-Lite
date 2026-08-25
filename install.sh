@@ -74,66 +74,85 @@ fi
 
 cd "$INSTALL_DIR"
 
-# --- Install i2pd from bundled package ---
+# --- Install i2pd ---
 echo "[2b] Installing i2pd..."
 ARCH=$(uname -m)
-if [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then
-    I2PD_DEB="$INSTALL_DIR/packages/i2pd_2.61.0-1jammy1_arm64.deb"
-elif [ "$ARCH" = "armv7l" ] || [ "$ARCH" = "armhf" ]; then
-    I2PD_DEB="$INSTALL_DIR/packages/i2pd_2.61.0-1jammy1_armhf.deb"
-else
-    I2PD_DEB="$INSTALL_DIR/packages/i2pd_2.61.0-1jammy1_amd64.deb"
+
+# Detect distro so we don't force an Ubuntu-jammy-built .deb onto Debian
+# (different libc/OpenSSL ABI — can fail to install, or install broken).
+DISTRO_ID="unknown"
+if [ -f /etc/os-release ]; then
+    DISTRO_ID=$(. /etc/os-release && echo "$ID")
 fi
 
-if [ -f "$I2PD_DEB" ]; then
-    if sudo dpkg -i "$I2PD_DEB" 2>/dev/null; then
-        echo "      i2pd installed from bundle."
+install_i2pd_from_apt() {
+    apt-get update -qq 2>/dev/null || true
+    apt-get install -y i2pd 2>/dev/null
+}
+
+install_i2pd_from_github() {
+    echo "      [INFO] Downloading i2pd from GitHub releases..."
+    local ver="2.53.1"
+    local url
+    if [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then
+        url="https://github.com/PurpleI2P/i2pd/releases/download/${ver}/i2pd_${ver}_arm64.deb"
+    elif [ "$ARCH" = "armv7l" ] || [ "$ARCH" = "armhf" ]; then
+        url="https://github.com/PurpleI2P/i2pd/releases/download/${ver}/i2pd_${ver}_armhf.deb"
     else
-        echo "      [INFO] Bundle install failed, trying apt-get install -f..."
-        sudo apt-get install -f -y 2>/dev/null || true
+        url="https://github.com/PurpleI2P/i2pd/releases/download/${ver}/i2pd_${ver}_amd64.deb"
     fi
-    # Try apt install as fallback
-    if ! systemctl list-unit-files i2pd.service &>/dev/null; then
-        echo "      [INFO] i2pd service not found, trying apt..."
-        sudo apt-get install -y i2pd 2>/dev/null || true
-    fi
-    if systemctl list-unit-files i2pd.service &>/dev/null; then
-        sudo systemctl enable --now i2pd
-        echo "      i2pd service enabled."
+    if wget -q --timeout=60 -O /tmp/i2pd_gh.deb "$url" 2>/dev/null; then
+        dpkg -i /tmp/i2pd_gh.deb 2>/dev/null || apt-get install -f -y 2>/dev/null || true
+        rm -f /tmp/i2pd_gh.deb
+        echo "      i2pd installed from GitHub."
     else
-        echo "      [WARN] i2pd service not available, skipping."
+        echo "      [WARN] i2pd not available, skipping. Install manually later."
+    fi
+}
+
+if [ "$DISTRO_ID" = "debian" ]; then
+    # Debian ships i2pd in its own repos — use it directly, don't touch
+    # the Ubuntu-jammy-built bundle at all.
+    echo "      Debian detected — installing i2pd from the distro repository..."
+    if install_i2pd_from_apt; then
+        echo "      i2pd installed from apt."
+    else
+        echo "      [INFO] apt install failed, falling back to GitHub release..."
+        install_i2pd_from_github
     fi
 else
-    echo "      [INFO] Bundled i2pd not found, trying official repo..."
-    I2PD_APT_OK=0
-    if wget -q --timeout=15 -O /tmp/add_i2pd_repo.sh https://repo.i2pd.xyz/.help/add_repo 2>/dev/null; then
-        bash /tmp/add_i2pd_repo.sh 2>/dev/null || true
-        apt-get update -qq 2>/dev/null || true
-        apt-get install -y i2pd 2>/dev/null && I2PD_APT_OK=1
+    # Ubuntu / Armbian / other — prefer the bundled jammy package (fast,
+    # works offline), then fall back to apt / i2pd's own repo / GitHub.
+    if [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then
+        I2PD_DEB="$INSTALL_DIR/packages/i2pd_2.61.0-1jammy1_arm64.deb"
+    elif [ "$ARCH" = "armv7l" ] || [ "$ARCH" = "armhf" ]; then
+        I2PD_DEB="$INSTALL_DIR/packages/i2pd_2.61.0-1jammy1_armhf.deb"
+    else
+        I2PD_DEB="$INSTALL_DIR/packages/i2pd_2.61.0-1jammy1_amd64.deb"
     fi
-    if [ "$I2PD_APT_OK" -eq 0 ]; then
-        echo "      [INFO] APT repo unavailable, downloading from GitHub..."
-        ARCH=$(uname -m)
-        I2PD_VER="2.53.1"
-        if [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then
-            I2PD_DEB_URL="https://github.com/PurpleI2P/i2pd/releases/download/${I2PD_VER}/i2pd_${I2PD_VER}_arm64.deb"
-        elif [ "$ARCH" = "armv7l" ] || [ "$ARCH" = "armhf" ]; then
-            I2PD_DEB_URL="https://github.com/PurpleI2P/i2pd/releases/download/${I2PD_VER}/i2pd_${I2PD_VER}_armhf.deb"
-        else
-            I2PD_DEB_URL="https://github.com/PurpleI2P/i2pd/releases/download/${I2PD_VER}/i2pd_${I2PD_VER}_amd64.deb"
+
+    if [ -f "$I2PD_DEB" ] && sudo dpkg -i "$I2PD_DEB" 2>/dev/null; then
+        echo "      i2pd installed from bundle."
+        sudo apt-get install -f -y -qq 2>/dev/null || true
+    else
+        echo "      [INFO] Bundle unavailable or failed, trying apt..."
+        if ! install_i2pd_from_apt; then
+            echo "      [INFO] apt failed, trying i2pd's own repository..."
+            I2PD_APT_OK=0
+            if wget -q --timeout=15 -O /tmp/add_i2pd_repo.sh https://repo.i2pd.xyz/.help/add_repo 2>/dev/null; then
+                bash /tmp/add_i2pd_repo.sh 2>/dev/null || true
+                install_i2pd_from_apt && I2PD_APT_OK=1
+            fi
+            [ "$I2PD_APT_OK" -eq 0 ] && install_i2pd_from_github
         fi
-        if wget -q --timeout=60 -O /tmp/i2pd_gh.deb "$I2PD_DEB_URL" 2>/dev/null; then
-            dpkg -i /tmp/i2pd_gh.deb 2>/dev/null || apt-get install -f -y 2>/dev/null || true
-            rm -f /tmp/i2pd_gh.deb
-            echo "      i2pd installed from GitHub."
-        else
-            echo "      [WARN] i2pd not available, skipping. Install manually later."
-        fi
     fi
-    if systemctl list-unit-files i2pd.service &>/dev/null; then
-        systemctl enable --now i2pd
-        echo "      i2pd service enabled."
-    fi
+fi
+
+if systemctl list-unit-files i2pd.service &>/dev/null; then
+    sudo systemctl enable --now i2pd
+    echo "      i2pd service enabled."
+else
+    echo "      [WARN] i2pd service not available, skipping."
 fi
 
 # --- Fix i2pd file permissions for backup ---
