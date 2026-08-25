@@ -132,7 +132,7 @@ else
     fi
 
     if [ -f "$I2PD_DEB" ]; then
-        sudo dpkg -i "$I2PD_DEB" 2>/dev/null
+        sudo dpkg -i "$I2PD_DEB" 2>/dev/null || true
         # dpkg -i can exit non-zero here even though it unpacked the package
         # fine — jammy's i2pd .deb pulls in libboost-program-options1.74.0
         # and libminiupnpc17, which aren't installed by this point, so dpkg
