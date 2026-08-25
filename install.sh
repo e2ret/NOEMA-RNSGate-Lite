@@ -131,9 +131,19 @@ else
         I2PD_DEB="$INSTALL_DIR/packages/i2pd_2.61.0-1jammy1_amd64.deb"
     fi
 
-    if [ -f "$I2PD_DEB" ] && sudo dpkg -i "$I2PD_DEB" 2>/dev/null; then
-        echo "      i2pd installed from bundle."
+    if [ -f "$I2PD_DEB" ]; then
+        sudo dpkg -i "$I2PD_DEB" 2>/dev/null
+        # dpkg -i can exit non-zero here even though it unpacked the package
+        # fine — jammy's i2pd .deb pulls in libboost-program-options1.74.0
+        # and libminiupnpc17, which aren't installed by this point, so dpkg
+        # reports "dependency problems" and returns non-zero regardless of
+        # whether the unpack itself succeeded. Always run --fix-broken to
+        # pull in whatever's missing and finish configuring the package.
         sudo apt-get install -f -y -qq 2>/dev/null || true
+    fi
+
+    if command -v i2pd >/dev/null 2>&1; then
+        echo "      i2pd installed from bundle."
     else
         echo "      [INFO] Bundle unavailable or failed, trying apt..."
         if ! install_i2pd_from_apt; then
