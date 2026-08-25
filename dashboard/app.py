@@ -943,6 +943,69 @@ def _save_chat_msg(addr, msg):
         _chat_cleanup_files(max_mb=CHAT_FILES_MAX_MB)
     except: pass
 
+def _update_chat_msg_status(addr, msg_id, status):
+    _update_chat_msg_fields(addr, msg_id, status=status)
+
+def _update_chat_msg_fields(addr, msg_id, **fields):
+    """
+    Merge the given fields into a previously-saved outbound message,
+    found by its msg_id. Used both by LXMF's delivery/failed callbacks
+    and by the in-flight state watcher below.
+    """
+    with _chat_lock:
+        try:
+            try:
+                data = _chat_json.load(open(CHAT_FILE, encoding="utf-8"))
+            except:
+                return
+            for m in data.get(addr, []):
+                if m.get("msg_id") == msg_id:
+                    m.update(fields)
+                    break
+            else:
+                return
+            _chat_json.dump(data, open(CHAT_FILE, "w", encoding="utf-8"), ensure_ascii=False)
+        except: pass
+
+def _watch_lxm_state(msg, addr, msg_id):
+    """
+    Poll an in-flight LXMessage's state and delivery_attempts while it's
+    still being sent, so the UI can show retry progress (e.g. "sending,
+    attempt 2") instead of just a flat "sent" until the final delivered/
+    failed callback fires. Stops once a terminal state is reached, or
+    after a generous timeout so a stuck message doesn't loop forever.
+    """
+    import LXMF, time as _wt
+    terminal = (LXMF.LXMessage.DELIVERED, LXMF.LXMessage.FAILED, LXMF.LXMessage.CANCELLED, LXMF.LXMessage.REJECTED)
+    state_map = {
+        LXMF.LXMessage.GENERATING: "sending",
+        LXMF.LXMessage.OUTBOUND:   "sending",
+        LXMF.LXMessage.SENDING:    "sending",
+        LXMF.LXMessage.SENT:       "sent",
+        LXMF.LXMessage.DELIVERED:  "delivered",
+        LXMF.LXMessage.FAILED:     "failed",
+        LXMF.LXMessage.CANCELLED:  "failed",
+        LXMF.LXMessage.REJECTED:   "failed",
+    }
+    last_seen = None
+    for _ in range(120):  # ~2 minutes at 1s intervals, generous upper bound
+        try:
+            state = getattr(msg, "state", None)
+            attempts = getattr(msg, "delivery_attempts", 0)
+            snapshot = (state, attempts)
+            if snapshot != last_seen:
+                fields = {"attempts": attempts}
+                mapped = state_map.get(state)
+                if mapped:
+                    fields["status"] = mapped
+                _update_chat_msg_fields(addr, msg_id, **fields)
+                last_seen = snapshot
+            if state in terminal:
+                return
+        except Exception:
+            return
+        _wt.sleep(1)
+
 def _chat_cleanup_files(max_mb=50):
     import glob as _g
     max_bytes = max_mb * 1024 * 1024
@@ -1016,6 +1079,31 @@ def chat_address():
     except:
         return jsonify({"address": ""})
 
+@app.route("/api/chat/hops/<addr>")
+def chat_hops(addr):
+    """
+    Number of hops to a known destination, via RNS's own path table.
+    Only meaningful once a path has actually been discovered (e.g. after
+    an announce was heard, or a path request has resolved) — otherwise
+    RNS doesn't know a route yet and there's nothing to report.
+    """
+    try:
+        import sys as _sys, glob as _glob
+        _sp_paths = _glob.glob(f"{_HOME}/rns-env/lib/python*/site-packages") + \
+                    _glob.glob(f"{_HOME}/MeshGate/.venv/lib/python*/site-packages") + \
+                    _glob.glob(f"{_HOME}/NOEMA-RNSGate-Lite/.venv/lib/python*/site-packages")
+        if _sp_paths: _sys.path.insert(0, _sp_paths[0])
+        import RNS
+        dest_hash = bytes.fromhex(addr)
+        if not RNS.Transport.has_path(dest_hash):
+            # We don't know a route yet — ask for one so a future check can succeed
+            RNS.Transport.request_path(dest_hash)
+            return jsonify({"hops": None, "known": False})
+        hops = RNS.Transport.hops_to(dest_hash)
+        return jsonify({"hops": hops, "known": True})
+    except Exception as e:
+        return jsonify({"hops": None, "known": False, "error": str(e)})
+
 @app.route("/api/chat/contacts")
 def chat_contacts():
     return jsonify(_load_contacts())
@@ -1063,7 +1151,7 @@ def chat_send():
     _sp_paths = _glob.glob(f"{_HOME}/rns-env/lib/python*/site-packages") +                 _glob.glob(f"{_HOME}/MeshGate/.venv/lib/python*/site-packages") + \
                 _glob.glob(f"{_HOME}/NOEMA-RNSGate-Lite/.venv/lib/python*/site-packages")
     if _sp_paths: _sys.path.insert(0, _sp_paths[0])
-    import RNS, LXMF, time as _t
+    import RNS, LXMF, time as _t, uuid as _uuid
     data = request.get_json(silent=True) or {}
     dest_addr = data.get("to", "").strip().replace("<","").replace(">","")
     text = data.get("text", "").strip()
@@ -1101,9 +1189,28 @@ def chat_send():
                 fname = file_name or "file"
                 # Always use FILE_ATTACHMENTS field (0x05) - MeshChat format
                 msg.fields = {0x05: [[fname, fdata]]}
+
+        msg_id = _uuid.uuid4().hex
+
+        def _on_delivered(m):
+            _update_chat_msg_status(dest_addr, msg_id, "delivered")
+        def _on_failed(m):
+            _update_chat_msg_status(dest_addr, msg_id, "failed")
+        try:
+            msg.register_delivery_callback(_on_delivered)
+            msg.register_failed_callback(_on_failed)
+        except Exception:
+            pass  # older LXMF versions may not support one of these
+
         _chat_router.handle_outbound(msg)
+
+        # Watch delivery_attempts/state in the background so the UI can show
+        # retry progress, not just a flat "sent" until the final callback.
+        import threading as _watch_th
+        _watch_th.Thread(target=_watch_lxm_state, args=(msg, dest_addr, msg_id), daemon=True).start()
+
         ts = int(_t.time())
-        record = {"ts": ts, "from": "me", "to": dest_addr, "text": text, "direction": "out"}
+        record = {"ts": ts, "from": "me", "to": dest_addr, "text": text, "direction": "out", "msg_id": msg_id, "status": "sent", "attempts": 0}
         if file_id:
             record.update({"file_id": file_id, "file_name": file_name, "file_size": file_size, "file_mime": file_mime})
         _save_chat_msg(dest_addr, record)

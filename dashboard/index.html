@@ -893,6 +893,7 @@ function chatShowMessages(){
                 <button id="chat-rename-btn" class="sys-btn" style="display:none;padding:2px 8px;font-size:11px" onclick="chatRenameContact()">✏</button>
               </div>
               <div id="chat-peer-addr" style="font-size:10px;color:var(--mu);font-family:var(--fn)"></div>
+              <div id="chat-peer-hops" style="font-size:10px;color:var(--mu);font-family:var(--fn);margin-top:2px;display:none"></div>
             </div>
             <button id="chat-remove-btn" class="sys-btn rd" style="display:none;padding:2px 8px;font-size:11px" onclick="chatRemoveContact()" data-i18n="btn_remove">Remove</button>
           </div>
@@ -1471,6 +1472,8 @@ const I18N = {
     txt_tg_bridge_msgs: "LXMF Bridge messages", txt_tg_chat_msgs: "Chat messages",
     btn_test: "Test", txt_enabled: "Enabled",
     txt_notif_sound: "Notification sound", txt_volume: "Volume", btn_add_lc: "Add",
+    txt_hop: "hop", txt_hops: "hops", txt_hops_away: "away",
+    txt_attempt_n: "attempt {n}",
   },
   ru: {
     nav_services: "Сервисы", nav_configs: "Конфиги", nav_addresses: "Адреса",
@@ -1560,6 +1563,8 @@ const I18N = {
     txt_tg_bridge_msgs: "Сообщения LXMF Bridge", txt_tg_chat_msgs: "Сообщения чата",
     btn_test: "Тест", txt_enabled: "Включено",
     txt_notif_sound: "Звук уведомления", txt_volume: "Громкость", btn_add_lc: "Добавить",
+    txt_hop: "хоп", txt_hops: "хопов", txt_hops_away: "отсюда",
+    txt_attempt_n: "попытка {n}",
   }
 };
 
@@ -2240,11 +2245,12 @@ async function chatSend(){
   try{
     await fetch(API+"/api/chat/send", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({to:chatCurrentAddr, text})});
     const r = await fetch(API+"/api/chat/history/"+chatCurrentAddr);
-    renderChatMsgs(await r.json());
+    renderChatMsgs(await r.json(), true);
   }catch(e){}
 }
 
 let chatCurrentAddr = null;
+let chatLastRenderedMsgs = [];
 let chatContacts = [];
 let chatPollTimer = null;
 let chatLastTs = Math.floor(Date.now()/1000);
@@ -2289,15 +2295,33 @@ async function openChat(addr, name){
   document.getElementById("chat-remove-btn").style.display = "block";
   document.getElementById("chat-rename-btn").style.display = "block";
   renderChatContacts();
+  loadChatHops(addr);
   const r = await fetch(API+"/api/chat/history/"+addr);
   const msgs = await r.json();
-  renderChatMsgs(msgs);
+  renderChatMsgs(msgs, true);
   if(msgs.length) chatLastTs = Math.max(chatLastTs, ...msgs.map(m=>m.ts));
 }
 
-function renderChatMsgs(msgs){
+async function loadChatHops(addr){
+  const el = document.getElementById("chat-peer-hops");
+  el.style.display = "none";
+  try{
+    const r = await fetch(API+"/api/chat/hops/"+addr);
+    const d = await r.json();
+    if(addr !== chatCurrentAddr) return; // user already switched contacts
+    if(d.known && d.hops !== null && d.hops !== undefined){
+      el.textContent = d.hops + " " + (d.hops === 1 ? t("txt_hop") : t("txt_hops")) + " " + t("txt_hops_away");
+      el.style.display = "block";
+    }
+  }catch(e){}
+}
+
+
+function renderChatMsgs(msgs, forceScroll){
+  chatLastRenderedMsgs = msgs;
   const box = document.getElementById("chat-messages");
   if(!box) return;
+  const wasNearBottom = forceScroll || (box.scrollHeight - box.scrollTop - box.clientHeight) < 80;
   box.innerHTML = msgs.filter(m => m.text || m.file_id).map(m => {
     const isOut = m.direction==="out";
     const time = new Date(m.ts*1000).toLocaleTimeString("ru",{hour:"2-digit",minute:"2-digit"});
@@ -2316,11 +2340,23 @@ function renderChatMsgs(msgs){
     return `<div style="display:flex;justify-content:${isOut?'flex-end':'flex-start'}">
       <div style="background:${isOut?'var(--s2)':'var(--s1)'};border:1px solid ${isOut?'var(--bd)':'var(--teal)'};border-radius:${isOut?'2px 2px 0 2px':'2px 2px 2px 0'};padding:7px 12px;max-width:75%">
         ${body}
-        <div style="font-size:10px;color:var(--mu);margin-top:3px;text-align:${isOut?'right':'left'}">${time}${isOut?' ✓':''}</div>
+        <div style="font-size:10px;color:var(--mu);margin-top:3px;text-align:${isOut?'right':'left'}">${time}<span id="${m.msg_id?'msg-status-'+m.msg_id:''}">${isOut?chatStatusIcon(m.status, m.attempts):''}</span></div>
       </div>
     </div>`;
   }).join("");
-  box.scrollTop = box.scrollHeight;
+  if(wasNearBottom) box.scrollTop = box.scrollHeight;
+}
+
+function chatStatusIcon(status, attempts){
+  if(status === "delivered") return ' <span style="color:var(--teal)">✓✓</span>';
+  if(status === "failed") return ' <span style="color:var(--rd,#f87171)">✕</span>';
+  if(status === "sending"){
+    const n = attempts && attempts > 0 ? attempts : 1;
+    const label = t("txt_attempt_n").replace("{n}", n);
+    return ` <span style="color:var(--mu)">⟳ ${label}</span>`;
+  }
+  // "sent", or missing status on older messages saved before this feature — plain single check
+  return ' ✓';
 }
 
 let _accessWhitelist = [];
@@ -2538,6 +2574,43 @@ function chatPushNotify(name, text){
   }
 }
 
+function chatHasPendingStatus(){
+  return chatLastRenderedMsgs.some(m => m.direction === "out" && (!m.status || m.status === "sent" || m.status === "sending"));
+}
+
+async function pollChatStatus(){
+  if(!chatCurrentAddr) return;
+  if(!chatHasPendingStatus()) return; // nothing pending — skip the fetch entirely
+  try{
+    const r = await fetch(API+"/api/chat/history/"+chatCurrentAddr);
+    const all = await r.json();
+    patchChatStatuses(all);
+  }catch(e){}
+}
+
+function patchChatStatuses(all){
+  // Surgical update: only touch the status span of messages whose status
+  // or attempt count actually changed since last render. Messages already
+  // at a final status (delivered/failed) are left completely alone — no
+  // DOM write, no re-render, no scroll interaction — once resolved, a
+  // message is done being polled/touched for good.
+  const prevById = {};
+  for(const m of chatLastRenderedMsgs) if(m.msg_id) prevById[m.msg_id] = m;
+  let anyChanged = false;
+  for(const m of all){
+    if(!m.msg_id) continue;
+    const prev = prevById[m.msg_id];
+    if(prev && prev.status === m.status && prev.attempts === m.attempts) continue; // unchanged, skip
+    const el = document.getElementById("msg-status-"+m.msg_id);
+    if(el) el.innerHTML = chatStatusIcon(m.status, m.attempts);
+    anyChanged = true;
+  }
+  // Keep our bookkeeping in sync so chatHasPendingStatus() reflects reality
+  // (and so the poller naturally stops once nothing is pending anymore),
+  // without triggering a full re-render for what was just a status patch.
+  if(anyChanged) chatLastRenderedMsgs = all;
+}
+
 async function pollChatIncoming(){
   try{
     // Load contacts if not yet loaded
@@ -2643,7 +2716,7 @@ async function sendChatMsg(){
   if(d.ok){
     const r2 = await fetch(API+"/api/chat/history/"+chatCurrentAddr);
     const all = await r2.json();
-    renderChatMsgs(all);
+    renderChatMsgs(all, true);
     chatLastTs = Math.max(chatLastTs, d.ts);
   } else {
     toast("Error: "+(d.error||"unknown"),false);
@@ -3334,6 +3407,7 @@ setInterval(pollLxmf, 3000 * _pollMul);
 setInterval(updateTopology, 10000 * _pollMul);
 updateTopology();
 setInterval(pollChatIncoming, 5000 * _pollMul);
+setInterval(pollChatStatus, 3000 * _pollMul);
 if("Notification" in window && Notification.permission === "default"){ Notification.requestPermission(); }
 // Load contacts and initialize chatLastTs from history at startup
 fetch(API+"/api/chat/contacts").then(r=>r.json()).then(async d=>{
