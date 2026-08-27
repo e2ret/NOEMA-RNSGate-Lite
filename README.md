@@ -11,6 +11,8 @@
 
 **NOEMA RNSGate Lite** — шлюз для сети Reticulum, объединяющий радиосвязь LoRa, LXMF мессенджер, MQTT-интеграцию с Home Assistant, анонимную сеть I2P, Nomadnet и современный веб-интерфейс управления.
 
+> 🔬 Хотите больше? Посмотрите **[NOEMA RNSGate FULL](https://github.com/e2ret/NOEMA-RNSGate-FULL)** — версию с Radio Observatory: реальные данные RSSI/SNR/Noise от RNode, карта сети с хопами, лог RF-пакетов, детекция помех и браузерный терминал.
+
 ### Возможности
 - Reticulum Mesh (TCP/IP + LoRa через RNode)
 - LXMF Bridge → MQTT → Home Assistant
@@ -88,6 +90,8 @@ IP-адрес устройства можно посмотреть в списк
 ## English
 
 **NOEMA RNSGate Lite** — a gateway for the Reticulum network, combining LoRa radio, the LXMF messenger, MQTT integration with Home Assistant, the anonymous I2P network, Nomadnet, and a modern web management interface.
+
+> 🔬 Want more? Check out **[NOEMA RNSGate FULL](https://github.com/e2ret/NOEMA-RNSGate-FULL)** — the version with Radio Observatory: real RSSI/SNR/Noise data from RNode, network map with hop rings, RF packet log, interference detection and browser terminal.
 
 ### Features
 - Reticulum Mesh (TCP/IP + LoRa via RNode)
