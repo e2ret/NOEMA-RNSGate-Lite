@@ -85,6 +85,14 @@ IP-адрес устройства можно посмотреть в списк
 
 Спасибо всем разработчикам, благодаря которым экосистема Reticulum продолжает развиваться.
 
+## Поддержать проект
+Если проект полезен, буду рад поддержке.
+
+| Сеть | Адрес |
+|------|-------|
+| **USDT TRC20** | `TD89XXL9ehwhp4WysfqHSBGJjxxdoaVsYD` |
+| **TON** | `UQCmROnKeaWIt5Uxu3MTebKUjYQHuvVeyOauWdVn6srUWKX8` |
+
 ---
 
 ## English
@@ -164,3 +172,11 @@ Minimum requirements: ~256 MB RAM, ~2 GB disk for a full install.
 **Mark Qvist** — Reticulum, LXMF, Nomadnet · **fr33n0w** — rBrowser · **PurpleI2P Team** — i2pd
 
 Thanks to all the developers who keep the Reticulum ecosystem growing.
+
+## Support the project
+If you find this useful, donations are welcome.
+
+| Network | Address |
+|---------|---------|
+| **USDT TRC20** | `TD89XXL9ehwhp4WysfqHSBGJjxxdoaVsYD` |
+| **TON** | `UQCmROnKeaWIt5Uxu3MTebKUjYQHuvVeyOauWdVn6srUWKX8` |
