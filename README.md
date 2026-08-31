@@ -92,7 +92,7 @@ IP-адрес устройства можно посмотреть в списк
 
 ![TON](https://img.shields.io/badge/TON-0098EA?style=flat&logo=ton&logoColor=white) `UQCmROnKeaWIt5Uxu3MTebKUjYQHuvVeyOauWdVn6srUWKX8`
 
-[![Boosty](https://img.shields.io/badge/Boosty-E55F2A?style=flat&logo=boosty&logoColor=E55F2A&labelColor=white&label=)](https://boosty.to/e2ret)
+[![Boosty](https://img.shields.io/badge/Boosty-E55F2A?style=flat&logo=boosty&logoColor=white)](https://boosty.to/noemarns/donate)
 
 ## Контакты
 
